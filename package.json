@@ -1,6 +1,29 @@
 {
   "name": "honox",
   "version": "0.0.0",
-  "main": "index.js",
-  "license": "MIT"
+  "main": "dist/index.js",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "author": "Yusuke Wada <yusuke@kamawada.com> (https://github.com/yusukebe)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/honojs/honox.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "homepage": "https://hono.dev",
+  "packageManager": "yarn@4.0.2",
+  "devDependencies": {
+    "@hono/eslint-config": "^0.0.3",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.14.1"
+  }
 }
