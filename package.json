@@ -3,9 +3,75 @@
   "version": "0.0.0",
   "main": "dist/index.js",
   "type": "module",
+  "scripts": {
+    "test": "yarn typecheck && yarn test:unit && yarn test:integration",
+    "test:unit": "vitest --run test/unit",
+    "test:integration": "yarn test:integration:api && yarn test:integration:hono-jsx",
+    "test:integration:hono-jsx": "vitest run -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts",
+    "test:integration:api": "vitest run -c ./test/api/vitest.config.ts ./test/api/integration.test.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsup && publint",
+    "watch": "tsup --watch",
+    "lint": "eslint src/**.ts",
+    "lint:fix": "eslint src/**.ts --fix",
+    "prerelease": "yarn test && yarn build",
+    "release": "np"
+  },
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    },
+    "./factory": {
+      "types": "./dist/factory/index.d.ts",
+      "import": "./dist/factory/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    },
+    "./utils/*": {
+      "types": "./dist/utils/*.d.ts",
+      "import": "./dist/utils/*.js"
+    },
+    "./vite": {
+      "types": "./dist/vite/index.d.ts",
+      "import": "./dist/vite/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "types": [
+        "./dist/types"
+      ],
+      "factory": [
+        "./dist/factory"
+      ],
+      "server": [
+        "./dist/server"
+      ],
+      "client": [
+        "./dist/client"
+      ],
+      "utils/*": [
+        "./dist/utils/*"
+      ],
+      "vite": [
+        "./dist/vite"
+      ]
+    }
+  },
   "author": "Yusuke Wada <yusuke@kamawada.com> (https://github.com/yusukebe)",
   "license": "MIT",
   "repository": {
@@ -16,13 +82,28 @@
     "registry": "https://registry.npmjs.org"
   },
   "homepage": "https://hono.dev",
-  "packageManager": "yarn@4.0.2",
+  "dependencies": {
+    "@babel/generator": "^7.23.6",
+    "@babel/parser": "^7.23.6",
+    "@babel/traverse": "^7.23.6",
+    "@babel/types": "^7.23.6",
+    "@hono/vite-dev-server": "^0.3.2"
+  },
   "devDependencies": {
     "@hono/eslint-config": "^0.0.3",
+    "@types/babel__generator": "^7",
+    "@types/babel__traverse": "^7",
+    "@types/node": "^20.10.5",
     "eslint": "^8.56.0",
+    "glob": "^10.3.10",
+    "hono": "^3.11.9",
     "prettier": "^3.1.1",
-    "typescript": "^5.3.3"
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vitest": "^1.1.0"
   },
+  "packageManager": "yarn@4.0.2",
   "engines": {
     "node": ">=18.14.1"
   }
