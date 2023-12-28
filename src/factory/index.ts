@@ -1,1 +1,1 @@
-export { createRoute } from './factory.js'
+export { createRoute, createHono } from './factory.js'

@@ -413,16 +413,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hono/vite-dev-server@npm:^0.3.2":
-  version: 0.3.2
-  resolution: "@hono/vite-dev-server@npm:0.3.2"
+"@hono/vite-dev-server@npm:^0.3.4":
+  version: 0.3.4
+  resolution: "@hono/vite-dev-server@npm:0.3.4"
   dependencies:
     "@hono/node-server": "npm:^1.2.0"
-    miniflare: "npm:^3.20231016.0"
+    miniflare: "npm:^3.20231030.4"
     minimatch: "npm:^9.0.3"
   peerDependencies:
     hono: ">=3.11.7"
-  checksum: 708ac1875d6c804005cdd5e82f3e4f80c368b928202c7cdc9e0e75e4eff8bca422ca6acf360e616e4ccff950d1a93b83198ef818e7dd003071d70dcd3cda834a
+  checksum: 9899fc9fdd65f1acee8862b780fd4dcf12d58eb3b53a94a7bbe4e32f7638e75c166d3e6c9a1be3ae92ec4e526ca08b1721c73bbe9a0f0bb7733607f5aa5487f2
   languageName: node
   linkType: hard
 
@@ -2438,10 +2438,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:^3.11.9":
-  version: 3.11.9
-  resolution: "hono@npm:3.11.9"
-  checksum: 5f02e077aaf91bca06ad9b6c6f6cf0b8dd196ea2b01061eb09cf940fe7ba850c8dce25021c44d47aa7e8d26a4be073d823e3fe10dd392b9ca3c82c9829bbafe8
+"hono@npm:^3.11.11":
+  version: 3.11.11
+  resolution: "hono@npm:3.11.11"
+  checksum: 2f061d296a6cca6b32e5f4857477e00a19b2cb94927bbc167b70400f79911ac2d1a24a572b24bbb1bd25652fc1829b3ebcb33f142b46c26b18a4080ebdcb3c22
   languageName: node
   linkType: hard
 
@@ -2454,13 +2454,13 @@ __metadata:
     "@babel/traverse": "npm:^7.23.6"
     "@babel/types": "npm:^7.23.6"
     "@hono/eslint-config": "npm:^0.0.3"
-    "@hono/vite-dev-server": "npm:^0.3.2"
+    "@hono/vite-dev-server": "npm:^0.3.4"
     "@types/babel__generator": "npm:^7"
     "@types/babel__traverse": "npm:^7"
     "@types/node": "npm:^20.10.5"
     eslint: "npm:^8.56.0"
     glob: "npm:^10.3.10"
-    hono: "npm:^3.11.9"
+    hono: "npm:^3.11.11"
     prettier: "npm:^3.1.1"
     publint: "npm:^0.2.7"
     tsup: "npm:^8.0.1"
@@ -3059,7 +3059,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"miniflare@npm:^3.20231016.0":
+"miniflare@npm:^3.20231030.4":
   version: 3.20231030.4
   resolution: "miniflare@npm:3.20231030.4"
   dependencies:

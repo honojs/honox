@@ -87,7 +87,7 @@
     "@babel/parser": "^7.23.6",
     "@babel/traverse": "^7.23.6",
     "@babel/types": "^7.23.6",
-    "@hono/vite-dev-server": "^0.3.2"
+    "@hono/vite-dev-server": "^0.3.4"
   },
   "devDependencies": {
     "@hono/eslint-config": "^0.0.3",
@@ -96,7 +96,7 @@
     "@types/node": "^20.10.5",
     "eslint": "^8.56.0",
     "glob": "^10.3.10",
-    "hono": "^3.11.9",
+    "hono": "^3.11.11",
     "prettier": "^3.1.1",
     "publint": "^0.2.7",
     "tsup": "^8.0.1",

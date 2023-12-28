@@ -67,7 +67,7 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
   const applyRenderer = (rendererFile: string) => {
     const renderer = RENDERER_FILE[rendererFile]
     const path = pathToDirectoryPath(rendererFile).replace(rootRegExp, '')
-    app.get(`${filePathToPath(path)}*`, renderer.default)
+    app.all(`${filePathToPath(path)}*`, renderer.default)
   }
 
   // Routes
@@ -117,7 +117,6 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
       // Instance of Hono
       if (routeDefault && 'fetch' in routeDefault) {
         subApp.route(path, routeDefault)
-        continue
       }
 
       // export const POST = factory.createHandlers(...)
