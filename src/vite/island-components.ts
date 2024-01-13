@@ -32,7 +32,7 @@ import {
 import type { Plugin } from 'vite'
 import { COMPONENT_NAME, DATA_SERIALIZED_PROPS } from '../constants.js'
 
-function addSSRCheck(funcName: string, componentName: string) {
+function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
   const isSSR = memberExpression(
     memberExpression(identifier('import'), identifier('meta')),
     identifier('env.SSR')
@@ -70,7 +70,11 @@ function addSSRCheck(funcName: string, componentName: string) {
   )
 
   const returnStmt = returnStatement(conditionalExpression(isSSR, ssrElement, clientElement))
-  return functionExpression(null, [identifier('props')], blockStatement([returnStmt]))
+  const functionExpr = functionExpression(null, [identifier('props')], blockStatement([returnStmt]))
+  if (isAsync) {
+    functionExpr.async = true
+  }
+  return functionExpr
 }
 
 export const transformJsxTags = (contents: string, componentName: string) => {
@@ -85,18 +89,23 @@ export const transformJsxTags = (contents: string, componentName: string) => {
         if (path.node.declaration.type === 'FunctionDeclaration') {
           const functionId = path.node.declaration.id
           if (!functionId) return
+          const isAsync = path.node.declaration.async
           const originalFunctionId = identifier(functionId.name + 'Original')
 
+          const originalFunction = functionExpression(
+            null,
+            path.node.declaration.params,
+            path.node.declaration.body
+          )
+          if (isAsync) {
+            originalFunction.async = true
+          }
+
           path.insertBefore(
-            variableDeclaration('const', [
-              variableDeclarator(
-                originalFunctionId,
-                functionExpression(null, path.node.declaration.params, path.node.declaration.body)
-              ),
-            ])
+            variableDeclaration('const', [variableDeclarator(originalFunctionId, originalFunction)])
           )
 
-          const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName)
+          const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName, isAsync)
           const wrappedFunctionId = identifier('Wrapped' + functionId.name)
           path.replaceWith(
             variableDeclaration('const', [variableDeclarator(wrappedFunctionId, wrappedFunction)])
