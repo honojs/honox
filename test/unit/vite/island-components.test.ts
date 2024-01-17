@@ -20,4 +20,20 @@ export default WrappedBadge;`
     const code = transformJsxTags('', 'Badge.tsx')
     expect(code).toBe('')
   })
+
+  it('async', () => {
+    const code = `export default async function AsyncComponent() {
+      return <h1>Hello</h1>
+    }`
+    const result = transformJsxTags(code, 'AsyncComponent.tsx')
+    expect(result).toBe(
+      `const AsyncComponentOriginal = async function () {
+  return <h1>Hello</h1>;
+};
+const WrappedAsyncComponent = async function (props) {
+  return import.meta.env.SSR ? <honox-island component-name="AsyncComponent.tsx" data-serialized-props={JSON.stringify(props)}><AsyncComponentOriginal {...props}></AsyncComponentOriginal></honox-island> : <AsyncComponentOriginal {...props}></AsyncComponentOriginal>;
+};
+export default WrappedAsyncComponent;`
+    )
+  })
 })
