@@ -14,5 +14,6 @@ jobs:
         with:
           node-version: 20.x
       - run: yarn install --frozen-lockfile
+      - run: npx playwright install --with-deps
       - run: yarn build
       - run: yarn test
