@@ -55,6 +55,20 @@ export const groupByDirectory = <T = unknown>(files: Record<string, T>) => {
   return organizedFiles
 }
 
+export const sortDirectoriesByDepth = <T>(directories: Record<string, T>) => {
+  const sortedKeys = Object.keys(directories).sort((a, b) => {
+    const depthA = a.split('/').length
+    const depthB = b.split('/').length
+    return depthB - depthA
+  })
+
+  const sortedDirectories: Record<string, T>[] = sortedKeys.map((key) => {
+    return { [key]: directories[key] }
+  })
+
+  return sortedDirectories
+}
+
 /*
     /app/routes/_renderer.tsx
     /app/routes/blog/_renderer.tsx

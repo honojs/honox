@@ -3,6 +3,7 @@ import {
   groupByDirectory,
   listByDirectory,
   pathToDirectoryPath,
+  sortDirectoriesByDepth,
 } from '../../../src/utils/file.js'
 
 describe('filePathToPath', () => {
@@ -52,6 +53,40 @@ describe('groupByDirectory', () => {
         'comments.tsx': 'file6',
       },
     })
+  })
+})
+
+describe('sortDirectoriesByDepth', () => {
+  it('Should sort directories by the depth', () => {
+    expect(
+      sortDirectoriesByDepth({
+        '/app/routes': {
+          'index.tsx': 'file1',
+        },
+        '/app/routes/blog/posts': {
+          'index.tsx': 'file2',
+        },
+        '/app/routes/blog': {
+          'index.tsx': 'file3',
+        },
+      })
+    ).toEqual([
+      {
+        '/app/routes/blog/posts': {
+          'index.tsx': 'file2',
+        },
+      },
+      {
+        '/app/routes/blog': {
+          'index.tsx': 'file3',
+        },
+      },
+      {
+        '/app/routes': {
+          'index.tsx': 'file1',
+        },
+      },
+    ])
   })
 })
 
