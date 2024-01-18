@@ -5,6 +5,7 @@ export default jsxRenderer(({ children, title }) => {
     <html>
       <head>
         <title>{title}</title>
+        <script type='module' src='/app/client.ts'></script>
       </head>
       <body>{children}</body>
     </html>

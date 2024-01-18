@@ -4,11 +4,12 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "yarn typecheck && yarn test:unit && yarn test:integration",
+    "test": "yarn typecheck && yarn test:unit && yarn test:integration && yarn test:e2e",
     "test:unit": "vitest --run test/unit",
     "test:integration": "yarn test:integration:api && yarn test:integration:hono-jsx",
     "test:integration:hono-jsx": "vitest run -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts",
     "test:integration:api": "vitest run -c ./test/api/vitest.config.ts ./test/api/integration.test.ts",
+    "test:e2e": "playwright test -c ./test/hono-jsx/playwright.config.ts ./test/hono-jsx/e2e.test.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsup && publint",
     "watch": "tsup --watch",
@@ -91,6 +92,7 @@
   },
   "devDependencies": {
     "@hono/eslint-config": "^0.0.3",
+    "@playwright/test": "^1.41.0",
     "@types/babel__generator": "^7",
     "@types/babel__traverse": "^7",
     "@types/node": "^20.10.5",

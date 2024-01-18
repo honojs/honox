@@ -1,3 +1,5 @@
+import { jsx as jsxFn } from 'hono/jsx'
+import { render } from 'hono/jsx/dom'
 import { COMPONENT_NAME, DATA_SERIALIZED_PROPS } from '../constants.js'
 import type { CreateElement, Hydrate } from '../types.js'
 
@@ -5,15 +7,15 @@ import type { CreateElement, Hydrate } from '../types.js'
 type FileCallback = () => Promise<{ default: Promise<any> }>
 
 export type ClientOptions = {
-  hydrate: Hydrate
-  createElement: CreateElement
+  hydrate?: Hydrate
+  createElement?: CreateElement
   ISLAND_FILES?: Record<string, () => Promise<unknown>>
   island_root?: string
 }
 
-export const createClient = async (options: ClientOptions) => {
-  const FILES = options.ISLAND_FILES ?? import.meta.glob('/app/islands/**/[a-zA-Z0-9[-]+.(tsx|ts)')
-  const root = options.island_root ?? '/app/islands/'
+export const createClient = async (options?: ClientOptions) => {
+  const FILES = options?.ISLAND_FILES ?? import.meta.glob('/app/islands/**/[a-zA-Z0-9[-]+.(tsx|ts)')
+  const root = options?.island_root ?? '/app/islands/'
 
   const hydrateComponent = async () => {
     const filePromises = Object.keys(FILES).map(async (filePath) => {
@@ -28,10 +30,11 @@ export const createClient = async (options: ClientOptions) => {
           const serializedProps = element.attributes.getNamedItem(DATA_SERIALIZED_PROPS)?.value
           const props = JSON.parse(serializedProps ?? '{}') as Record<string, unknown>
 
-          const hydrate = options.hydrate
-          const createElement = options.createElement
+          const hydrate = options?.hydrate ?? render
+          const createElement = options?.createElement ?? jsxFn
 
           const newElem = await createElement(Component, props)
+          // @ts-expect-error default `render` cause a type error
           await hydrate(newElem, element)
         })
         await Promise.all(elementPromises)

@@ -18,6 +18,7 @@ describe('Basic', () => {
   it('Should have correct routes', () => {
     const routes = [
       { path: '/*', method: 'ALL', handler: expect.anything() },
+
       {
         path: '/about/:name',
         method: 'GET',
@@ -28,8 +29,6 @@ describe('Basic', () => {
         method: 'GET',
         handler: expect.anything(),
       },
-      { path: '/', method: 'GET', handler: expect.anything() },
-      { path: '/foo', method: 'GET', handler: expect.anything() },
       {
         path: '/middleware/*',
         method: 'ALL',
@@ -40,12 +39,16 @@ describe('Basic', () => {
         method: 'GET',
         handler: expect.anything(),
       },
+
       {
         path: '/middleware/foo',
         method: 'GET',
         handler: expect.anything(),
       },
+      { path: '/', method: 'GET', handler: expect.anything() },
+      { path: '/foo', method: 'GET', handler: expect.anything() },
     ]
+
     expect(app.routes).toEqual(routes)
   })
 

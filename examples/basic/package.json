@@ -1,0 +1,21 @@
+{
+  "name": "basic",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && vite build --mode client",
+    "preview": "wrangler pages dev ./dist",
+    "deploy": "$npm_execpath build && wrangler pages deploy ./dist"
+  },
+  "private": true,
+  "dependencies": {
+    "honox": "^0.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.10",
+    "wrangler": "^3.22.1"
+  },
+  "resolutions": {
+    "honox": "portal:../.."
+  }
+}
