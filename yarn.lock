@@ -2468,10 +2468,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:4.0.0-rc.1":
-  version: 4.0.0-rc.1
-  resolution: "hono@npm:4.0.0-rc.1"
-  checksum: c857ac94746e4b7120a9572c51cf3dbe2304be409235a103588c85aaa1f6006e51ea6be421d9b850528c915dbf47079b8ad3cbbfb79360266c43c7009931aa71
+"hono@npm:4.0.0-rc.2":
+  version: 4.0.0-rc.2
+  resolution: "hono@npm:4.0.0-rc.2"
+  checksum: 0f6cf74af39e187b2f1b8a56422f811053060f6c9cc4aa38ded10fddfccb15be8d126f1adeac89be61cf92414da030e08c454bdb1942c2c1260b9a65d64aac5c
   languageName: node
   linkType: hard
 
@@ -2491,7 +2491,7 @@ __metadata:
     "@types/node": "npm:^20.10.5"
     eslint: "npm:^8.56.0"
     glob: "npm:^10.3.10"
-    hono: "npm:4.0.0-rc.1"
+    hono: "npm:4.0.0-rc.2"
     prettier: "npm:^3.1.1"
     publint: "npm:^0.2.7"
     tsup: "npm:^8.0.1"
