@@ -83,6 +83,9 @@
     "registry": "https://registry.npmjs.org"
   },
   "homepage": "https://hono.dev",
+  "workspaces": [
+    "examples/basic"
+  ],
   "dependencies": {
     "@babel/generator": "^7.23.6",
     "@babel/parser": "^7.23.6",

@@ -8,14 +8,11 @@
     "deploy": "$npm_execpath build && wrangler pages deploy ./dist"
   },
   "private": true,
-  "dependencies": {
-    "honox": "^0.0.0"
-  },
   "devDependencies": {
-    "vite": "^5.0.10",
-    "wrangler": "^3.22.1"
+    "vite": "^5.0.12",
+    "wrangler": "^3.23.0"
   },
-  "resolutions": {
-    "honox": "portal:../.."
+  "dependencies": {
+    "honox": "workspace:^"
   }
 }
