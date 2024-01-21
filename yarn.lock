@@ -406,23 +406,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hono/node-server@npm:^1.2.0":
-  version: 1.3.3
-  resolution: "@hono/node-server@npm:1.3.3"
-  checksum: a5bcb295e022bb817106288ee11fe8966df7d289ef5097c2cf0450f2a73b15bcee1f5243ec9a1c89b9ea175753629fc6a8392fdf991d3db3ed5d803d343fa996
+"@hono/node-server@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "@hono/node-server@npm:1.4.1"
+  checksum: c53dccbff980ac05f2ad0db643e68c0b92c3fd744313167020da1a83376a28b17342a78c8849c7628d428c00bbf4a43135bcca08c3088c955541b9fedadac8ff
   languageName: node
   linkType: hard
 
-"@hono/vite-dev-server@npm:^0.3.4":
-  version: 0.3.4
-  resolution: "@hono/vite-dev-server@npm:0.3.4"
+"@hono/vite-dev-server@npm:^0.3.5":
+  version: 0.3.5
+  resolution: "@hono/vite-dev-server@npm:0.3.5"
   dependencies:
-    "@hono/node-server": "npm:^1.2.0"
+    "@hono/node-server": "npm:^1.4.1"
     miniflare: "npm:^3.20231030.4"
     minimatch: "npm:^9.0.3"
   peerDependencies:
     hono: ">=3.11.7"
-  checksum: 9899fc9fdd65f1acee8862b780fd4dcf12d58eb3b53a94a7bbe4e32f7638e75c166d3e6c9a1be3ae92ec4e526ca08b1721c73bbe9a0f0bb7733607f5aa5487f2
+  checksum: 4839bee99c148e1b38e5d57ff01150572343619e8cf86121b9a35b15d022f25e6a7c49d5a9568b282b7cdd695c25d418aa78163731df09bace36aa0572e8ed22
   languageName: node
   linkType: hard
 
@@ -2484,7 +2484,7 @@ __metadata:
     "@babel/traverse": "npm:^7.23.6"
     "@babel/types": "npm:^7.23.6"
     "@hono/eslint-config": "npm:^0.0.3"
-    "@hono/vite-dev-server": "npm:^0.3.4"
+    "@hono/vite-dev-server": "npm:^0.3.5"
     "@playwright/test": "npm:^1.41.0"
     "@types/babel__generator": "npm:^7"
     "@types/babel__traverse": "npm:^7"
