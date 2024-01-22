@@ -74,9 +74,10 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
   // Routes
   const ROUTES_FILE =
     options?.ROUTES ??
-    import.meta.glob<RouteFile | AppFile>('/app/routes/**/[a-z0-9[-][a-z0-9[_-]*.(ts|tsx|mdx)', {
+    import.meta.glob<RouteFile | AppFile>('/app/routes/**/[!_]*.(ts|tsx|mdx)', {
       eager: true,
     })
+
   const routesMap = sortDirectoriesByDepth(groupByDirectory(ROUTES_FILE))
 
   for (const map of routesMap) {
@@ -137,7 +138,7 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
         // export default function Helle() {}
         if (typeof routeDefault === 'function') {
           subApp.get(path, (c) => {
-            return c.render(routeDefault())
+            return c.render(routeDefault(), route as any)
           })
         }
       }

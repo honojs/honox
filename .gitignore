@@ -1,5 +1,6 @@
 dist
 sandbox
+.hono
 
 # Cloudflare
 worker

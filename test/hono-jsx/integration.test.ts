@@ -3,7 +3,7 @@ import { poweredBy } from 'hono/powered-by'
 import { createApp } from '../../src/server'
 
 describe('Basic', () => {
-  const ROUTES = import.meta.glob('./app/routes/**/[a-z[-][a-z[_-]*.(tsx|ts)', {
+  const ROUTES = import.meta.glob('./app/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)', {
     eager: true,
   })
 
@@ -46,6 +46,11 @@ describe('Basic', () => {
       { path: '/api', method: 'GET', handler: expect.any(Function) },
       { path: '/', method: 'GET', handler: expect.any(Function) },
       {
+        path: '/post',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/throw_error',
         method: 'GET',
         handler: expect.any(Function),
@@ -78,6 +83,12 @@ describe('Basic', () => {
       method: 'POST',
     })
     expect(res.status).toBe(201)
+  })
+
+  it('Should render MDX content - /post', async () => {
+    const res = await app.request('/post')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<h1>Hello MDX</h1>')
   })
 
   it('Should return 500 response /throw_error', async () => {

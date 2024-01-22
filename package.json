@@ -84,7 +84,8 @@
   },
   "homepage": "https://hono.dev",
   "workspaces": [
-    "examples/basic"
+    "examples/basic",
+    "examples/mdx"
   ],
   "dependencies": {
     "@babel/generator": "^7.23.6",
@@ -95,6 +96,7 @@
   },
   "devDependencies": {
     "@hono/eslint-config": "^0.0.3",
+    "@mdx-js/rollup": "^3.0.0",
     "@playwright/test": "^1.41.0",
     "@types/babel__generator": "^7",
     "@types/babel__traverse": "^7",
@@ -106,8 +108,8 @@
     "publint": "^0.2.7",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vite": "^5.0.10",
-    "vitest": "^1.1.0"
+    "vite": "^5.0.12",
+    "vitest": "^1.2.1"
   },
   "packageManager": "yarn@4.0.2",
   "engines": {
