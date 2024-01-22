@@ -1,0 +1,44 @@
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+  color: #333;
+}
+
+a:link, a:visited {
+  color: #333;
+  text-decoration: none;
+}
+
+header, nav, main, footer {
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+}
+
+article {
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+footer {
+  text-align: center;
+}
+
+.article-list li {
+  margin: 10px 0;
+}
+
+.article-list li a {
+  text-decoration: none;
+  color: #333;
+}
+
+.article-list li a:hover {
+  color: #0275d8;
+}

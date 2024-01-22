@@ -63,6 +63,6 @@ function honox(options?: HonoXOptions): PluginOption[] {
   ]
 }
 
-export { devServerDefaultOptions }
+export { devServerDefaultOptions, islandComponents }
 
 export default honox
