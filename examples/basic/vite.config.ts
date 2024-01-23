@@ -1,3 +1,4 @@
+import build from '@hono/vite-cloudflare-pages'
 import honox from 'honox/vite'
 import { defineConfig } from '../../node_modules/vite'
 
@@ -19,15 +20,7 @@ export default defineConfig(({ mode }) => {
     }
   } else {
     return {
-      build: {
-        rollupOptions: {
-          output: {
-            entryFileNames: '_worker.js',
-          },
-        },
-        minify: true,
-      },
-      plugins: [honox()],
+      plugins: [honox(), build()],
     }
   }
 })

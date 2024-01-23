@@ -1,4 +1,3 @@
-import { builtinModules } from 'module'
 import path from 'path'
 import devServer, { defaultOptions as devServerDefaultOptions } from '@hono/vite-dev-server'
 import type { DevServerOptions } from '@hono/vite-dev-server'
@@ -15,7 +14,6 @@ type HonoXOptions = {
 export const defaultOptions: HonoXOptions = {
   islands: true,
   entry: path.join(process.cwd(), './app/server.ts'),
-  external: ['react', 'react-dom'],
 }
 
 function honox(options?: HonoXOptions): PluginOption[] {
@@ -43,21 +41,6 @@ function honox(options?: HonoXOptions): PluginOption[] {
   return [
     {
       name: 'honox-vite-config',
-      config: () => {
-        return {
-          ssr: {
-            noExternal: true,
-            external: defaultOptions.external,
-          },
-          build: {
-            ssr: entry,
-            rollupOptions: {
-              external: [...builtinModules, /^node:/],
-              input: entry,
-            },
-          },
-        }
-      },
     },
     ...plugins,
   ]

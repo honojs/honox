@@ -13,6 +13,7 @@
     "wrangler": "^3.23.0"
   },
   "dependencies": {
+    "@hono/vite-cloudflare-pages": "^0.2.0",
     "honox": "workspace:^"
   }
 }
