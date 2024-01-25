@@ -9,6 +9,7 @@
   },
   "private": true,
   "devDependencies": {
+    "@hono/vite-ssg": "^0.0.1",
     "@mdx-js/rollup": "^3.0.0",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx-frontmatter": "^4.0.0",

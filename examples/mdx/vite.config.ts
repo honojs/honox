@@ -1,10 +1,10 @@
 import devServer from '@hono/vite-dev-server'
+import ssg from '@hono/vite-ssg'
 import mdx from '@mdx-js/rollup'
 import honox from 'honox/vite'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import { defineConfig } from '../../node_modules/vite'
-import ssg from './src/vite-plugin'
 
 const entry = './app/server.ts'
 
