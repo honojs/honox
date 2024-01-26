@@ -16,7 +16,7 @@
     "lint": "eslint src/**.ts",
     "lint:fix": "eslint src/**.ts --fix",
     "prerelease": "yarn test && yarn build",
-    "release": "np --no-yarn"
+    "release": "np"
   },
   "files": [
     "dist"
@@ -84,10 +84,6 @@
     "access": "public"
   },
   "homepage": "https://hono.dev",
-  "workspaces": [
-    "examples/basic",
-    "examples/mdx"
-  ],
   "dependencies": {
     "@babel/generator": "^7.23.6",
     "@babel/parser": "^7.23.6",
@@ -98,7 +94,7 @@
   "devDependencies": {
     "@hono/eslint-config": "^0.0.3",
     "@mdx-js/rollup": "^3.0.0",
-    "@playwright/test": "^1.41.0",
+    "@playwright/test": "^1.41.1",
     "@types/babel__generator": "^7",
     "@types/babel__traverse": "^7",
     "@types/node": "^20.10.5",

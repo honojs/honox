@@ -1,3 +1,3 @@
-import { createClient } from 'honox/client'
+import { createClient } from '../../../src/client'
 
 createClient()

@@ -1,4 +1,4 @@
-import { createRoute } from 'honox/factory'
+import { createRoute } from '../../../../src/factory'
 import Counter from '../islands/counter'
 
 export default createRoute((c) => {

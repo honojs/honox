@@ -1,5 +1,5 @@
 import { showRoutes } from 'hono/dev'
-import { createApp } from 'honox/server'
+import { createApp } from '../../../src/server'
 
 const app = createApp()
 
