@@ -16,7 +16,7 @@
     "lint": "eslint src/**.ts",
     "lint:fix": "eslint src/**.ts --fix",
     "prerelease": "yarn test && yarn build",
-    "release": "np"
+    "release": "np --no-yarn"
   },
   "files": [
     "dist"
@@ -80,7 +80,8 @@
     "url": "https://github.com/honojs/honox.git"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "homepage": "https://hono.dev",
   "workspaces": [
