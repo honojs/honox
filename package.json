@@ -112,5 +112,8 @@
   "packageManager": "yarn@4.0.2",
   "engines": {
     "node": ">=18.14.1"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.9.6"
   }
 }
