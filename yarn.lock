@@ -626,16 +626,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hono/vite-dev-server@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@hono/vite-dev-server@npm:0.4.0"
+"@hono/vite-dev-server@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@hono/vite-dev-server@npm:0.4.1"
   dependencies:
     "@hono/node-server": "npm:^1.4.1"
     miniflare: "npm:^3.20231218.2"
     minimatch: "npm:^9.0.3"
   peerDependencies:
-    hono: ">=3.11.7"
-  checksum: 478289f294f026d9960c82c78f777873a902cd1034dc3e05bd55def3c84bdf9d71e986ee6aad1e1345534f89c5739aee7bcc750ee840b8c0cef515fdcd2ec269
+    hono: "*"
+  checksum: f1a2aabbf0eedce9145366115212b25fb579028d2f3a85e3c14df427eb00f26f1dc39c42847c75424dfdf5f236321ad6886b58930bffd4a90c812f3ad3d97a96
   languageName: node
   linkType: hard
 
@@ -4128,7 +4128,7 @@ __metadata:
     "@babel/traverse": "npm:^7.23.6"
     "@babel/types": "npm:^7.23.6"
     "@hono/eslint-config": "npm:^0.0.3"
-    "@hono/vite-dev-server": "npm:^0.4.0"
+    "@hono/vite-dev-server": "npm:^0.4.1"
     "@mdx-js/rollup": "npm:^3.0.0"
     "@playwright/test": "npm:^1.41.0"
     "@types/babel__generator": "npm:^7"
