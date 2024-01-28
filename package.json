@@ -84,10 +84,6 @@
     "access": "public"
   },
   "homepage": "https://hono.dev",
-  "workspaces": [
-    "examples/basic",
-    "examples/mdx"
-  ],
   "dependencies": {
     "@babel/generator": "^7.23.6",
     "@babel/parser": "^7.23.6",

@@ -4,7 +4,7 @@ import mdx from '@mdx-js/rollup'
 import honox from 'honox/vite'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
-import { defineConfig } from '../../node_modules/vite'
+import { defineConfig } from 'vite'
 
 const entry = './app/server.ts'
 

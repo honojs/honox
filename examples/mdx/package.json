@@ -17,6 +17,10 @@
     "wrangler": "^3.23.0"
   },
   "dependencies": {
-    "honox": "workspace:^"
+    "hono": "4.0.0-rc.3",
+    "honox": "^0.0.0"
+  },
+  "resolutions": {
+    "honox": "portal:../.."
   }
 }
