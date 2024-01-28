@@ -15,7 +15,7 @@
     "watch": "tsup --watch",
     "lint": "eslint src/**.ts",
     "lint:fix": "eslint src/**.ts --fix",
-    "prerelease": "yarn test && yarn build",
+    "prerelease": "bun run test && bun run build",
     "release": "np"
   },
   "files": [
@@ -109,7 +109,6 @@
     "vite": "^5.0.12",
     "vitest": "^1.2.1"
   },
-  "packageManager": "yarn@4.0.2",
   "engines": {
     "node": ">=18.14.1"
   },
