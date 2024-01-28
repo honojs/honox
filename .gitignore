@@ -7,9 +7,6 @@ worker
 .wrangler
 .mf
 
-# Bun
-bun.lockb
-
 # Logs
 logs
 *.log
