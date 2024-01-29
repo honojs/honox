@@ -13,8 +13,10 @@
     "typecheck": "tsc --noEmit",
     "build": "tsup && publint",
     "watch": "tsup --watch",
-    "lint": "eslint src/**.ts",
-    "lint:fix": "eslint src/**.ts --fix",
+    "lint": "eslint --ext js,ts src test",
+    "lint:fix": "eslint --ext js,ts src test --fix",
+    "format": "prettier --check \"src/**/*.{js,ts}\" \"test/**/*.{js,ts}\"",
+    "format:fix": "prettier --write \"src/**/*.{js,ts}\" \"test/**/*.{js,ts}\"",
     "prerelease": "bun run test && bun run build",
     "release": "np"
   },
@@ -92,7 +94,7 @@
     "@hono/vite-dev-server": "^0.4.1"
   },
   "devDependencies": {
-    "@hono/eslint-config": "^0.0.3",
+    "@hono/eslint-config": "^0.0.4",
     "@mdx-js/rollup": "^3.0.0",
     "@playwright/test": "^1.41.0",
     "@types/babel__generator": "^7",
