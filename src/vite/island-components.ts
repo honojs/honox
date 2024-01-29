@@ -88,7 +88,9 @@ export const transformJsxTags = (contents: string, componentName: string) => {
       ExportDefaultDeclaration(path) {
         if (path.node.declaration.type === 'FunctionDeclaration') {
           const functionId = path.node.declaration.id
-          if (!functionId) return
+          if (!functionId) {
+            return
+          }
           const isAsync = path.node.declaration.async
           const originalFunctionId = identifier(functionId.name + 'Original')
 

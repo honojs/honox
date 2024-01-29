@@ -18,5 +18,7 @@ jobs:
           bun-version: 1.0.25
       - run: bunx playwright install --with-deps
       - run: bun install
+      - run: bun run format
+      - run: bun run lint
       - run: bun run build
       - run: bun run test
