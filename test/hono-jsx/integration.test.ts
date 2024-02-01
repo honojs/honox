@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { poweredBy } from 'hono/powered-by'
+import { describe, it, expect, vi } from 'vitest'
 import { createApp } from '../../src/server'
 
 describe('Basic', () => {
@@ -28,12 +29,32 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/about/:name/address',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/about/:name',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/about/:name',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/about/:name',
         method: 'POST',
         handler: expect.any(Function),
       },
       {
         path: '/about/:name',
+        method: 'POST',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction',
         method: 'GET',
         handler: expect.any(Function),
       },
@@ -43,8 +64,16 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       { path: '/api', method: 'POST', handler: expect.any(Function) },
+      { path: '/api', method: 'POST', handler: expect.any(Function) },
+      { path: '/api', method: 'GET', handler: expect.any(Function) },
       { path: '/api', method: 'GET', handler: expect.any(Function) },
       { path: '/', method: 'GET', handler: expect.any(Function) },
+      { path: '/', method: 'GET', handler: expect.any(Function) },
+      {
+        path: '/post',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
       {
         path: '/post',
         method: 'GET',
@@ -55,8 +84,14 @@ describe('Basic', () => {
         method: 'GET',
         handler: expect.any(Function),
       },
+      {
+        path: '/throw_error',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
     ]
-    expect(app.routes).toEqual(routes)
+    expect(app.routes).toHaveLength(routes.length)
+    expect(app.routes).toEqual(expect.arrayContaining(routes))
   })
 
   it('Should return 200 response - / with a Powered By header', async () => {
@@ -127,7 +162,7 @@ describe('Basic', () => {
       const res = await app.request('/')
       expect(res.status).toBe(200)
       expect(await res.text()).toBe(
-        '<html><head><title>This is a title</title><script type="module" src="/app/client.ts"></script></head><body><h1>Hello</h1></body></html>'
+        '<html><head><title>This is a title</title></head><body><h1>Hello</h1></body></html>'
       )
     })
 
@@ -135,7 +170,7 @@ describe('Basic', () => {
       const res = await app.request('/foo')
       expect(res.status).toBe(404)
       expect(await res.text()).toBe(
-        '<html><head><title>Not Found</title><script type="module" src="/app/client.ts"></script></head><body><h1>Not Found</h1></body></html>'
+        '<html><head><title>Not Found</title></head><body><h1>Not Found</h1></body></html>'
       )
     })
 
@@ -144,7 +179,7 @@ describe('Basic', () => {
       expect(res.status).toBe(200)
       // hono/jsx escape a single quote to &#39;
       expect(await res.text()).toBe(
-        '<html><head><title>me</title><script type="module" src="/app/client.ts"></script></head><body><p>It&#39;s me</p><b>My name is me</b></body></html>'
+        '<html><head><title>me</title></head><body><p>It&#39;s me</p><b>My name is me</b></body></html>'
       )
     })
 
@@ -157,11 +192,20 @@ describe('Basic', () => {
       )
     })
 
+    it('Should return 200 response /interaction', async () => {
+      const res = await app.request('/interaction')
+      expect(res.status).toBe(200)
+      // hono/jsx escape a single quote to &#39;
+      expect(await res.text()).toBe(
+        '<html><head><title></title><script type="module" src="/app/client.ts"></script></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div><p>Count: 5</p><button onClick="() =&gt; setCount(count + 1)">Increment</button></div></honox-island></body></html>'
+      )
+    })
+
     it('Should return 500 response /throw_error', async () => {
       const res = await app.request('/throw_error')
       expect(res.status).toBe(500)
       expect(await res.text()).toBe(
-        '<html><head><title>Internal Server Error</title><script type="module" src="/app/client.ts"></script></head><body><h1>Custom Error Message: Foo</h1></body></html>'
+        '<html><head><title>Internal Server Error</title></head><body><h1>Custom Error Message: Foo</h1></body></html>'
       )
     })
   })

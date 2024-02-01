@@ -2,6 +2,7 @@ import path from 'path'
 import devServer, { defaultOptions as devServerDefaultOptions } from '@hono/vite-dev-server'
 import type { DevServerOptions } from '@hono/vite-dev-server'
 import type { PluginOption } from 'vite'
+import { injectImportingIslands } from './inject-importing-islands.js'
 import { islandComponents } from './island-components.js'
 
 type HonoXOptions = {
@@ -37,6 +38,8 @@ function honox(options?: HonoXOptions): PluginOption[] {
   if (options?.islands !== false) {
     plugins.push(islandComponents())
   }
+
+  plugins.push(injectImportingIslands())
 
   return [
     {

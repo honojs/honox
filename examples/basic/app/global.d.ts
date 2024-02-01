@@ -1,16 +1,11 @@
-// eslint-disable-next-line node/no-extraneous-import
-import 'hono'
+import type {} from 'hono'
 
-type Head = {
+type Props = {
   title?: string
 }
 
 declare module 'hono' {
-  interface Env {
-    Variables: {}
-    Bindings: {}
-  }
   interface ContextRenderer {
-    (content: string | Promise<string>, head?: Head): Response | Promise<Response>
+    (content: string | Promise<string>, props?: Props): Response | Promise<Response>
   }
 }
