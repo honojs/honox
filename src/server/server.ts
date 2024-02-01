@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Hono } from 'hono'
 import type { Env, NotFoundHandler, ErrorHandler, MiddlewareHandler } from 'hono'
+import { createMiddleware } from 'hono/factory'
 import type { H } from 'hono/types'
+import { IMPORTING_ISLANDS_ID } from '../constants.js'
 import {
   filePathToPath,
   groupByDirectory,
@@ -15,12 +17,19 @@ const ERROR_FILENAME = '_error.tsx'
 const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'] as const
 
 type AppFile = { default: Hono }
+
+type InnerMeta = {
+  [key in typeof IMPORTING_ISLANDS_ID]?: boolean
+}
+
 type RouteFile = {
   default?: Function
-} & { [M in (typeof METHODS)[number]]?: H[] }
+} & { [M in (typeof METHODS)[number]]?: H[] } & InnerMeta
+
 type RendererFile = { default: MiddlewareHandler }
 type NotFoundFile = { default: NotFoundHandler }
 type ErrorFile = { default: ErrorHandler }
+
 type InitFunction<E extends Env = Env> = (app: Hono<E>) => void
 
 export type ServerOptions<E extends Env = Env> = {
@@ -114,6 +123,13 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
       rootPath = filePathToPath(rootPath)
 
       for (const [filename, route] of Object.entries(content)) {
+        // @ts-expect-error route[IMPORTING_ISLANDS_ID] is not typed
+        const importingIslands = route[IMPORTING_ISLANDS_ID] as boolean
+        const setInnerMeta = createMiddleware(async function setInnerMeta(c, next) {
+          c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
+          await next()
+        })
+
         const routeDefault = route.default
         const path = filePathToPath(filename)
 
@@ -126,17 +142,20 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
         for (const m of METHODS) {
           const handlers = (route as Record<string, H[]>)[m]
           if (handlers) {
+            subApp.on(m, path, setInnerMeta)
             subApp.on(m, path, ...handlers)
           }
         }
 
         // export default factory.createHandlers(...)
         if (routeDefault && Array.isArray(routeDefault)) {
+          subApp.get(path, setInnerMeta)
           subApp.get(path, ...(routeDefault as H[]))
         }
 
         // export default function Helle() {}
         if (typeof routeDefault === 'function') {
+          subApp.get(path, setInnerMeta)
           subApp.get(path, (c) => {
             return c.render(routeDefault(), route as any)
           })
