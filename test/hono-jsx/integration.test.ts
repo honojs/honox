@@ -106,14 +106,14 @@ describe('Basic', () => {
     expect(res.status).toBe(404)
   })
 
-  it('Should return 200 response /about/me', async () => {
+  it('Should return 200 response - /about/me', async () => {
     const res = await app.request('/about/me')
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe('<p>It&#39;s me</p><b>My name is me</b>')
   })
 
-  it('Should return 200 response POST /about/me', async () => {
+  it('Should return 200 response - POST /about/me', async () => {
     const res = await app.request('/about/me', {
       method: 'POST',
     })
@@ -126,7 +126,7 @@ describe('Basic', () => {
     expect(await res.text()).toBe('<h1>Hello MDX</h1>')
   })
 
-  it('Should return 500 response /throw_error', async () => {
+  it('Should return 500 response - /throw_error', async () => {
     global.console.trace = vi.fn()
     const res = await app.request('/throw_error')
     expect(res.status).toBe(500)
@@ -175,7 +175,7 @@ describe('With preserved', () => {
     )
   })
 
-  it('Should return 200 response /about/me', async () => {
+  it('Should return 200 response - /about/me', async () => {
     const res = await app.request('/about/me')
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
@@ -184,7 +184,7 @@ describe('With preserved', () => {
     )
   })
 
-  it('Should return 200 response /about/me/address', async () => {
+  it('Should return 200 response - /about/me/address', async () => {
     const res = await app.request('/about/me/address')
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
@@ -193,7 +193,7 @@ describe('With preserved', () => {
     )
   })
 
-  it('Should return 200 response /interaction', async () => {
+  it('Should return 200 response - /interaction', async () => {
     const res = await app.request('/interaction')
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
@@ -202,7 +202,7 @@ describe('With preserved', () => {
     )
   })
 
-  it('Should return 500 response /throw_error', async () => {
+  it('Should return 500 response - /throw_error', async () => {
     const res = await app.request('/throw_error')
     expect(res.status).toBe(500)
     expect(await res.text()).toBe(
@@ -277,5 +277,23 @@ describe('Nested Layouts', () => {
     const res = await app.request('/nested/foo/bar/baz')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe('<main><nav>foo menu</nav><nav>bar menu</nav><h1>Baz</h1></main>')
+  })
+})
+
+describe('<Script /> component', () => {
+  const ROUTES = import.meta.glob('./app-script/routes/index.tsx', {
+    eager: true,
+  })
+  const app = createApp({
+    root: './app-script/routes',
+    ROUTES: ROUTES as any,
+  })
+
+  it('Should convert the script path correctly', async () => {
+    const res = await app.request('/')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe(
+      '<html><head><script type="module" src="/static/client-abc.js"></script></head></html>'
+    )
   })
 })
