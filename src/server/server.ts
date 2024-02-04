@@ -74,10 +74,13 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
       eager: true,
     })
   const rendererList = listByDirectory(RENDERER_FILE)
-  const applyRenderer = (rendererFile: string) => {
+
+  const applyRenderer = (app: Hono, rendererFile: string) => {
     const renderer = RENDERER_FILE[rendererFile]
-    const path = pathToDirectoryPath(rendererFile).replace(rootRegExp, '')
-    app.all(`${filePathToPath(path)}*`, renderer.default)
+    const rendererDefault = renderer['default']
+    if (rendererDefault) {
+      app.all('*', rendererDefault)
+    }
   }
 
   // Routes
@@ -94,29 +97,25 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
       const subApp = new Hono()
 
       // Renderer
-      let rendererFiles = rendererList[dir]
+      let rendererPaths = rendererList[dir] ?? []
 
-      if (rendererFiles) {
-        applyRenderer(rendererFiles[0])
-      }
-
-      if (!rendererFiles) {
-        const dirPaths = dir.split('/')
-        const getRendererPaths = (paths: string[]) => {
-          rendererFiles = rendererList[paths.join('/')]
-          if (!rendererFiles) {
-            paths.pop()
-            if (paths.length) {
-              getRendererPaths(paths)
-            }
+      const getRendererPaths = (paths: string[]) => {
+        rendererPaths = rendererList[paths.join('/')]
+        if (!rendererPaths) {
+          paths.pop()
+          if (paths.length) {
+            getRendererPaths(paths)
           }
-          return rendererFiles
         }
-        rendererFiles = getRendererPaths(dirPaths)
-        if (rendererFiles) {
-          applyRenderer(rendererFiles[0])
-        }
+        return rendererPaths ?? []
       }
+
+      const dirPaths = dir.split('/')
+      rendererPaths = getRendererPaths(dirPaths)
+      rendererPaths.sort((a, b) => a.split('/').length - b.split('/').length)
+      rendererPaths.map((path) => {
+        applyRenderer(subApp, path)
+      })
 
       // Root path
       let rootPath = dir.replace(rootRegExp, '')
