@@ -1,15 +1,15 @@
 # HonoX
 
-**HonoX** is a simple and fast meta framework for creating websites and Web APIs with Server-Side Rendering - (formerly _[Sonik](https://github.com/sonikjs/sonik)_). It stands on the shoulders of giants; built on [Hono](https://hono.dev/), [Vite](https://hono.dev/), and UI libraries.
+**HonoX** is a simple and fast - _supersonic_ - meta framework for creating full-stack websites or Web APIs - (formerly _[Sonik](https://github.com/sonikjs/sonik)_). It stands on the shoulders of giants; built on [Hono](https://hono.dev/), [Vite](https://hono.dev/), and UI libraries.
 
-**Note**: _HonoX is currently in a "beta stage". There will be breaking changes without any announcement. Don't use it in production. However, feel free to try it in your hobby project and give us your feedback!_
+**Note**: _HonoX is currently in a "beta stage". Breaking changes are introduced without following semantic versioning._
 
 ## Features
 
-- **File-based routing** - You can create a large app by separating concerns.
+- **File-based routing** - You can create a large application like Next.js.
 - **Fast SSR** - Rendering is ultra-fast thanks to Hono.
 - **BYOR** - You can bring your own renderer, not only one using hono/jsx.
-- **Island hydration** - If you want interactions, create an island. JavaScript is hydrated only for it.
+- **Islands hydration** - If you want interactions, create an island. JavaScript is hydrated only for it.
 - **Middleware** - It works as Hono, so you can use a lot of Hono's middleware.
 
 ## Get Started - Basic
@@ -154,7 +154,7 @@ Before writing `_renderer.tsx`, write the Renderer type definition in `global.d.
 
 ```ts
 // app/global.d.ts
-import 'hono'
+import type {} from 'hono'
 
 type Head = {
   title?: string
@@ -179,7 +179,7 @@ export default jsxRenderer(({ children, title }) => {
       <head>
         <meta charset='UTF-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-        {title ? <title>{title}</title> : ''}
+        {title ? <title>{title}</title> : <></>}
       </head>
       <body>{children}</body>
     </html>
@@ -245,7 +245,7 @@ The below is the project structure of a minimal application including a client s
 
 ### Renderer
 
-This is a `_renderer.tsx` which will load the `/app/client.ts` entry file for the client. It can also load the JavaScript file for the production according to the variable `import.meta.env.PROD`.
+This is a `_renderer.tsx`, which will load the `/app/client.ts` entry file for the client. It will load the JavaScript file for the production according to the variable `import.meta.env.PROD`. And renders the inside of `HasIslands` if there are islands on that page.
 
 ```tsx
 // app/routes/_renderer.tsx
@@ -258,7 +258,9 @@ export default jsxRenderer(({ children }) => {
         <meta charset='UTF-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
         {import.meta.env.PROD ? (
-          <script type='module' src='/static/client.js'></script>
+          <HasIslands>
+            <script type='module' src='/static/client.js'></script>
+          </HasIslands>
         ) : (
           <script type='module' src='/app/client.ts'></script>
         )}
@@ -320,7 +322,7 @@ export default createRoute((c) => {
 
 You can bring your own renderer using a UI library like React, Preact, Solid, or others.
 
-**Note**: We cannot provide technical support for the renderer you bring.
+**Note**: We may not provide supports for the renderer you bring.
 
 ### React case
 
@@ -388,6 +390,25 @@ createClient({
 ```
 
 ## Guides
+
+### Nested Layouts
+
+If you are using the JSX Renderer middleware, you can nest layouts using ` <Layout />`.
+
+```tsx
+// app/routes/posts/_renderer.tsx
+
+import { jsxRenderer } from 'hono/jsx-renderer'
+
+export default jsxRenderer(({ children, Layout }) => {
+  return (
+    <Layout>
+      <nav>Posts Menu</nav>
+      <div>{children}</div>
+    </Layout>
+  )
+})
+```
 
 ### Using Middleware
 
