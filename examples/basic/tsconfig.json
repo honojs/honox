@@ -3,11 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "esModuleInterop": true,
     "strict": true,
-    "lib": [
-      "esnext"
-    ],
     "types": [
       "vite/client"
     ],

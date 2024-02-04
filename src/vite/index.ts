@@ -5,19 +5,19 @@ import type { PluginOption } from 'vite'
 import { injectImportingIslands } from './inject-importing-islands.js'
 import { islandComponents } from './island-components.js'
 
-type HonoXOptions = {
+type Options = {
   islands?: boolean
   entry?: string
   devServer?: DevServerOptions
   external?: string[]
 }
 
-export const defaultOptions: HonoXOptions = {
+export const defaultOptions: Options = {
   islands: true,
   entry: path.join(process.cwd(), './app/server.ts'),
 }
 
-function honox(options?: HonoXOptions): PluginOption[] {
+function honox(options?: Options): PluginOption[] {
   const plugins: PluginOption[] = []
 
   const entry = options?.entry ?? defaultOptions.entry

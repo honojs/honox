@@ -271,6 +271,27 @@ export default jsxRenderer(({ children }) => {
 })
 ```
 
+If you have a manifest file in `dist/.vite/manifest.json`, you can easily write it using `<Script />`.
+
+```tsx
+// app/routes/_renderer.tsx
+import { Style } from 'hono/css'
+import { jsxRenderer } from 'hono/jsx-renderer'
+
+export default jsxRenderer(({ children }) => {
+  return (
+    <html lang='en'>
+      <head>
+        <meta charset='UTF-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+        <Script src='/app/client.ts' />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+})
+```
+
 ### Client Entry File
 
 A client side entry file should be in `app/client.ts`. Simply, write `createClient()`.
@@ -554,6 +575,7 @@ Since a HonoX instance is essentially a Hono instance, it can be deployed on any
 Setup the `vite.config.ts`:
 
 ```ts
+// vite.config.ts
 import { defineConfig } from 'vite'
 import honox from 'honox/vite'
 import pages from '@hono/vite-cloudflare-pages'
@@ -567,25 +589,15 @@ If you want to include client side scripts and assets:
 
 ```ts
 // vite.config.ts
-import { defineConfig } from 'vite'
-import honox from 'honox/vite'
 import pages from '@hono/vite-cloudflare-pages'
+import honox from 'honox/vite'
+import client from 'honox/vite/client'
+import { defineConfig } from 'vite'
 
 export default defineConfig(({ mode }) => {
   if (mode === 'client') {
     return {
-      build: {
-        rollupOptions: {
-          input: ['./app/client.ts'],
-          output: {
-            entryFileNames: 'static/client.js',
-            chunkFileNames: 'static/assets/[name]-[hash].js',
-            assetFileNames: 'static/assets/[name].[ext]',
-          },
-        },
-        emptyOutDir: false,
-        copyPublicDir: false,
-      },
+      plugins: [client()],
     }
   } else {
     return {
@@ -598,7 +610,7 @@ export default defineConfig(({ mode }) => {
 Build command (including a client):
 
 ```txt
-vite build && vite build --mode client
+vite build --mode client && vite build
 ```
 
 Deploy with the following commands after build. Ensure you have [Wrangler](https://developers.cloudflare.com/workers/wrangler/) installed:

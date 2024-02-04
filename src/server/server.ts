@@ -8,7 +8,6 @@ import {
   filePathToPath,
   groupByDirectory,
   listByDirectory,
-  pathToDirectoryPath,
   sortDirectoriesByDepth,
 } from '../utils/file.js'
 
