@@ -212,7 +212,7 @@ describe('With preserved', () => {
 })
 
 describe('API', () => {
-  const ROUES = import.meta.glob('./app/routes//**/[a-z[-][a-z-_[]*.(tsx|ts)', {
+  const ROUES = import.meta.glob('./app/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)', {
     eager: true,
   })
 
@@ -284,16 +284,22 @@ describe('<Script /> component', () => {
   const ROUTES = import.meta.glob('./app-script/routes/index.tsx', {
     eager: true,
   })
+
+  const RENDERER = import.meta.glob('./app-script/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+
   const app = createApp({
     root: './app-script/routes',
     ROUTES: ROUTES as any,
+    RENDERER: RENDERER as any,
   })
 
   it('Should convert the script path correctly', async () => {
     const res = await app.request('/')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe(
-      '<html><head><script type="module" src="/static/client-abc.js"></script></head></html>'
+      '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
     )
   })
 })
