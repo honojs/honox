@@ -1,17 +1,28 @@
 import type { FC } from 'hono/jsx'
 import type { Manifest } from 'vite'
 
-export const Script: FC<{ src: string }> = async ({ src }) => {
-  if (import.meta.env.PROD) {
-    // @ts-expect-error not typed
-    const manifest = await import('/dist/.vite/manifest.json')
-    const manifestDefault: Manifest = manifest['default']
-    const scriptInManifest = manifestDefault[src.replace(/^\//, '')]
-    if (scriptInManifest) {
-      return <script type='module' src={`/${scriptInManifest.file}`}></script>
-    } else {
-      return <></>
+type Options = {
+  src: string
+  prod?: boolean
+  manifest?: Manifest
+}
+
+export const Script: FC<Options> = async (options) => {
+  const src = options.src
+  if (options.prod ?? import.meta.env.PROD) {
+    let manifest: Manifest | undefined = options.manifest
+    if (!manifest) {
+      // @ts-expect-error not typed
+      const manifestFile = await import('/dist/.vite/manifest.json')
+      manifest = manifestFile['default']
     }
+    if (manifest) {
+      const scriptInManifest = manifest[src.replace(/^\//, '')]
+      if (scriptInManifest) {
+        return <script type='module' src={`/${scriptInManifest.file}`}></script>
+      }
+    }
+    return <></>
   } else {
     return <script type='module' src={src}></script>
   }

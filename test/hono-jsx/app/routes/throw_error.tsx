@@ -1,5 +1,5 @@
-import { createHandlers } from '../factory'
+import { createRoute } from '../../../../src/factory'
 
-export default createHandlers(() => {
+export default createRoute(() => {
   throw new Error('Foo')
 })

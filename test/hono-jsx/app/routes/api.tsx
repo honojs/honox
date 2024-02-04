@@ -1,6 +1,6 @@
-import { createHandlers } from '../factory'
+import { createRoute } from '../../../../src/factory'
 
-export const POST = createHandlers((c) => {
+export const POST = createRoute((c) => {
   return c.json(
     {
       message: 'created',
@@ -10,7 +10,7 @@ export const POST = createHandlers((c) => {
   )
 })
 
-export default createHandlers((c) => {
+export default createRoute((c) => {
   c.header('X-Custom', 'Hello')
   return c.json({
     foo: 'bar',
