@@ -1,5 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Manifest } from 'vite'
+import { HasIslands } from './has-islands.js'
 
 type Options = {
   src: string
@@ -19,7 +20,11 @@ export const Script: FC<Options> = async (options) => {
     if (manifest) {
       const scriptInManifest = manifest[src.replace(/^\//, '')]
       if (scriptInManifest) {
-        return <script type='module' src={`/${scriptInManifest.file}`}></script>
+        return (
+          <HasIslands>
+            <script type='module' src={`/${scriptInManifest.file}`}></script>
+          </HasIslands>
+        )
       }
     }
     return <></>
