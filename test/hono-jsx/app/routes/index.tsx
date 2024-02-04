@@ -1,6 +1,6 @@
-import { createHandlers } from '../factory'
+import { createRoute } from '../../../../src/factory'
 
-export default createHandlers((c) => {
+export default createRoute((c) => {
   return c.render(<h1>Hello</h1>, {
     title: 'This is a title',
   })

@@ -52,6 +52,10 @@
     "./vite": {
       "types": "./dist/vite/index.d.ts",
       "import": "./dist/vite/index.js"
+    },
+    "./vite/client": {
+      "types": "./dist/vite/client.d.ts",
+      "import": "./dist/vite/client.js"
     }
   },
   "typesVersions": {
@@ -73,6 +77,9 @@
       ],
       "vite": [
         "./dist/vite"
+      ],
+      "vite/client": [
+        "./dist/vite/client"
       ]
     }
   },
