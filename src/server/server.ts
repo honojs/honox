@@ -125,7 +125,7 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
       for (const [filename, route] of Object.entries(content)) {
         // @ts-expect-error route[IMPORTING_ISLANDS_ID] is not typed
         const importingIslands = route[IMPORTING_ISLANDS_ID] as boolean
-        const setInnerMeta = createMiddleware(async function setInnerMeta(c, next) {
+        const setInnerMeta = createMiddleware(async function innerMeta(c, next) {
           c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
           await next()
         })
