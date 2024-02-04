@@ -13,9 +13,15 @@ export const Script: FC<Options> = async (options) => {
   if (options.prod ?? import.meta.env.PROD) {
     let manifest: Manifest | undefined = options.manifest
     if (!manifest) {
-      // @ts-expect-error not typed
-      const manifestFile = await import('/dist/.vite/manifest.json')
-      manifest = manifestFile['default']
+      const MANIFEST = import.meta.glob<{ default: Manifest }>('/dist/.vite/manifest.json', {
+        eager: true,
+      })
+      for (const [, manifestFile] of Object.entries(MANIFEST)) {
+        if (manifestFile['default']) {
+          manifest = manifestFile['default']
+          break
+        }
+      }
     }
     if (manifest) {
       const scriptInManifest = manifest[src.replace(/^\//, '')]
