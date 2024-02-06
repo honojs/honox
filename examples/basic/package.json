@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build --mode client && vite build",
     "preview": "wrangler pages dev ./dist",
-    "deploy": "$npm_execpath build && wrangler pages deploy ./dist"
+    "deploy": "$npm_execpath run build && wrangler pages deploy ./dist"
   },
   "private": true,
   "devDependencies": {

@@ -1,4 +1,3 @@
-import devServer from '@hono/vite-dev-server'
 import ssg from '@hono/vite-ssg'
 import mdx from '@mdx-js/rollup'
 import honox from 'honox/vite'
@@ -12,7 +11,6 @@ export default defineConfig(() => {
   return {
     plugins: [
       honox(),
-      devServer({ entry }),
       ssg({ entry }),
       mdx({
         jsxImportSource: 'hono/jsx',
