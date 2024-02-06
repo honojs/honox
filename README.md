@@ -275,8 +275,8 @@ If you have a manifest file in `dist/.vite/manifest.json`, you can easily write 
 
 ```tsx
 // app/routes/_renderer.tsx
-import { Style } from 'hono/css'
 import { jsxRenderer } from 'hono/jsx-renderer'
+import { Script } from 'honox/server'
 
 export default jsxRenderer(({ children }) => {
   return (
