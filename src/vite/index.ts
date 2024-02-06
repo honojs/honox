@@ -44,6 +44,13 @@ function honox(options?: Options): PluginOption[] {
   return [
     {
       name: 'honox-vite-config',
+      config: () => {
+        return {
+          ssr: {
+            noExternal: true,
+          },
+        }
+      },
     },
     ...plugins,
   ]
