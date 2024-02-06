@@ -1,5 +1,4 @@
-// eslint-disable-next-line node/no-extraneous-import
-import 'hono'
+import {} from 'hono'
 import type { Meta } from './types'
 
 declare module 'hono' {
