@@ -645,7 +645,6 @@ wrangler pages deploy ./dist
 
 ## Examples
 
-- [/example](./examples/)
 - https://github.com/yusukebe/honox-examples
 
 ## Related projects
