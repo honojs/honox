@@ -198,7 +198,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title><script type="module" src="/app/client.ts"></script></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div><p>Count: 5</p><button onClick="() =&gt; setCount(count + 1)">Increment</button></div></honox-island></body></html>'
+      '<!DOCTYPE html><html><head><title></title><script type="module" src="/app/client.ts"></script></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div><p>Count: 5</p><button>Increment</button></div></honox-island></body></html>'
     )
   })
 
