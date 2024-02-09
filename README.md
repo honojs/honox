@@ -12,6 +12,22 @@
 - **Islands hydration** - If you want interactions, create an island. JavaScript is hydrated only for it.
 - **Middleware** - It works as Hono, so you can use a lot of Hono's middleware.
 
+## Installing
+
+You can install the `honox` package from the npm.
+
+```txt
+npm install hono honox
+```
+
+## Starter template
+
+If you are starting a new HonoX project, use the `hono-create` command. Run the following and choose `x-basic`.
+
+```txt
+npm create hono@latest
+```
+
 ## Get Started - Basic
 
 Let's create a basic HonoX application using hono/jsx as a renderer. This application has no client JavaScript and renders JSX on the server side.
