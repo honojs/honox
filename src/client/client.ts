@@ -1,5 +1,5 @@
-import { jsx as jsxFn } from 'hono/jsx'
 import { render } from 'hono/jsx/dom'
+import { jsx as jsxFn } from 'hono/jsx/dom/jsx-runtime'
 import { COMPONENT_NAME, DATA_SERIALIZED_PROPS } from '../constants.js'
 import type { CreateElement, Hydrate } from '../types.js'
 
