@@ -207,7 +207,7 @@ The `_renderer.tsx` is applied under each directory, and the `app/routes/posts/_
 
 ### Not Found page
 
-You can write a custom Not Found page in `_404.tx`.
+You can write a custom Not Found page in `_404.tsx`.
 
 ```tsx
 // app/routes/_404.tsx
@@ -222,10 +222,10 @@ export default handler
 
 ### Error Page
 
-You can write a custom Error page in `_error.tx`.
+You can write a custom Error page in `_error.tsx`.
 
 ```tsx
-// app/routes/_error.ts
+// app/routes/_error.tsx
 import { ErrorHandler } from 'hono'
 
 const handler: ErrorHandler = (e, c) => {
