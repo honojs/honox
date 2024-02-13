@@ -1,37 +1,28 @@
-import { Hono, type Input } from 'hono'
-import type { Factory } from 'hono/factory'
-import type { BlankInput, Env, H, HandlerInterface, HandlerResponse, Schema } from 'hono/types'
+import type { H, TypedResponse, Input } from 'hono/types'
 
+type UnionToAnd<T> = 
+  (T extends any ? (k: T) => void : never) extends ((k: infer R) => void) ? R : never
+
+type RpcResponse <R extends Response> = 
+  (R extends (TypedResponse<infer TypedType> & { format: 'json' }) ? {
+    json (): Promise<TypedType>
+  } & Exclude<R, 'json'> : R)
+
+type LastHandler <Handlers extends H[]> = Handlers extends [...H[], infer R] ? R : never
 interface RpcClient<
-  E extends Env,
-  I extends Input,
-  R extends HandlerResponse<any>
+  Handlers extends H[],
+  I = UnionToAnd<{[Index in keyof Handlers]: Handlers[Index] extends H<any, any, infer E> ? E : never}[number]>,
+  R = LastHandler<Handlers> extends H<any, any, any, infer E> ? E : never
 > {
-  
+  (opts?: (
+    {
+      i: I extends Input ? I['in'] : never
+    }
+  )): R extends Response ? Promise<RpcResponse<R>> : never
 }
 
-type Handlers<
-  I extends Input = BlankInput,
-  R extends HandlerResponse<any> = any
-> = [
-  H<Env, string, I, any>,
-  H<Env, string, any, R>
-] /*[
-  H<E, any, I>,
-  H<E, any, BlankInput, R>
-] |[
-  H<E, string, I>,
-  ...H[],
-  H<E, string, BlankInput, R>
-] | [
-  H<E, string, I, R>
-]*/
-
 export const rpc = <
-  HandlersType extends Handlers<E, I, R>,
-  E extends Env = Env,
-  I extends Input = any,
-  R extends HandlerResponse<any> = any
->(handlers: HandlersType): RpcClient<E, I, R> => {
-  return {}
+  Handlers extends H[],
+>(handlers: Handlers): RpcClient<Handlers> => {
+  return {} as RpcClient<Handlers>
 }
