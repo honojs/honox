@@ -45,6 +45,10 @@
       "types": "./dist/client/index.d.ts",
       "import": "./dist/client/index.js"
     },
+    "./rpc": {
+      "types": "./dist/rpc/index.d.ts",
+      "import": "./dist/rpc/index.js"
+    },
     "./utils/*": {
       "types": "./dist/utils/*.d.ts",
       "import": "./dist/utils/*.js"
@@ -71,6 +75,9 @@
       ],
       "client": [
         "./dist/client"
+      ],
+      "rpc": [
+        "./dist/rpc"
       ],
       "utils/*": [
         "./dist/utils/*"
