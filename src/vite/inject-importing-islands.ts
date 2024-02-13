@@ -1,8 +1,10 @@
+import * as pathLib from 'node:path'
 import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
 import _traverse from '@babel/traverse'
 import type { Plugin } from 'vite'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const traverse = (_traverse.default as typeof _traverse) ?? _traverse
@@ -27,6 +29,23 @@ export function injectImportingIslands(): Plugin {
             if (path.node.source.value.includes('islands/')) {
               hasIslandsImport = true
             }
+
+            // RPC
+            ;(() => {
+              const specifier = path.node.specifiers[0]
+              if (specifier.type !== 'ImportDefaultSpecifier') {
+                return
+              }
+              const importName = specifier.local.name
+              if (!importName.startsWith('$')) {
+                return
+              }
+              if (!path.node.source.value.includes('routes/')) {
+                return
+              }
+              const importPath = pathLib.resolve(pathLib.dirname(id), path.node.source.value)
+              path.node.source.value = `virtual:honox-rpc?${importPath}`
+            })()
           },
         })
 
