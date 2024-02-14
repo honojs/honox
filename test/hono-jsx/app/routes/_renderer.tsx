@@ -1,16 +1,21 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 import { HasIslands } from '../../../../src/server'
 
-export default jsxRenderer(({ children, title }) => {
-  return (
-    <html>
-      <head>
-        <title>{title}</title>
-        <HasIslands>
-          <script type='module' src='/app/client.ts'></script>
-        </HasIslands>
-      </head>
-      <body>{children}</body>
-    </html>
-  )
-})
+export default jsxRenderer(
+  ({ children, title }) => {
+    return (
+      <html>
+        <head>
+          <title>{title}</title>
+        </head>
+        <body>
+          {children}
+          <HasIslands>
+            <script type='module' async src='/app/client.ts'></script>
+          </HasIslands>
+        </body>
+      </html>
+    )
+  },
+  { stream: true }
+)
