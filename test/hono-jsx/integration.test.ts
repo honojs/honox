@@ -285,21 +285,43 @@ describe('<Script /> component', () => {
     eager: true,
   })
 
-  const RENDERER = import.meta.glob('./app-script/routes/**/_renderer.tsx', {
-    eager: true,
+  describe('default', () => {
+    const RENDERER = import.meta.glob('./app-script/routes/**/_renderer.tsx', {
+      eager: true,
+    })
+
+    const app = createApp({
+      root: './app-script/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    it('Should convert the script path correctly', async () => {
+      const res = await app.request('/')
+      expect(res.status).toBe(200)
+      expect(await res.text()).toBe(
+        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
+      )
+    })
   })
 
-  const app = createApp({
-    root: './app-script/routes',
-    ROUTES: ROUTES as any,
-    RENDERER: RENDERER as any,
-  })
+  describe('With async', () => {
+    const RENDERER = import.meta.glob('./app-script/routes/**/_async_renderer.tsx', {
+      eager: true,
+    })
 
-  it('Should convert the script path correctly', async () => {
-    const res = await app.request('/')
-    expect(res.status).toBe(200)
-    expect(await res.text()).toBe(
-      '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
-    )
+    const app = createApp({
+      root: './app-script/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    it('Should convert the script path correctly', async () => {
+      const res = await app.request('/')
+      expect(res.status).toBe(200)
+      expect(await res.text()).toBe(
+        '<html><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main><script type="module" async="" src="/static/client-abc.js"></script></body></html>'
+      )
+    })
   })
 })
