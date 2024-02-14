@@ -101,6 +101,9 @@
     "@babel/types": "^7.23.6",
     "@hono/vite-dev-server": "^0.5.0"
   },
+  "peerDependencies": {
+    "hono": ">=4.*"
+  },
   "devDependencies": {
     "@hono/eslint-config": "^0.0.4",
     "@mdx-js/rollup": "^3.0.0",
@@ -110,7 +113,7 @@
     "@types/node": "^20.10.5",
     "eslint": "^8.56.0",
     "glob": "^10.3.10",
-    "hono": "^4.0.0",
+    "hono": "^4.0.1",
     "np": "7.7.0",
     "prettier": "^3.1.1",
     "publint": "^0.2.7",
