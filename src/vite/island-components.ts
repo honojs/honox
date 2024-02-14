@@ -30,7 +30,7 @@ import {
 } from '@babel/types'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
-import { COMPONENT_NAME, DATA_SERIALIZED_PROPS } from '../constants.js'
+import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
 
 function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
   const isSSR = memberExpression(
@@ -59,6 +59,21 @@ function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
         ),
         jsxClosingElement(jsxIdentifier(funcName)),
         []
+      ),
+      jsxExpressionContainer(
+        conditionalExpression(
+          memberExpression(identifier('props'), identifier('children')),
+          jsxElement(
+            jsxOpeningElement(
+              jsxIdentifier('template'),
+              [jsxAttribute(jsxIdentifier(DATA_HONO_TEMPLATE), stringLiteral(''))],
+              false
+            ),
+            jsxClosingElement(jsxIdentifier('template')),
+            [jsxExpressionContainer(memberExpression(identifier('props'), identifier('children')))]
+          ),
+          identifier('null')
+        )
       ),
     ]
   )
