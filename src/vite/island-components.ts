@@ -38,7 +38,20 @@ function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
     identifier('env.SSR')
   )
 
-  const serializedProps = callExpression(identifier('JSON.stringify'), [identifier('props')])
+  // serialize props by excluding the children
+  const serializedProps = callExpression(identifier('JSON.stringify'), [
+    callExpression(memberExpression(identifier('Object'), identifier('fromEntries')), [
+      callExpression(
+        memberExpression(
+          callExpression(memberExpression(identifier('Object'), identifier('entries')), [
+            identifier('props'),
+          ]),
+          identifier('filter')
+        ),
+        [identifier('([key]) => key !== "children"')]
+      ),
+    ]),
+  ])
 
   const ssrElement = jsxElement(
     jsxOpeningElement(

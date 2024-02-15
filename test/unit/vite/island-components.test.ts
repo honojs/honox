@@ -11,7 +11,7 @@ describe('transformJsxTags', () => {
   return <h1>Hello</h1>;
 };
 const WrappedBadge = function (props) {
-  return import.meta.env.SSR ? <honox-island component-name="Badge.tsx" data-serialized-props={JSON.stringify(props)}><BadgeOriginal {...props}></BadgeOriginal>{props.children ? <template data-hono-template="">{props.children}</template> : null}</honox-island> : <BadgeOriginal {...props}></BadgeOriginal>;
+  return import.meta.env.SSR ? <honox-island component-name="Badge.tsx" data-serialized-props={JSON.stringify(Object.fromEntries(Object.entries(props).filter(([key]) => key !== "children")))}><BadgeOriginal {...props}></BadgeOriginal>{props.children ? <template data-hono-template="">{props.children}</template> : null}</honox-island> : <BadgeOriginal {...props}></BadgeOriginal>;
 };
 export default WrappedBadge;`
     )
@@ -31,7 +31,7 @@ export default WrappedBadge;`
   return <h1>Hello</h1>;
 };
 const WrappedAsyncComponent = async function (props) {
-  return import.meta.env.SSR ? <honox-island component-name="AsyncComponent.tsx" data-serialized-props={JSON.stringify(props)}><AsyncComponentOriginal {...props}></AsyncComponentOriginal>{props.children ? <template data-hono-template="">{props.children}</template> : null}</honox-island> : <AsyncComponentOriginal {...props}></AsyncComponentOriginal>;
+  return import.meta.env.SSR ? <honox-island component-name="AsyncComponent.tsx" data-serialized-props={JSON.stringify(Object.fromEntries(Object.entries(props).filter(([key]) => key !== "children")))}><AsyncComponentOriginal {...props}></AsyncComponentOriginal>{props.children ? <template data-hono-template="">{props.children}</template> : null}</honox-island> : <AsyncComponentOriginal {...props}></AsyncComponentOriginal>;
 };
 export default WrappedAsyncComponent;`
     )
