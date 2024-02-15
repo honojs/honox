@@ -18,7 +18,7 @@ export type ClientOptions = {
 }
 
 const buildCreateChildrenFn = (createElement: CreateElement): CreateChildren => {
-  const createChildren = (childNodes: NodeListOf<ChildNode>): Node[] => {
+  const createChildren = async (childNodes: NodeListOf<ChildNode>): Promise<Node[]> => {
     const children = []
     for (let i = 0; i < childNodes.length; i++) {
       const child = childNodes[i] as HTMLElement
@@ -38,7 +38,7 @@ const buildCreateChildrenFn = (createElement: CreateElement): CreateChildren => 
         // Suspense: replace content by `replaceWith` when resolved
         // ErrorBoundary: replace content by `replaceWith` when error
         child.replaceWith = (node: DocumentFragment) => {
-          resolve(createChildren(node.childNodes))
+          createChildren(node.childNodes).then(resolve)
           placeholderElement.remove()
         }
 
@@ -62,8 +62,8 @@ const buildCreateChildrenFn = (createElement: CreateElement): CreateChildren => 
             fallback.push(child.textContent)
           } else {
             fallback.push(
-              createElement(child.nodeName, {
-                children: createChildren(child.childNodes),
+              await createElement(child.nodeName, {
+                children: await createChildren(child.childNodes),
               })
             )
           }
@@ -75,19 +75,19 @@ const buildCreateChildrenFn = (createElement: CreateElement): CreateChildren => 
         )
         if (fallbackTemplates.length > 0) {
           const fallbackTemplate = fallbackTemplates[fallbackTemplates.length - 1]
-          fallback = createChildren(fallbackTemplate.content.childNodes)
+          fallback = await createChildren(fallbackTemplate.content.childNodes)
         }
 
         // if no content available, wait for ErrorBoundary fallback content
         if (fallback.length === 0 && child.id.startsWith('E:')) {
           let resolve: (nodes: Node[]) => void
           const promise = new Promise<Node[]>((r) => (resolve = r))
-          fallback = createElement(Suspense, {
+          fallback = await createElement(Suspense, {
             fallback: [],
-            children: [createElement(() => use(promise), {})],
+            children: [await createElement(() => use(promise), {})],
           })
           placeholderElement.insertBefore = ((node: DocumentFragment) => {
-            resolve(createChildren(node.childNodes))
+            createChildren(node.childNodes).then(resolve)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           }) as any
         }
@@ -97,15 +97,15 @@ const buildCreateChildrenFn = (createElement: CreateElement): CreateChildren => 
 
         // render fallback content
         children.push(
-          createElement(Suspense, {
+          await createElement(Suspense, {
             fallback,
-            children: [createElement(() => use(promise), {})],
+            children: [await createElement(() => use(promise), {})],
           })
         )
       } else {
         children.push(
-          createElement(child.nodeName, {
-            children: createChildren(child.childNodes),
+          await createElement(child.nodeName, {
+            children: await createChildren(child.childNodes),
           })
         )
       }
