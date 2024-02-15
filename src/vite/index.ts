@@ -4,6 +4,7 @@ import type { DevServerOptions } from '@hono/vite-dev-server'
 import type { PluginOption } from 'vite'
 import { injectImportingIslands } from './inject-importing-islands.js'
 import { islandComponents } from './island-components.js'
+import { restartOnAddUnlink } from './restart-on-add-unlink.js'
 
 type Options = {
   islands?: boolean
@@ -40,6 +41,7 @@ function honox(options?: Options): PluginOption[] {
   }
 
   plugins.push(injectImportingIslands())
+  plugins.push(restartOnAddUnlink())
 
   return [
     {
