@@ -63,6 +63,46 @@ describe('Basic', () => {
         method: 'GET',
         handler: expect.any(Function),
       },
+      {
+        path: '/interaction/children',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/children',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/error-boundary',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/error-boundary',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense-never',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense-never',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
       { path: '/api', method: 'POST', handler: expect.any(Function) },
       { path: '/api', method: 'POST', handler: expect.any(Function) },
       { path: '/api', method: 'GET', handler: expect.any(Function) },
@@ -198,7 +238,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title><script type="module" src="/app/client.ts"></script></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div><p>Count: 5</p><button>Increment</button></div></honox-island></body></html>'
+      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
