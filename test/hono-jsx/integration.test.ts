@@ -64,6 +64,46 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/interaction/children',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/children',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/error-boundary',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/error-boundary',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense-never',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense-never',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/fc',
         method: 'GET',
         handler: expect.any(Function),
@@ -214,7 +254,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title><script type="module" src="/app/client.ts"></script></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div><p>Count: 5</p><button>Increment</button></div></honox-island></body></html>'
+      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
@@ -301,21 +341,43 @@ describe('<Script /> component', () => {
     eager: true,
   })
 
-  const RENDERER = import.meta.glob('./app-script/routes/**/_renderer.tsx', {
-    eager: true,
+  describe('default', () => {
+    const RENDERER = import.meta.glob('./app-script/routes/**/_renderer.tsx', {
+      eager: true,
+    })
+
+    const app = createApp({
+      root: './app-script/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    it('Should convert the script path correctly', async () => {
+      const res = await app.request('/')
+      expect(res.status).toBe(200)
+      expect(await res.text()).toBe(
+        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
+      )
+    })
   })
 
-  const app = createApp({
-    root: './app-script/routes',
-    ROUTES: ROUTES as any,
-    RENDERER: RENDERER as any,
-  })
+  describe('With async', () => {
+    const RENDERER = import.meta.glob('./app-script/routes/**/_async_renderer.tsx', {
+      eager: true,
+    })
 
-  it('Should convert the script path correctly', async () => {
-    const res = await app.request('/')
-    expect(res.status).toBe(200)
-    expect(await res.text()).toBe(
-      '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
-    )
+    const app = createApp({
+      root: './app-script/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    it('Should convert the script path correctly', async () => {
+      const res = await app.request('/')
+      expect(res.status).toBe(200)
+      expect(await res.text()).toBe(
+        '<html><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main><script type="module" async="" src="/static/client-abc.js"></script></body></html>'
+      )
+    })
   })
 })

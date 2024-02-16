@@ -4,6 +4,7 @@ import { HasIslands } from './has-islands.js'
 
 type Options = {
   src: string
+  async?: boolean
   prod?: boolean
   manifest?: Manifest
 }
@@ -28,13 +29,17 @@ export const Script: FC<Options> = async (options) => {
       if (scriptInManifest) {
         return (
           <HasIslands>
-            <script type='module' src={`/${scriptInManifest.file}`}></script>
+            <script
+              type='module'
+              async={!!options.async}
+              src={`/${scriptInManifest.file}`}
+            ></script>
           </HasIslands>
         )
       }
     }
     return <></>
   } else {
-    return <script type='module' src={src}></script>
+    return <script type='module' async={!!options.async} src={src}></script>
   }
 }

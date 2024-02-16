@@ -30,7 +30,7 @@ import {
 } from '@babel/types'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
-import { COMPONENT_NAME, DATA_SERIALIZED_PROPS } from '../constants.js'
+import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
 
 function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
   const isSSR = memberExpression(
@@ -38,7 +38,20 @@ function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
     identifier('env.SSR')
   )
 
-  const serializedProps = callExpression(identifier('JSON.stringify'), [identifier('props')])
+  // serialize props by excluding the children
+  const serializedProps = callExpression(identifier('JSON.stringify'), [
+    callExpression(memberExpression(identifier('Object'), identifier('fromEntries')), [
+      callExpression(
+        memberExpression(
+          callExpression(memberExpression(identifier('Object'), identifier('entries')), [
+            identifier('props'),
+          ]),
+          identifier('filter')
+        ),
+        [identifier('([key]) => key !== "children"')]
+      ),
+    ]),
+  ])
 
   const ssrElement = jsxElement(
     jsxOpeningElement(
@@ -59,6 +72,21 @@ function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
         ),
         jsxClosingElement(jsxIdentifier(funcName)),
         []
+      ),
+      jsxExpressionContainer(
+        conditionalExpression(
+          memberExpression(identifier('props'), identifier('children')),
+          jsxElement(
+            jsxOpeningElement(
+              jsxIdentifier('template'),
+              [jsxAttribute(jsxIdentifier(DATA_HONO_TEMPLATE), stringLiteral(''))],
+              false
+            ),
+            jsxClosingElement(jsxIdentifier('template')),
+            [jsxExpressionContainer(memberExpression(identifier('props'), identifier('children')))]
+          ),
+          identifier('null')
+        )
       ),
     ]
   )
