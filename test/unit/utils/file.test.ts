@@ -9,6 +9,7 @@ import {
 describe('filePathToPath', () => {
   it('Should return a correct path', () => {
     expect(filePathToPath('index.tsx')).toBe('/')
+    expect(filePathToPath('index.get.tsx')).toBe('/index.get')
     expect(filePathToPath('about.tsx')).toBe('/about')
     expect(filePathToPath('about/index.tsx')).toBe('/about')
     expect(filePathToPath('about/me')).toBe('/about/me')
@@ -16,6 +17,7 @@ describe('filePathToPath', () => {
     expect(filePathToPath('about/me/address.tsx')).toBe('/about/me/address')
 
     expect(filePathToPath('/index.tsx')).toBe('/')
+    expect(filePathToPath('/index.get.tsx')).toBe('/index.get')
     expect(filePathToPath('/about.tsx')).toBe('/about')
     expect(filePathToPath('/about/index.tsx')).toBe('/about')
     expect(filePathToPath('/about/me')).toBe('/about/me')
@@ -25,6 +27,7 @@ describe('filePathToPath', () => {
     expect(filePathToPath('/about/[name].tsx')).toBe('/about/:name')
     expect(filePathToPath('/about/[...foo].tsx')).toBe('/about/*')
     expect(filePathToPath('/about/[name]/address.tsx')).toBe('/about/:name/address')
+    expect(filePathToPath('/about/[arg1]/[arg2]')).toBe('/about/:arg1/:arg2')
   })
 })
 

@@ -1,6 +1,6 @@
 {
   "name": "honox",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -113,7 +113,7 @@
     "@types/node": "^20.10.5",
     "eslint": "^8.56.0",
     "glob": "^10.3.10",
-    "hono": "^4.0.1",
+    "hono": "^4.0.3",
     "np": "7.7.0",
     "prettier": "^3.1.1",
     "publint": "^0.2.7",

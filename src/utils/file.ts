@@ -2,10 +2,10 @@ export const filePathToPath = (filePath: string) => {
   filePath = filePath
     .replace(/\.tsx?$/g, '')
     .replace(/\.mdx$/g, '')
-    .replace(/^\/?index/, '/') // `/index`
-    .replace(/\/index/, '') // `/about/index`
+    .replace(/^\/?index$/, '/') // `/index`
+    .replace(/\/index$/, '') // `/about/index`
     .replace(/\[\.{3}.+\]/, '*')
-    .replace(/\[(.+)\]/, ':$1')
+    .replace(/\[(.+?)\]/g, ':$1')
   return /^\//.test(filePath) ? filePath : '/' + filePath
 }
 
