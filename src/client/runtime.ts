@@ -2,6 +2,16 @@ import { Suspense, use } from 'hono/jsx/dom'
 import type { CreateElement, CreateChildren } from '../types.js'
 
 export const buildCreateChildrenFn = (createElement: CreateElement): CreateChildren => {
+  const createElementFromHTMLElement = async (element: HTMLElement) => {
+    const props = {
+      children: await createChildren(element.childNodes),
+    } as Record<string, string> & { children: Node[] }
+    const attributes = element.attributes
+    for (let i = 0; i < attributes.length; i++) {
+      props[attributes[i].name] = attributes[i].value
+    }
+    return createElement(element.nodeName, props)
+  }
   const createChildren = async (childNodes: NodeListOf<ChildNode>): Promise<Node[]> => {
     const children = []
     for (let i = 0; i < childNodes.length; i++) {
@@ -45,11 +55,7 @@ export const buildCreateChildrenFn = (createElement: CreateElement): CreateChild
           } else if (child.nodeType === 3) {
             fallback.push(child.textContent)
           } else {
-            fallback.push(
-              await createElement(child.nodeName, {
-                children: await createChildren(child.childNodes),
-              })
-            )
+            fallback.push(await createElementFromHTMLElement(child as HTMLElement))
           }
         }
 
@@ -87,11 +93,7 @@ export const buildCreateChildrenFn = (createElement: CreateElement): CreateChild
           })
         )
       } else {
-        children.push(
-          await createElement(child.nodeName, {
-            children: await createChildren(child.childNodes),
-          })
-        )
+        children.push(await createElementFromHTMLElement(child))
       }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

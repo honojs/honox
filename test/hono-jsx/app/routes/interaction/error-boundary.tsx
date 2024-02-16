@@ -22,7 +22,13 @@ export default function Interaction() {
         </ErrorBoundary>
       </Counter>
       <Counter id='error-boundary-failure' initial={4}>
-        <ErrorBoundary fallback={<span>Something went wrong</span>}>
+        <ErrorBoundary
+          fallback={
+            <div>
+              <span class='error'>Something went wrong</span>
+            </div>
+          }
+        >
           <Suspense fallback={<span>Loading...</span>}>
             <SuspenseFailureChild />
           </Suspense>

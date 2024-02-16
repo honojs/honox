@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 test('test counter', async ({ page }) => {
   await page.goto('/interaction')
@@ -18,7 +18,10 @@ test('children - sync', async ({ page }) => {
   const container = page.locator('id=sync')
   await container.locator('button').click()
   await container.getByText('Count: 1').click()
-  await container.getByText('Sync child').click()
+  const div = await container.locator('div')
+  expect(await div.innerHTML()).toBe(
+    '<h3 id="sync-header">Sync</h3><span data-content="Sync child">Sync child</span>'
+  )
 })
 
 test('children - async', async ({ page }) => {
@@ -65,5 +68,6 @@ test('error-boundary failure', async ({ page }) => {
   const container = page.locator('id=error-boundary-failure')
   await container.locator('button').click()
   await container.getByText('Count: 5').click()
-  await container.getByText('Something went wrong').click()
+  const div = await container.locator('div')
+  expect(await div.innerHTML()).toBe('<span class="error">Something went wrong</span>')
 })
