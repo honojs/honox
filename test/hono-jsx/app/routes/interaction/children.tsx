@@ -8,7 +8,10 @@ export default function Interaction() {
   return (
     <>
       <Counter id='sync'>
-        <span>Sync child</span>
+        <div>
+          <h3 id="sync-header">Sync</h3>
+          <span data-content="Sync child">Sync child</span>
+        </div>
       </Counter>
       <Counter id='async' initial={2}>
         <AsyncChild />
