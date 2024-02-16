@@ -466,7 +466,7 @@ export const POST = createRoute(zValidator('form', schema), async (c) => {
 })
 ```
 
-Alternatively, you can use a `_middleware.tsx` file in a directory to have that middleware applied to the current route, as well as all child routes. The following example will enable the logger middleware for the root, as well as all child routes. Middleware is ran in the order that it is listed within the array.
+Alternatively, you can use a `_middleware.tsx` file in a directory to have that middleware applied to the current route, as well as all child routes. Middleware is ran in the order that it is listed within the array.
 
 An equivilant example to the previous Hono-style middleware configuration is as follows:
 
