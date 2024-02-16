@@ -1,8 +1,3 @@
-import { MiddlewareHandler } from "hono"
+import { headerMiddleware } from "../../middleware/appendHeader"
 
-const headerMiddleware: MiddlewareHandler = (ctx,next) => {
-    ctx.res.headers.append('root', 'root')
-    return next()
-}
-
-export default [headerMiddleware]
+export default [headerMiddleware('root')]

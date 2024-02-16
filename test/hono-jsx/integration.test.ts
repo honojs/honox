@@ -2,7 +2,6 @@
 import { poweredBy } from 'hono/powered-by'
 import { describe, it, expect, vi } from 'vitest'
 import { createApp } from '../../src/server'
-import { anyTypeAnnotation } from '@babel/types'
 
 describe('Basic', () => {
   const ROUTES = import.meta.glob('./app/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)', {
