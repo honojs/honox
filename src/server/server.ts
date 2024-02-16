@@ -84,23 +84,6 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
     })
   const middlewareList = listByDirectory(MIDDLEWARE_FILE)
 
-
-  const applyRenderer = (app: Hono, rendererFile: string) => {
-    const renderer = RENDERER_FILE[rendererFile]
-    const rendererDefault = renderer.default
-    if (rendererDefault) {
-      app.all('*', rendererDefault)
-    }
-  }
-
-  const applyMiddleware = (app: Hono, middlewareFile: string) => {
-    const middleware = MIDDLEWARE_FILE[middlewareFile]
-    const middlewareDefault = middleware.default
-    if (middlewareDefault) {
-      app.use(...middlewareDefault)
-    }
-  }
-
   // Routes
   const ROUTES_FILE =
     options?.ROUTES ??
@@ -137,13 +120,21 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
       // Renderer
       const rendererPaths = getPaths(dir, rendererList)
       rendererPaths.map((path) => {
-        applyRenderer(subApp, path)
+        const renderer = RENDERER_FILE[path]
+        const rendererDefault = renderer.default
+        if (rendererDefault) {
+          subApp.all('*', rendererDefault)
+        }
       })
 
       // Middleware
       const middlewarePaths = getPaths(dir, middlewareList)
       middlewarePaths.map((path) => {
-        applyMiddleware(subApp, path);
+        const middleware = MIDDLEWARE_FILE[path]
+        const middlewareDefault = middleware.default
+        if (middlewareDefault) {
+          subApp.use(...middlewareDefault)
+        }
       })
 
       // Root path
