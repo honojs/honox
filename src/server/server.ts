@@ -28,6 +28,7 @@ type RouteFile = {
 type RendererFile = { default: MiddlewareHandler }
 type NotFoundFile = { default: NotFoundHandler }
 type ErrorFile = { default: ErrorHandler }
+type MiddlewareFile = { default: MiddlewareHandler[] }
 
 type InitFunction<E extends Env = Env> = (app: Hono<E>) => void
 
@@ -36,6 +37,7 @@ export type ServerOptions<E extends Env = Env> = {
   RENDERER?: Record<string, RendererFile>
   NOT_FOUND?: Record<string, NotFoundFile>
   ERROR?: Record<string, ErrorFile>
+  MIDDLEWARE?: Record<string, MiddlewareFile>
   root?: string
   app?: Hono<E>
   init?: InitFunction<E>
@@ -74,11 +76,28 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
     })
   const rendererList = listByDirectory(RENDERER_FILE)
 
+  // Middleware
+  const MIDDLEWARE_FILE =
+    options?.MIDDLEWARE ??
+    import.meta.glob<MiddlewareFile>('/app/routes/**/_middleware.tsx', {
+      eager: true,
+    })
+  const middlewareList = listByDirectory(MIDDLEWARE_FILE)
+
+
   const applyRenderer = (app: Hono, rendererFile: string) => {
     const renderer = RENDERER_FILE[rendererFile]
-    const rendererDefault = renderer['default']
+    const rendererDefault = renderer.default
     if (rendererDefault) {
       app.all('*', rendererDefault)
+    }
+  }
+
+  const applyMiddleware = (app: Hono, middlewareFile: string) => {
+    const middleware = MIDDLEWARE_FILE[middlewareFile]
+    const middlewareDefault = middleware.default
+    if (middlewareDefault) {
+      app.use(...middlewareDefault)
     }
   }
 
@@ -109,11 +128,31 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
         return rendererPaths ?? []
       }
 
-      const dirPaths = dir.split('/')
-      rendererPaths = getRendererPaths(dirPaths)
+      const renderDirPaths = dir.split('/')
+      rendererPaths = getRendererPaths(renderDirPaths)
       rendererPaths.sort((a, b) => a.split('/').length - b.split('/').length)
       rendererPaths.map((path) => {
         applyRenderer(subApp, path)
+      })
+
+      // Middleware
+      let middlewarePaths = middlewareList[dir] ?? []
+      const getMiddlewarePaths = (paths: string[]) => {
+        middlewarePaths = middlewareList[paths.join('/')]
+        if (!middlewarePaths) {
+          paths.pop()
+          if (paths.length) {
+            getMiddlewarePaths(paths)
+          }
+        }
+        return middlewarePaths ?? []
+      }
+
+      const middlewareDirPaths = dir.split('/')
+      middlewarePaths = getMiddlewarePaths(middlewareDirPaths)
+      middlewarePaths.sort((a, b) => a.split('/').length - b.split('/').length)
+      middlewarePaths.map((path) => {
+        applyMiddleware(subApp, path);
       })
 
       // Root path
