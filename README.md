@@ -157,7 +157,7 @@ export default app
 Or simply, you can just return JSX.
 
 ```tsx
-export default function Home() {
+export default function Home(_c: Context) {
   return <h1>Welcome!</h1>
 }
 ```

@@ -63,6 +63,16 @@ describe('Basic', () => {
         method: 'GET',
         handler: expect.any(Function),
       },
+      {
+        path: '/fc',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/fc',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
       { path: '/api', method: 'POST', handler: expect.any(Function) },
       { path: '/api', method: 'POST', handler: expect.any(Function) },
       { path: '/api', method: 'GET', handler: expect.any(Function) },
@@ -118,6 +128,12 @@ describe('Basic', () => {
       method: 'POST',
     })
     expect(res.status).toBe(201)
+  })
+
+  it('Should return 200 response - GET /fc', async () => {
+    const res = await app.request('/fc')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<h1>Function from /fc</h1>')
   })
 
   it('Should render MDX content - /post', async () => {

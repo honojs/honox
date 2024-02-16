@@ -155,7 +155,7 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
         if (typeof routeDefault === 'function') {
           subApp.get(path, setInnerMeta)
           subApp.get(path, (c) => {
-            return c.render(routeDefault(), route as any)
+            return c.render(routeDefault(c), route as any)
           })
         }
       }
