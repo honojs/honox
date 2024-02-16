@@ -113,19 +113,19 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
   const getPaths = (currentDirectory: string, fileList: Record<string, string[]>) => {
     let paths = fileList[currentDirectory] ?? []
 
-    const getRendererPaths = (childDirectories: string[]) => {
+    const getChildPaths = (childDirectories: string[]) => {
       paths = fileList[childDirectories.join('/')]
       if (!paths) {
         childDirectories.pop()
         if (childDirectories.length) {
-          getRendererPaths(childDirectories)
+          getChildPaths(childDirectories)
         }
       }
       return paths ?? []
     }
 
     const renderDirPaths = currentDirectory.split('/')
-    paths = getRendererPaths(renderDirPaths)
+    paths = getChildPaths(renderDirPaths)
     paths.sort((a, b) => a.split('/').length - b.split('/').length)
     return paths
   }
