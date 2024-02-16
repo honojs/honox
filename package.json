@@ -7,7 +7,7 @@
     "test": "bun typecheck && bun test:unit && bun test:integration && bun test:e2e",
     "test:unit": "vitest --run test/unit",
     "test:integration": "bun test:integration:api && bun test:integration:hono-jsx",
-    "test:integration:hono-jsx": "vitest run -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts -t 'Nested Middleware' --silent=false",
+    "test:integration:hono-jsx": "vitest run -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts",
     "test:integration:hono-jsx:watch": "vitest -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts",
     "test:integration:api": "vitest run -c ./test/api/vitest.config.ts ./test/api/integration.test.ts",
     "test:e2e": "playwright test -c ./test/hono-jsx/playwright.config.ts ./test/hono-jsx/e2e.test.ts",
