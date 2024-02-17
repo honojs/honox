@@ -671,6 +671,9 @@ export default defineConfig(({ mode }) => {
     }
   } else {
     return {
+      build: {
+        emptyOutDir: false,
+      },
       plugins: [honox(), ssg({ entry })],
     }
   }
