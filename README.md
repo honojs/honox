@@ -648,9 +648,39 @@ const entry = './app/server.ts'
 
 export default defineConfig(() => {
   return {
-    plugins: [honox(), devServer({ entry }), ssg({ entry })],
+    plugins: [honox(), ssg({ entry })],
   }
 })
+```
+
+If you want to include client side scripts and assets:
+
+```ts
+// vite.config.ts
+import ssg from '@hono/vite-ssg'
+import honox from 'honox/vite'
+import client from 'honox/vite/client'
+import { defineConfig } from 'vite'
+
+const entry = './app/server.ts'
+
+export default defineConfig(({ mode }) => {
+  if (mode === 'client') {
+    return {
+      plugins: [client()],
+    }
+  } else {
+    return {
+      plugins: [honox(), ssg({ entry })],
+    }
+  }
+})
+```
+
+Build command (including a client):
+
+```txt
+vite build --mode client && vite build
 ```
 
 You can also deploy it to Cloudflare Pages.
