@@ -79,7 +79,7 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
   // Middleware
   const MIDDLEWARE_FILE =
     options?.MIDDLEWARE ??
-    import.meta.glob<MiddlewareFile>('/app/routes/**/_middleware.tsx', {
+    import.meta.glob<MiddlewareFile>('/app/routes/**/_middleware.(ts|tsx)', {
       eager: true,
     })
   const middlewareList = listByDirectory(MIDDLEWARE_FILE)
