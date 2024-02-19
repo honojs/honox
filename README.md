@@ -472,6 +472,7 @@ An equivilant example to the previous Hono-style middleware configuration is as 
 
 ```tsx
 // /app/_middleware.tsx
+import { createRoute } from 'honox/factory'
 import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
 
