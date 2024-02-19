@@ -471,7 +471,7 @@ Alternatively, you can use a `_middleware.(ts|tsx)` file in a directory to have 
 An equivilant example to the previous Hono-style middleware configuration is as follows:
 
 ```tsx
-// /app/_middleware.tsx
+// /app/_middleware.ts
 import { createRoute } from 'honox/factory'
 import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
