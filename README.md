@@ -383,7 +383,7 @@ declare module '@hono/react-renderer' {
 }
 ```
 
-The following is an example of `app/routes/renderer.tsx`.
+The following is an example of `app/routes/_renderer.tsx`.
 
 ```tsx
 // app/routes/_renderer.tsx
