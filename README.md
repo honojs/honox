@@ -466,6 +466,25 @@ export const POST = createRoute(zValidator('form', schema), async (c) => {
 })
 ```
 
+Alternatively, you can use a `_middleware.(ts|tsx)` file in a directory to have that middleware applied to the current route, as well as all child routes. Middleware is ran in the order that it is listed within the array.
+
+An equivilant example to the previous Hono-style middleware configuration is as follows:
+
+```tsx
+// /app/_middleware.ts
+import { createRoute } from 'honox/factory'
+import { z } from 'zod'
+import { zValidator } from '@hono/zod-validator'
+
+const schema = z.object({
+  name: z.string().max(10),
+})
+
+export default createRoute(zValidator('form', schema), ...<more-middleware>)
+```
+
+Note that is some scenarios, auto-complete for the request body within the route may be lost depending on how the middleware was written.
+
 ### Using Tailwind CSS
 
 Given that HonoX is Vite-centric, if you wish to utilize [Tailwind CSS](https://tailwindcss.com/), simply adhere to the official instructions.

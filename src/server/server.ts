@@ -28,6 +28,7 @@ type RouteFile = {
 type RendererFile = { default: MiddlewareHandler }
 type NotFoundFile = { default: NotFoundHandler }
 type ErrorFile = { default: ErrorHandler }
+type MiddlewareFile = { default: MiddlewareHandler[] }
 
 type InitFunction<E extends Env = Env> = (app: Hono<E>) => void
 
@@ -36,6 +37,7 @@ export type ServerOptions<E extends Env = Env> = {
   RENDERER?: Record<string, RendererFile>
   NOT_FOUND?: Record<string, NotFoundFile>
   ERROR?: Record<string, ErrorFile>
+  MIDDLEWARE?: Record<string, MiddlewareFile>
   root?: string
   app?: Hono<E>
   init?: InitFunction<E>
@@ -74,13 +76,13 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
     })
   const rendererList = listByDirectory(RENDERER_FILE)
 
-  const applyRenderer = (app: Hono, rendererFile: string) => {
-    const renderer = RENDERER_FILE[rendererFile]
-    const rendererDefault = renderer['default']
-    if (rendererDefault) {
-      app.all('*', rendererDefault)
-    }
-  }
+  // Middleware
+  const MIDDLEWARE_FILE =
+    options?.MIDDLEWARE ??
+    import.meta.glob<MiddlewareFile>('/app/routes/**/_middleware.(ts|tsx)', {
+      eager: true,
+    })
+  const middlewareList = listByDirectory(MIDDLEWARE_FILE)
 
   // Routes
   const ROUTES_FILE =
@@ -91,29 +93,48 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> =>
 
   const routesMap = sortDirectoriesByDepth(groupByDirectory(ROUTES_FILE))
 
+  const getPaths = (currentDirectory: string, fileList: Record<string, string[]>) => {
+    let paths = fileList[currentDirectory] ?? []
+
+    const getChildPaths = (childDirectories: string[]) => {
+      paths = fileList[childDirectories.join('/')]
+      if (!paths) {
+        childDirectories.pop()
+        if (childDirectories.length) {
+          getChildPaths(childDirectories)
+        }
+      }
+      return paths ?? []
+    }
+
+    const renderDirPaths = currentDirectory.split('/')
+    paths = getChildPaths(renderDirPaths)
+    paths.sort((a, b) => a.split('/').length - b.split('/').length)
+    return paths
+  }
+
   for (const map of routesMap) {
     for (const [dir, content] of Object.entries(map)) {
       const subApp = new Hono()
 
       // Renderer
-      let rendererPaths = rendererList[dir] ?? []
-
-      const getRendererPaths = (paths: string[]) => {
-        rendererPaths = rendererList[paths.join('/')]
-        if (!rendererPaths) {
-          paths.pop()
-          if (paths.length) {
-            getRendererPaths(paths)
-          }
-        }
-        return rendererPaths ?? []
-      }
-
-      const dirPaths = dir.split('/')
-      rendererPaths = getRendererPaths(dirPaths)
-      rendererPaths.sort((a, b) => a.split('/').length - b.split('/').length)
+      const rendererPaths = getPaths(dir, rendererList)
       rendererPaths.map((path) => {
-        applyRenderer(subApp, path)
+        const renderer = RENDERER_FILE[path]
+        const rendererDefault = renderer.default
+        if (rendererDefault) {
+          subApp.all('*', rendererDefault)
+        }
+      })
+
+      // Middleware
+      const middlewarePaths = getPaths(dir, middlewareList)
+      middlewarePaths.map((path) => {
+        const middleware = MIDDLEWARE_FILE[path]
+        const middlewareDefault = middleware.default
+        if (middlewareDefault) {
+          subApp.use(...middlewareDefault)
+        }
       })
 
       // Root path
