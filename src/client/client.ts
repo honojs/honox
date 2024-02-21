@@ -24,9 +24,13 @@ export const createClient = async (options?: ClientOptions) => {
   const hydrateComponent = async () => {
     const filePromises = Object.keys(FILES).map(async (filePath) => {
       const componentName = filePath.replace(root, '')
-      const elements = document.querySelectorAll(`[${COMPONENT_NAME}="${componentName}"]`)
+      const elements = document.querySelectorAll(
+        `[${COMPONENT_NAME}="${componentName}"]:not([data-hono-hydrated])`
+      )
       if (elements) {
         const elementPromises = Array.from(elements).map(async (element) => {
+          element.setAttribute('data-hono-hydrated', 'true') // mark as hydrated
+
           const fileCallback = FILES[filePath] as FileCallback
           const file = await fileCallback()
           const Component = await file.default
