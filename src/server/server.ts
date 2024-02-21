@@ -32,66 +32,47 @@ type MiddlewareFile = { default: MiddlewareHandler[] }
 
 type InitFunction<E extends Env = Env> = (app: Hono<E>) => void
 
-export type ServerOptions<E extends Env = Env> = {
-  ROUTES?: Record<string, RouteFile>
-  RENDERER?: Record<string, RendererFile>
-  NOT_FOUND?: Record<string, NotFoundFile>
-  ERROR?: Record<string, ErrorFile>
-  MIDDLEWARE?: Record<string, MiddlewareFile>
-  root?: string
+type BaseServerOptions<E extends Env = Env> = {
+  ROUTES: Record<string, RouteFile | AppFile>
+  RENDERER: Record<string, RendererFile>
+  NOT_FOUND: Record<string, NotFoundFile>
+  ERROR: Record<string, ErrorFile>
+  MIDDLEWARE: Record<string, MiddlewareFile>
+  root: string
   app?: Hono<E>
   init?: InitFunction<E>
 }
 
-export const createApp = <E extends Env>(options?: ServerOptions<E>): Hono<E> => {
-  const root = options?.root ?? '/app/routes'
-  const rootRegExp = new RegExp(`^${root}`)
-  const app = options?.app ?? new Hono()
+export type ServerOptions<E extends Env = Env> = Partial<BaseServerOptions<E>>
 
-  if (options?.init) {
+export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E> => {
+  const root = options.root
+  const rootRegExp = new RegExp(`^${root}`)
+  const app = options.app ?? new Hono()
+
+  if (options.init) {
     options.init(app)
   }
 
   // Not Found
-  const NOT_FOUND_FILE =
-    options?.NOT_FOUND ??
-    import.meta.glob<NotFoundFile>('/app/routes/**/_404.(ts|tsx)', {
-      eager: true,
-    })
+  const NOT_FOUND_FILE = options.NOT_FOUND
   const notFoundMap = groupByDirectory(NOT_FOUND_FILE)
 
   // Error
-  const ERROR_FILE =
-    options?.ERROR ??
-    import.meta.glob<ErrorFile>('/app/routes/**/_error.(ts|tsx)', {
-      eager: true,
-    })
+  const ERROR_FILE = options.ERROR
   const errorMap = groupByDirectory(ERROR_FILE)
 
   // Renderer
-  const RENDERER_FILE =
-    options?.RENDERER ??
-    import.meta.glob<RendererFile>('/app/routes/**/_renderer.tsx', {
-      eager: true,
-    })
+  const RENDERER_FILE = options.RENDERER
   const rendererList = listByDirectory(RENDERER_FILE)
 
   // Middleware
-  const MIDDLEWARE_FILE =
-    options?.MIDDLEWARE ??
-    import.meta.glob<MiddlewareFile>('/app/routes/**/_middleware.(ts|tsx)', {
-      eager: true,
-    })
+  const MIDDLEWARE_FILE = options.MIDDLEWARE
   const middlewareList = listByDirectory(MIDDLEWARE_FILE)
 
   // Routes
-  const ROUTES_FILE =
-    options?.ROUTES ??
-    import.meta.glob<RouteFile | AppFile>('/app/routes/**/[!_]*.(ts|tsx|mdx)', {
-      eager: true,
-    })
-
-  const routesMap = sortDirectoriesByDepth(groupByDirectory(ROUTES_FILE))
+  const ROUTES_FILE = options.ROUTES
+  const routesMap = sortDirectoriesByDepth(groupByDirectory<RouteFile | AppFile>(ROUTES_FILE))
 
   const getPaths = (currentDirectory: string, fileList: Record<string, string[]>) => {
     let paths = fileList[currentDirectory] ?? []
