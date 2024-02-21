@@ -114,18 +114,26 @@ export const transformJsxTags = (contents: string, componentName: string) => {
   if (ast) {
     traverse(ast, {
       ExportDefaultDeclaration(path) {
-        if (path.node.declaration.type === 'FunctionDeclaration') {
-          const functionId = path.node.declaration.id
-          if (!functionId) {
-            return
-          }
+        const declarationType = path.node.declaration.type
+        if (
+          declarationType === 'FunctionDeclaration' ||
+          declarationType === 'FunctionExpression' ||
+          declarationType === 'ArrowFunctionExpression'
+        ) {
+          const functionName =
+            ((declarationType === 'FunctionDeclaration' ||
+              declarationType === 'FunctionExpression') &&
+              path.node.declaration.id?.name) ||
+            '__HonoIsladComponent__'
           const isAsync = path.node.declaration.async
-          const originalFunctionId = identifier(functionId.name + 'Original')
+          const originalFunctionId = identifier(functionName + 'Original')
 
           const originalFunction = functionExpression(
             null,
             path.node.declaration.params,
-            path.node.declaration.body
+            path.node.declaration.body.type === 'BlockStatement'
+              ? path.node.declaration.body
+              : blockStatement([returnStatement(path.node.declaration.body)])
           )
           if (isAsync) {
             originalFunction.async = true
@@ -136,7 +144,7 @@ export const transformJsxTags = (contents: string, componentName: string) => {
           )
 
           const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName, isAsync)
-          const wrappedFunctionId = identifier('Wrapped' + functionId.name)
+          const wrappedFunctionId = identifier('Wrapped' + functionName)
           path.replaceWith(
             variableDeclaration('const', [variableDeclarator(wrappedFunctionId, wrappedFunction)])
           )

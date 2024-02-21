@@ -36,4 +36,50 @@ const WrappedAsyncComponent = async function (props) {
 export default WrappedAsyncComponent;`
     )
   })
+
+  it('unnamed', () => {
+    const code = `export default async function() {
+      return <h1>Hello</h1>
+    }`
+    const result = transformJsxTags(code, 'UnnamedComponent.tsx')
+    expect(result).toBe(
+      `const __HonoIsladComponent__Original = async function () {
+  return <h1>Hello</h1>;
+};
+const Wrapped__HonoIsladComponent__ = async function (props) {
+  return import.meta.env.SSR ? <honox-island component-name="UnnamedComponent.tsx" data-serialized-props={JSON.stringify(Object.fromEntries(Object.entries(props).filter(([key]) => key !== "children")))}><__HonoIsladComponent__Original {...props}></__HonoIsladComponent__Original>{props.children ? <template data-hono-template="">{props.children}</template> : null}</honox-island> : <__HonoIsladComponent__Original {...props}></__HonoIsladComponent__Original>;
+};
+export default Wrapped__HonoIsladComponent__;`
+    )
+  })
+
+  it('arrow - block', () => {
+    const code = `export default () => {
+      return <h1>Hello</h1>
+    }`
+    const result = transformJsxTags(code, 'UnnamedComponent.tsx')
+    expect(result).toBe(
+      `const __HonoIsladComponent__Original = function () {
+  return <h1>Hello</h1>;
+};
+const Wrapped__HonoIsladComponent__ = function (props) {
+  return import.meta.env.SSR ? <honox-island component-name="UnnamedComponent.tsx" data-serialized-props={JSON.stringify(Object.fromEntries(Object.entries(props).filter(([key]) => key !== "children")))}><__HonoIsladComponent__Original {...props}></__HonoIsladComponent__Original>{props.children ? <template data-hono-template="">{props.children}</template> : null}</honox-island> : <__HonoIsladComponent__Original {...props}></__HonoIsladComponent__Original>;
+};
+export default Wrapped__HonoIsladComponent__;`
+    )
+  })
+
+  it('arrow - expression', () => {
+    const code = 'export default () => <h1>Hello</h1>'
+    const result = transformJsxTags(code, 'UnnamedComponent.tsx')
+    expect(result).toBe(
+      `const __HonoIsladComponent__Original = function () {
+  return <h1>Hello</h1>;
+};
+const Wrapped__HonoIsladComponent__ = function (props) {
+  return import.meta.env.SSR ? <honox-island component-name="UnnamedComponent.tsx" data-serialized-props={JSON.stringify(Object.fromEntries(Object.entries(props).filter(([key]) => key !== "children")))}><__HonoIsladComponent__Original {...props}></__HonoIsladComponent__Original>{props.children ? <template data-hono-template="">{props.children}</template> : null}</honox-island> : <__HonoIsladComponent__Original {...props}></__HonoIsladComponent__Original>;
+};
+export default Wrapped__HonoIsladComponent__;`
+    )
+  })
 })
