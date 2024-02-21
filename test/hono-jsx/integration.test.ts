@@ -117,6 +117,8 @@ describe('Basic', () => {
       { path: '/api', method: 'POST', handler: expect.any(Function) },
       { path: '/api', method: 'GET', handler: expect.any(Function) },
       { path: '/api', method: 'GET', handler: expect.any(Function) },
+      { path: '/env', method: 'GET', handler: expect.any(Function) },
+      { path: '/env', method: 'GET', handler: expect.any(Function) },
       { path: '/', method: 'GET', handler: expect.any(Function) },
       { path: '/', method: 'GET', handler: expect.any(Function) },
       {
