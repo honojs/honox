@@ -1,8 +1,0 @@
-[vars]
-TEST_VARIABLE = "TEST_VARIABLE_VALUE"
-
-[[d1_databases]]
-binding = "DB" 
-database_name = "DB_NAME"
-database_id = "DB_ID"
-

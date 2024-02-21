@@ -71,11 +71,3 @@ test('error-boundary failure', async ({ page }) => {
   const div = await container.locator('div')
   expect(await div.innerHTML()).toBe('<span class="error">Something went wrong</span>')
 })
-
-test('sets variables and bindings from wrangler.toml', async ({ page }) => {
-  const res = await page.goto('/env', { waitUntil: 'domcontentloaded' })
-  expect(res?.ok()).toBe(true)
-  const json = await res?.json()
-  expect(json).toBeTruthy()
-  expect(json.env).toStrictEqual({ DB: expect.any(Object), TEST_VARIABLE: 'TEST_VARIABLE_VALUE' })
-})
