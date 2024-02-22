@@ -121,25 +121,25 @@ export const transformJsxTags = (contents: string, componentName: string) => {
               declarationType === 'FunctionExpression') &&
               path.node.declaration.id?.name) ||
             '__HonoIsladComponent__'
-          const isAsync = path.node.declaration.async
           const originalFunctionId = identifier(functionName + 'Original')
 
-          const originalFunction = functionExpression(
-            null,
-            path.node.declaration.params,
-            path.node.declaration.body.type === 'BlockStatement'
-              ? path.node.declaration.body
-              : blockStatement([returnStatement(path.node.declaration.body)])
-          )
-          if (isAsync) {
-            originalFunction.async = true
-          }
+          const originalFunction =
+            path.node.declaration.type === 'FunctionExpression' ||
+            path.node.declaration.type === 'ArrowFunctionExpression'
+              ? path.node.declaration
+              : functionExpression(
+                  null,
+                  path.node.declaration.params,
+                  path.node.declaration.body,
+                  undefined,
+                  path.node.declaration.async
+                )
 
           path.insertBefore(
             variableDeclaration('const', [variableDeclarator(originalFunctionId, originalFunction)])
           )
 
-          const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName, isAsync)
+          const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName)
           const wrappedFunctionId = identifier('Wrapped' + functionName)
           path.replaceWith(
             variableDeclaration('const', [variableDeclarator(wrappedFunctionId, wrappedFunction)])
