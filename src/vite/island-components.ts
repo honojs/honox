@@ -108,46 +108,83 @@ export const transformJsxTags = (contents: string, componentName: string) => {
   })
 
   if (ast) {
+    let wrappedFunctionId
+
     traverse(ast, {
+      ExportNamedDeclaration(path) {
+        for (const specifier of path.node.specifiers) {
+          if (specifier.type !== 'ExportSpecifier') {
+            continue
+          }
+          const exportAs =
+            specifier.exported.type === 'StringLiteral'
+              ? specifier.exported.value
+              : specifier.exported.name
+          if (exportAs !== 'default') {
+            continue
+          }
+
+          const wrappedFunction = addSSRCheck(specifier.local.name, componentName)
+          const wrappedFunctionId = identifier('Wrapped' + specifier.local.name)
+          path.insertBefore(
+            variableDeclaration('const', [variableDeclarator(wrappedFunctionId, wrappedFunction)])
+          )
+
+          specifier.local.name = wrappedFunctionId.name
+        }
+      },
       ExportDefaultDeclaration(path) {
         const declarationType = path.node.declaration.type
         if (
           declarationType === 'FunctionDeclaration' ||
           declarationType === 'FunctionExpression' ||
-          declarationType === 'ArrowFunctionExpression'
+          declarationType === 'ArrowFunctionExpression' ||
+          declarationType === 'Identifier'
         ) {
           const functionName =
-            ((declarationType === 'FunctionDeclaration' ||
-              declarationType === 'FunctionExpression') &&
-              path.node.declaration.id?.name) ||
-            '__HonoIsladComponent__'
-          const originalFunctionId = identifier(functionName + 'Original')
+            (declarationType === 'Identifier'
+              ? path.node.declaration.name
+              : (declarationType === 'FunctionDeclaration' ||
+                  declarationType === 'FunctionExpression') &&
+                path.node.declaration.id?.name) || '__HonoIsladComponent__'
 
-          const originalFunction =
-            path.node.declaration.type === 'FunctionExpression' ||
-            path.node.declaration.type === 'ArrowFunctionExpression'
-              ? path.node.declaration
-              : functionExpression(
-                  null,
-                  path.node.declaration.params,
-                  path.node.declaration.body,
-                  undefined,
-                  path.node.declaration.async
-                )
+          let originalFunctionId
+          if (declarationType === 'Identifier') {
+            originalFunctionId = path.node.declaration
+          } else {
+            originalFunctionId = identifier(functionName + 'Original')
 
-          path.insertBefore(
-            variableDeclaration('const', [variableDeclarator(originalFunctionId, originalFunction)])
-          )
+            const originalFunction =
+              path.node.declaration.type === 'FunctionExpression' ||
+              path.node.declaration.type === 'ArrowFunctionExpression'
+                ? path.node.declaration
+                : functionExpression(
+                    null,
+                    path.node.declaration.params,
+                    path.node.declaration.body,
+                    undefined,
+                    path.node.declaration.async
+                  )
+
+            path.insertBefore(
+              variableDeclaration('const', [
+                variableDeclarator(originalFunctionId, originalFunction),
+              ])
+            )
+          }
 
           const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName)
-          const wrappedFunctionId = identifier('Wrapped' + functionName)
+          wrappedFunctionId = identifier('Wrapped' + functionName)
           path.replaceWith(
             variableDeclaration('const', [variableDeclarator(wrappedFunctionId, wrappedFunction)])
           )
-          path.insertAfter(exportDefaultDeclaration(wrappedFunctionId))
         }
       },
     })
+
+    if (wrappedFunctionId) {
+      ast.program.body.push(exportDefaultDeclaration(wrappedFunctionId))
+    }
 
     const { code } = generate(ast)
     return code
