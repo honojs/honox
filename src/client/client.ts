@@ -45,7 +45,10 @@ export const createClient = async (options?: ClientOptions) => {
             let createChildren = options?.createChildren
             if (!createChildren) {
               const { buildCreateChildrenFn } = await import('./runtime')
-              createChildren = buildCreateChildrenFn(createElement as CreateElement)
+              createChildren = buildCreateChildrenFn(
+                createElement as CreateElement,
+                async (name: string) => (await (FILES[`${root}${name}`] as FileCallback)()).default
+              )
             }
             props.children = await createChildren(
               (maybeTemplate as HTMLTemplateElement).content.childNodes

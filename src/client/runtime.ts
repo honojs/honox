@@ -1,7 +1,23 @@
 import { Suspense, use } from 'hono/jsx/dom'
+import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
 import type { CreateElement, CreateChildren } from '../types.js'
 
-export const buildCreateChildrenFn = (createElement: CreateElement): CreateChildren => {
+type ImportComponent = (name: string) => Promise<Function | undefined>
+export const buildCreateChildrenFn = (
+  createElement: CreateElement,
+  importComponent: ImportComponent
+): CreateChildren => {
+  const setChildrenFromTemplate = async (props: { children?: Node[] }, element: HTMLElement) => {
+    const maybeTemplate = element.childNodes[element.childNodes.length - 1]
+    if (
+      maybeTemplate?.nodeName === 'TEMPLATE' &&
+      (maybeTemplate as HTMLElement)?.getAttribute(DATA_HONO_TEMPLATE) !== null
+    ) {
+      props.children = await createChildren(
+        (maybeTemplate as HTMLTemplateElement).content.childNodes
+      )
+    }
+  }
   const createElementFromHTMLElement = async (element: HTMLElement) => {
     const props = {
       children: await createChildren(element.childNodes),
@@ -93,7 +109,18 @@ export const buildCreateChildrenFn = (createElement: CreateElement): CreateChild
           })
         )
       } else {
-        children.push(await createElementFromHTMLElement(child))
+        let component: Function | undefined = undefined
+        const componentName = child.getAttribute(COMPONENT_NAME)
+        if (componentName) {
+          component = await importComponent(componentName)
+        }
+        if (component) {
+          const props = JSON.parse(child.getAttribute(DATA_SERIALIZED_PROPS) || '{}')
+          await setChildrenFromTemplate(props, child)
+          children.push(await createElement(component, props))
+        } else {
+          children.push(await createElementFromHTMLElement(child))
+        }
       }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

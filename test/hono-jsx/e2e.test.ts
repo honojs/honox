@@ -34,6 +34,19 @@ test('children - async', async ({ page }) => {
   await container.getByText('Async child').click()
 })
 
+test('children - nest', async ({ page }) => {
+  await page.goto('/interaction/children')
+  await page.waitForSelector('body[data-client-loaded]')
+
+  const container = page.locator('id=nest')
+  await container.locator('button').first().click()
+  await container.getByText('Count: 11').click()
+
+  const childContainer = page.locator('id=child')
+  await childContainer.locator('button').click()
+  await childContainer.getByText('Count: 13').click()
+})
+
 test('suspense', async ({ page }) => {
   await page.goto('/interaction/suspense', { waitUntil: 'domcontentloaded' })
   await page.waitForSelector('body[data-client-loaded]')
