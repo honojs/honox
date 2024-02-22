@@ -32,7 +32,7 @@ import {
 import type { Plugin } from 'vite'
 import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
 
-function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
+function addSSRCheck(funcName: string, componentName: string) {
   const isSSR = memberExpression(
     memberExpression(identifier('import'), identifier('meta')),
     identifier('env.SSR')
@@ -98,11 +98,7 @@ function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
   )
 
   const returnStmt = returnStatement(conditionalExpression(isSSR, ssrElement, clientElement))
-  const functionExpr = functionExpression(null, [identifier('props')], blockStatement([returnStmt]))
-  if (isAsync) {
-    functionExpr.async = true
-  }
-  return functionExpr
+  return functionExpression(null, [identifier('props')], blockStatement([returnStmt]))
 }
 
 export const transformJsxTags = (contents: string, componentName: string) => {
