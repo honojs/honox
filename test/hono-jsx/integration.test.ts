@@ -104,6 +104,16 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/interaction/suspense-islands',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/suspense-islands',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/fc',
         method: 'GET',
         handler: expect.any(Function),

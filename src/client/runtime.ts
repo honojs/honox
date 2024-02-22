@@ -1,6 +1,6 @@
 import { Suspense, use } from 'hono/jsx/dom'
 import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
-import type { CreateElement, CreateChildren } from '../types.js'
+import type { CreateElement, CreateChildren, HydrateComponent } from '../types.js'
 
 type ImportComponent = (name: string) => Promise<Function | undefined>
 export const buildCreateChildrenFn = (
@@ -128,4 +128,42 @@ export const buildCreateChildrenFn = (
   }
 
   return createChildren
+}
+
+export const hydrateComponentHonoSuspense = async (hydrateComponent: HydrateComponent) => {
+  const templates = new Set<Element>()
+  const observerTargets = new Set<Element>()
+  document.querySelectorAll('template[id^="H:"], template[id^="E:"]').forEach((template) => {
+    if (template.parentElement) {
+      templates.add(template)
+      observerTargets.add(template.parentElement)
+    }
+  })
+
+  if (observerTargets.size === 0) {
+    return
+  }
+
+  const observer = new MutationObserver((mutations) => {
+    const targets = new Set<Element>()
+    mutations.forEach((mutation) => {
+      if (mutation.target instanceof Element) {
+        targets.add(mutation.target)
+        mutation.removedNodes.forEach((node) => {
+          templates.delete(node as Element)
+        })
+      }
+    })
+    targets.forEach((target) => {
+      hydrateComponent(target)
+    })
+
+    if (templates.size === 0) {
+      // all templates have been hydrated
+      observer.disconnect()
+    }
+  })
+  observerTargets.forEach((target) => {
+    observer.observe(target, { childList: true })
+  })
 }

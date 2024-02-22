@@ -84,3 +84,13 @@ test('error-boundary failure', async ({ page }) => {
   const div = await container.locator('div')
   expect(await div.innerHTML()).toBe('<span class="error">Something went wrong</span>')
 })
+
+test('server-side suspense contains island components', async ({ page }) => {
+  await page.goto('/interaction/suspense-islands', { timeout: 1 }).catch(() => {}) // proceed test as soon as possible
+  await page.waitForSelector('body[data-client-loaded]')
+
+  const container = page.locator('id=suspense-islands')
+  await container.locator('button').click()
+  await container.getByText('Count: 7').click()
+  await container.getByText('Suspense Islands').click()
+})
