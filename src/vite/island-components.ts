@@ -32,7 +32,7 @@ import {
 import type { Plugin } from 'vite'
 import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
 
-function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
+function addSSRCheck(funcName: string, componentName: string) {
   const isSSR = memberExpression(
     memberExpression(identifier('import'), identifier('meta')),
     identifier('env.SSR')
@@ -98,11 +98,7 @@ function addSSRCheck(funcName: string, componentName: string, isAsync = false) {
   )
 
   const returnStmt = returnStatement(conditionalExpression(isSSR, ssrElement, clientElement))
-  const functionExpr = functionExpression(null, [identifier('props')], blockStatement([returnStmt]))
-  if (isAsync) {
-    functionExpr.async = true
-  }
-  return functionExpr
+  return functionExpression(null, [identifier('props')], blockStatement([returnStmt]))
 }
 
 export const transformJsxTags = (contents: string, componentName: string) => {
@@ -112,38 +108,83 @@ export const transformJsxTags = (contents: string, componentName: string) => {
   })
 
   if (ast) {
+    let wrappedFunctionId
+
     traverse(ast, {
-      ExportDefaultDeclaration(path) {
-        if (path.node.declaration.type === 'FunctionDeclaration') {
-          const functionId = path.node.declaration.id
-          if (!functionId) {
-            return
+      ExportNamedDeclaration(path) {
+        for (const specifier of path.node.specifiers) {
+          if (specifier.type !== 'ExportSpecifier') {
+            continue
           }
-          const isAsync = path.node.declaration.async
-          const originalFunctionId = identifier(functionId.name + 'Original')
-
-          const originalFunction = functionExpression(
-            null,
-            path.node.declaration.params,
-            path.node.declaration.body
-          )
-          if (isAsync) {
-            originalFunction.async = true
+          const exportAs =
+            specifier.exported.type === 'StringLiteral'
+              ? specifier.exported.value
+              : specifier.exported.name
+          if (exportAs !== 'default') {
+            continue
           }
 
+          const wrappedFunction = addSSRCheck(specifier.local.name, componentName)
+          const wrappedFunctionId = identifier('Wrapped' + specifier.local.name)
           path.insertBefore(
-            variableDeclaration('const', [variableDeclarator(originalFunctionId, originalFunction)])
+            variableDeclaration('const', [variableDeclarator(wrappedFunctionId, wrappedFunction)])
           )
 
-          const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName, isAsync)
-          const wrappedFunctionId = identifier('Wrapped' + functionId.name)
+          specifier.local.name = wrappedFunctionId.name
+        }
+      },
+      ExportDefaultDeclaration(path) {
+        const declarationType = path.node.declaration.type
+        if (
+          declarationType === 'FunctionDeclaration' ||
+          declarationType === 'FunctionExpression' ||
+          declarationType === 'ArrowFunctionExpression' ||
+          declarationType === 'Identifier'
+        ) {
+          const functionName =
+            (declarationType === 'Identifier'
+              ? path.node.declaration.name
+              : (declarationType === 'FunctionDeclaration' ||
+                  declarationType === 'FunctionExpression') &&
+                path.node.declaration.id?.name) || '__HonoIsladComponent__'
+
+          let originalFunctionId
+          if (declarationType === 'Identifier') {
+            originalFunctionId = path.node.declaration
+          } else {
+            originalFunctionId = identifier(functionName + 'Original')
+
+            const originalFunction =
+              path.node.declaration.type === 'FunctionExpression' ||
+              path.node.declaration.type === 'ArrowFunctionExpression'
+                ? path.node.declaration
+                : functionExpression(
+                    null,
+                    path.node.declaration.params,
+                    path.node.declaration.body,
+                    undefined,
+                    path.node.declaration.async
+                  )
+
+            path.insertBefore(
+              variableDeclaration('const', [
+                variableDeclarator(originalFunctionId, originalFunction),
+              ])
+            )
+          }
+
+          const wrappedFunction = addSSRCheck(originalFunctionId.name, componentName)
+          wrappedFunctionId = identifier('Wrapped' + functionName)
           path.replaceWith(
             variableDeclaration('const', [variableDeclarator(wrappedFunctionId, wrappedFunction)])
           )
-          path.insertAfter(exportDefaultDeclaration(wrappedFunctionId))
         }
       },
     })
+
+    if (wrappedFunctionId) {
+      ast.program.body.push(exportDefaultDeclaration(wrappedFunctionId))
+    }
 
     const { code } = generate(ast)
     return code
