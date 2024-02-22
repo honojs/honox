@@ -41,6 +41,10 @@
       "types": "./dist/server/index.d.ts",
       "import": "./dist/server/index.js"
     },
+    "./server/base": {
+      "types": "./dist/server/base.d.ts",
+      "import": "./dist/server/base.js"
+    },
     "./client": {
       "types": "./dist/client/index.d.ts",
       "import": "./dist/client/index.js"
@@ -68,6 +72,9 @@
       ],
       "server": [
         "./dist/server"
+      ],
+      "server/base": [
+        "./dist/server/base"
       ],
       "client": [
         "./dist/client"
