@@ -413,7 +413,7 @@ describe('<Script /> component', () => {
       const res = await app.request('/')
       expect(res.status).toBe(200)
       expect(await res.text()).toBe(
-        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
+        '<html><head><link href="/static/style.css" rel="stylesheet"/><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
       )
     })
   })
