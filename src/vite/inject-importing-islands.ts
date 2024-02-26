@@ -1,6 +1,6 @@
 import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
-import type { Statement } from '@babel/types'
+import { exportNamedDeclaration, variableDeclaration, variableDeclarator } from '@babel/types'
 import dependencyTree from 'dependency-tree'
 import type { Plugin } from 'vite'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
@@ -37,23 +37,17 @@ export function injectImportingIslands(): Plugin {
         plugins: ['jsx'],
       })
       ast.program.body.push(hasIslandsNode)
+
       return generate(ast, {}, sourceCode)
     },
   }
 }
 
-const hasIslandsNode: Statement = {
-  type: 'ExportNamedDeclaration',
-  specifiers: [],
-  declaration: {
-    type: 'VariableDeclaration',
-    declarations: [
-      {
-        type: 'VariableDeclarator',
-        id: { type: 'Identifier', name: IMPORTING_ISLANDS_ID },
-        init: { type: 'BooleanLiteral', value: true },
-      },
-    ],
-    kind: 'const',
-  },
-}
+const hasIslandsNode = exportNamedDeclaration(
+  variableDeclaration('const', [
+    variableDeclarator(
+      { type: 'Identifier', name: IMPORTING_ISLANDS_ID },
+      { type: 'BooleanLiteral', value: true }
+    ),
+  ])
+)
