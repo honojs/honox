@@ -6,12 +6,12 @@ import { IMPORTING_ISLANDS_ID } from '../constants.js'
 export function injectImportingIslands(): Plugin {
   const visited = {}
   const isIslandRegex = new RegExp(/\/islands\//)
-  const fileExtensionRegex = new RegExp(/routes\/.*\.[t|j]sx$/)
+  const routesRegex = new RegExp(/routes\/.*\.[t|j]sx$/)
 
   return {
     name: 'inject-importing-islands',
     transform(sourceCode, id) {
-      if (!fileExtensionRegex.test(id)) {
+      if (!routesRegex.test(id)) {
         return
       }
 
