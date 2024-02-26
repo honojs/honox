@@ -114,6 +114,16 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/interaction/nested',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/nested',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/fc',
         method: 'GET',
         handler: expect.any(Function),
@@ -265,6 +275,34 @@ describe('With preserved', () => {
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
       '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+
+  it('Should return 200 response - /interaction/nested', async () => {
+    const res = await app.request('/interaction/nested')
+    expect(res.status).toBe(200)
+    // hono/jsx escape a single quote to &#39;
+    expect(await res.text()).toBe(
+      `
+      <!DOCTYPE html>
+      <html>
+         <head>
+            <title></title>
+         </head>
+         <body>
+            <div>
+               <h1>Nested Island Test</h1>
+               <honox-island component-name="Counter.tsx" data-serialized-props="{}">
+                  <div id="">
+                     <p>Count: 0</p>
+                     <button>Increment</button>
+                  </div>
+               </honox-island>
+            </div>
+            <script type="module" async="" src="/app/client.ts"></script>
+         </body>
+      </html>
+`.replace(/\n|\s{2,}/g, '')
     )
   })
 

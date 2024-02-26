@@ -1,6 +1,7 @@
 import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
 import _traverse from '@babel/traverse'
+import dependencyTree from 'dependency-tree'
 import type { Plugin } from 'vite'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -11,6 +12,10 @@ const traverse = (_traverse.default as typeof _traverse) ?? _traverse
 const generate = (_generate.default as typeof _generate) ?? _generate
 
 export function injectImportingIslands(): Plugin {
+  const visited = {}
+  const nonExistent: string[] = []
+  const regex = new RegExp(/\\islands\\/)
+
   return {
     name: 'inject-importing-islands',
     transform(code, id) {
@@ -21,10 +26,18 @@ export function injectImportingIslands(): Plugin {
           plugins: ['jsx'],
         })
 
+        const hasIsland = dependencyTree
+          .toList({
+            filename: id,
+            directory: '.',
+            visited,
+            nonExistent,
+          })
+          .some((x) => regex.test(x))
+
         traverse(ast, {
-          ImportDeclaration(path) {
-            // We have to make a note that `../components/islands/foo.tsx` is also a target.
-            if (path.node.source.value.includes('islands/')) {
+          ImportDeclaration() {
+            if (hasIsland) {
               hasIslandsImport = true
             }
           },
