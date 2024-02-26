@@ -11,7 +11,7 @@ const generate = (_generate.default as typeof _generate) ?? _generate
 export function injectImportingIslands(): Plugin {
   const visited = {}
   const isIslandRegex = new RegExp(/\\islands\\/)
-  const fileExtensionRegex = new RegExp(/\.[t|j]sx$/)
+  const fileExtensionRegex = new RegExp(/routes\/.*\.[t|j]sx$/)
 
   return {
     name: 'inject-importing-islands',
