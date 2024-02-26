@@ -47,7 +47,7 @@ export function injectImportingIslands(): Plugin {
         )
       )
 
-      return generate(ast, {}, sourceCode)
+      return generate(ast)
     },
   }
 }
