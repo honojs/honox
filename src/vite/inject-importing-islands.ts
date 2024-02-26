@@ -1,12 +1,7 @@
-import _generate from '@babel/generator'
-import { parse } from '@babel/parser'
-import { exportNamedDeclaration, variableDeclaration, variableDeclarator } from '@babel/types'
 import dependencyTree from 'dependency-tree'
+import MagicString from 'magic-string'
 import { normalizePath, type Plugin } from 'vite'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const generate = (_generate.default as typeof _generate) ?? _generate
 
 export function injectImportingIslands(): Plugin {
   const visited = {}
@@ -32,22 +27,10 @@ export function injectImportingIslands(): Plugin {
         return
       }
 
-      const ast = parse(sourceCode, {
-        sourceType: 'module',
-        plugins: ['jsx'],
-      })
-      ast.program.body.push(
-        exportNamedDeclaration(
-          variableDeclaration('const', [
-            variableDeclarator(
-              { type: 'Identifier', name: IMPORTING_ISLANDS_ID },
-              { type: 'BooleanLiteral', value: true }
-            ),
-          ])
-        )
-      )
+      const islandEnabledSource = new MagicString(sourceCode)
+      islandEnabledSource.append(`export const ${IMPORTING_ISLANDS_ID} = true;`)
 
-      return generate(ast)
+      return { code: islandEnabledSource.toString(), map: islandEnabledSource.generateMap() }
     },
   }
 }
