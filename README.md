@@ -266,6 +266,7 @@ This is a `_renderer.tsx`, which will load the `/app/client.ts` entry file for t
 ```tsx
 // app/routes/_renderer.tsx
 import { jsxRenderer } from 'hono/jsx-renderer'
+import { HasIslands } from "honox/server";
 
 export default jsxRenderer(({ children }) => {
   return (
