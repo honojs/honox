@@ -108,7 +108,8 @@
     "@babel/types": "^7.23.6",
     "@hono/vite-dev-server": "^0.8.0",
     "dependency-tree": "^10.0.9",
-    "magic-string": "^0.30.7"
+    "magic-string": "^0.30.7",
+    "precinct": "^11.0.5"
   },
   "peerDependencies": {
     "hono": ">=4.*"
