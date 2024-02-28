@@ -119,7 +119,6 @@
     "@playwright/test": "^1.41.0",
     "@types/babel__generator": "^7",
     "@types/babel__traverse": "^7",
-    "@types/filing-cabinet": "^2.5.3",
     "@types/node": "^20.10.5",
     "eslint": "^8.56.0",
     "glob": "^10.3.10",
