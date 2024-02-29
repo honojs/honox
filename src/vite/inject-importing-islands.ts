@@ -1,9 +1,15 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
-import MagicString from 'magic-string'
+import _generate from '@babel/generator'
+import { parse } from '@babel/parser'
+// @ts-expect-error `precinct` is not typed
 import precinct from 'precinct'
 import { normalizePath, type Plugin } from 'vite'
-import { IMPORTING_ISLANDS_ID } from '../constants'
+import { IMPORTING_ISLANDS_ID } from '../constants.js'
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const generate = (_generate.default as typeof _generate) ?? _generate
 
 export async function injectImportingIslands(): Promise<Plugin> {
   const isIslandRegex = new RegExp(/\/islands\//)
@@ -24,7 +30,9 @@ export async function injectImportingIslands(): Promise<Plugin> {
         cache[depPath] = (await readFile(depPath, { flag: '' })).toString()
       }
 
-      const currentFileDeps = precinct(cache[depPath]) as string[]
+      const currentFileDeps = precinct(cache[depPath], {
+        type: 'tsx',
+      }) as string[]
 
       const childDeps = await Promise.all(
         currentFileDeps.map(async (x) => await walkDependencyTree(depPath, x))
@@ -52,10 +60,34 @@ export async function injectImportingIslands(): Promise<Plugin> {
         return
       }
 
-      const islandEnabledSource = new MagicString(sourceCode)
-      islandEnabledSource.append(`export const ${IMPORTING_ISLANDS_ID} = true;`)
+      const ast = parse(sourceCode, {
+        sourceType: 'module',
+        plugins: ['jsx', 'typescript'],
+      })
 
-      return { code: islandEnabledSource.toString(), map: islandEnabledSource.generateMap() }
+      const hasIslandsNode = {
+        type: 'ExportNamedDeclaration',
+        declaration: {
+          type: 'VariableDeclaration',
+          declarations: [
+            {
+              type: 'VariableDeclarator',
+              id: { type: 'Identifier', name: IMPORTING_ISLANDS_ID },
+              init: { type: 'BooleanLiteral', value: true },
+            },
+          ],
+          kind: 'const',
+        },
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ast.program.body.push(hasIslandsNode as any)
+
+      const output = generate(ast, {}, sourceCode)
+      return {
+        code: output.code,
+        map: output.map,
+      }
     },
   }
 }
