@@ -114,6 +114,16 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/interaction/nested',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/interaction/nested',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/fc',
         method: 'GET',
         handler: expect.any(Function),
@@ -265,6 +275,34 @@ describe('With preserved', () => {
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
       '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+
+  it('Should return 200 response - /interaction/nested', async () => {
+    const res = await app.request('/interaction/nested')
+    expect(res.status).toBe(200)
+    // hono/jsx escape a single quote to &#39;
+    expect(await res.text()).toBe(
+      `
+      <!DOCTYPE html>
+      <html>
+         <head>
+            <title></title>
+         </head>
+         <body>
+            <div>
+               <h1>Nested Island Test</h1>
+               <honox-island component-name="Counter.tsx" data-serialized-props="{}">
+                  <div id="">
+                     <p>Count: 0</p>
+                     <button>Increment</button>
+                  </div>
+               </honox-island>
+            </div>
+            <script type="module" async="" src="/app/client.ts"></script>
+         </body>
+      </html>
+`.replace(/\n|\s{2,}/g, '')
     )
   })
 
@@ -436,5 +474,34 @@ describe('<Script /> component', () => {
         '<html><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main><script type="module" async="" src="/static/client-abc.js"></script></body></html>'
       )
     })
+  })
+})
+
+describe('<HasIslands /> Component with path aliases', () => {
+  const ROUES = import.meta.glob('./app-alias/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)', {
+    eager: true,
+  })
+  const RENDERER = import.meta.glob('./app-alias/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: './app-alias/routes',
+    ROUTES: ROUES as any,
+    RENDERER: RENDERER as any,
+  })
+
+  it('Should return a script tag with tagged HasIslands - /has-islands', async () => {
+    const res = await app.request('/has-islands')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe(
+      '<html><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div>Counter</div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+
+  it('Should no return a script tag - /has-no-islands', async () => {
+    const res = await app.request('/has-no-islands')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<html><body><h1>No Islands</h1></body></html>')
   })
 })
