@@ -19,4 +19,7 @@
     "src",
     "test"
   ],
+  "exclude": [
+    "test/hono-jsx/app-alias",
+  ]
 }

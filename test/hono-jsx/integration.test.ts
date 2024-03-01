@@ -476,3 +476,32 @@ describe('<Script /> component', () => {
     })
   })
 })
+
+describe('<HasIslands /> Component with path aliases', () => {
+  const ROUES = import.meta.glob('./app-alias/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)', {
+    eager: true,
+  })
+  const RENDERER = import.meta.glob('./app-alias/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: './app-alias/routes',
+    ROUTES: ROUES as any,
+    RENDERER: RENDERER as any,
+  })
+
+  it('Should return a script tag with tagged HasIslands - /has-islands', async () => {
+    const res = await app.request('/has-islands')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe(
+      '<html><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div>Counter</div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+
+  it('Should no return a script tag - /has-no-islands', async () => {
+    const res = await app.request('/has-no-islands')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<html><body><h1>No Islands</h1></body></html>')
+  })
+})
