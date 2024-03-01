@@ -266,7 +266,7 @@ This is a `_renderer.tsx`, which will load the `/app/client.ts` entry file for t
 ```tsx
 // app/routes/_renderer.tsx
 import { jsxRenderer } from 'hono/jsx-renderer'
-import { HasIslands } from "honox/server";
+import { HasIslands } from 'honox/server'
 
 export default jsxRenderer(({ children }) => {
   return (
@@ -322,7 +322,7 @@ createClient()
 
 ### Interactions
 
-Function components placed in `app/islands/*` are also sent to the client side. For example, you can write interactive component such as the following counter:
+Function components placed in `app/islands/*` - Island components - are also sent to the client side. For example, you can write interactive component such as the following counter:
 
 ```tsx
 // app/islands/counter.tsx
@@ -354,6 +354,18 @@ export default createRoute((c) => {
     </div>
   )
 })
+```
+
+**Note**: You cannot access a Context object in Island components. Therefore, you should pass the value from components outside of Island.
+
+```ts
+import { useRequestContext } from 'hono/jsx-renderer'
+import Counter from '../islands/counter.tsx'
+
+export default function Component() {
+  const c = useRequestContext()
+  return <Counter init={parseInt(c.req.query('count') ?? '0', 10)} />
+}
 ```
 
 ## BYOR - Bring Your Own Renderer
@@ -457,8 +469,8 @@ Let's start with our route handler:
 ```tsx
 // app/routes/nested/index.tsx
 export default createRoute((c) => {
-  return c.render(<div>Content</div>, { title: 'Dashboard' });
-});
+  return c.render(<div>Content</div>, { title: 'Dashboard' })
+})
 ```
 
 Now, let's take a look at our nested renderer:
@@ -467,11 +479,12 @@ Now, let's take a look at our nested renderer:
 // app/routes/nested/_renderer.tsx
 export default jsxRenderer(({ children, Layout, title }) => {
   return (
-    <Layout title={title}> {/* Pass the title prop to the parent renderer */}
+    <Layout title={title}>
+      {/* Pass the title prop to the parent renderer */}
       <main>{children}</main>
     </Layout>
-  );
-});
+  )
+})
 ```
 
 In this setup, all the props sent to the nested renderer's <Layout /> are consumed by the parent renderer:
@@ -480,7 +493,7 @@ In this setup, all the props sent to the nested renderer's <Layout /> are consum
 // app/routes/_renderer.tsx
 export default jsxRenderer(({ children, title }) => {
   return (
-    <html lang="en">
+    <html lang='en'>
       <head>
         <title>{title}</title> {/* Use the title prop here */}
       </head>
@@ -488,8 +501,8 @@ export default jsxRenderer(({ children, title }) => {
         {children} {/* Insert the Layout's children here */}
       </body>
     </html>
-  );
-});
+  )
+})
 ```
 
 ### Using Middleware
