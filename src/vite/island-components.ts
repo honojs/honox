@@ -205,11 +205,11 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
       root = config.root
     },
     async load(id) {
-      const defaultIsland: IsIsland = (id) => {
+      const defaultIsIsland: IsIsland = (id) => {
         const islandDirectoryPath = path.join(root, 'app/islands')
         return id.startsWith(islandDirectoryPath)
       }
-      const matchIslandPath = options?.isIsland ?? defaultIsland
+      const matchIslandPath = options?.isIsland ?? defaultIsIsland
       if (!matchIslandPath(id)) {
         return
       }
