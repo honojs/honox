@@ -54,6 +54,16 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/non-interactive',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/non-interactive',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/interaction',
         method: 'GET',
         handler: expect.any(Function),
@@ -194,6 +204,12 @@ describe('Basic', () => {
     const res = await app.request('/fc')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe('<h1>Function from /fc</h1>')
+  })
+
+  it('Should not determined as an island component - GET /non-interactive', async () => {
+    const res = await app.request('/non-interactive')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<p>Not Island</p>')
   })
 
   it('Should render MDX content - /post', async () => {

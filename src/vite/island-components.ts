@@ -1,4 +1,5 @@
 import fs from 'fs/promises'
+import path from 'path'
 import _generate from '@babel/generator'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -191,10 +192,27 @@ export const transformJsxTags = (contents: string, componentName: string) => {
   }
 }
 
-export function islandComponents(): Plugin {
+type IsIsland = (id: string) => boolean
+export type IslandComponentsOptions = {
+  isIsland: IsIsland
+}
+
+export function islandComponents(options?: IslandComponentsOptions): Plugin {
+  let root = ''
   return {
     name: 'transform-island-components',
+    configResolved: (config) => {
+      root = config.root
+    },
     async load(id) {
+      const defaultIsland: IsIsland = (id) => {
+        const islandDirectoryPath = path.join(root, 'app/islands')
+        return id.startsWith(islandDirectoryPath)
+      }
+      const matchIslandPath = options?.isIsland ?? defaultIsland
+      if (!matchIslandPath(id)) {
+        return
+      }
       const match = id.match(/\/islands\/(.+?\.tsx)$/)
       if (match) {
         const componentName = match[1]

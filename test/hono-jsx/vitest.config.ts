@@ -4,6 +4,8 @@ import { defineConfig } from 'vitest/config'
 import { injectImportingIslands } from '../../src/vite/inject-importing-islands'
 import { islandComponents } from '../../src/vite/island-components'
 
+const root = './test/hono-jsx'
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -11,7 +13,13 @@ export default defineConfig({
     },
   },
   plugins: [
-    islandComponents(),
+    islandComponents({
+      isIsland: (id) => {
+        const resolvedPath = path.resolve(root)
+        const regexp = new RegExp(`${resolvedPath}/app[^/]*/islands/.+\.tsx?$`)
+        return regexp.test(id)
+      },
+    }),
     injectImportingIslands(),
     mdx({
       jsxImportSource: 'hono/jsx',
