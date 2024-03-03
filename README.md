@@ -261,7 +261,7 @@ The below is the project structure of a minimal application including a client s
 
 ### Renderer
 
-This is a `_renderer.tsx`, which will load the `/app/client.ts` entry file for the client. It will load the JavaScript file for the production according to the variable `import.meta.env.PROD`. And renders the inside of `HasIslands` if there are islands on that page.
+This is a `_renderer.tsx`, which will load the `/app/client.ts` entry file for the client. It will load the JavaScript file for the production according to the variable `import.meta.env.PROD`. And renders the inside of `<HasIslands />` if there are islands on that page.
 
 ```tsx
 // app/routes/_renderer.tsx
@@ -308,6 +308,8 @@ export default jsxRenderer(({ children }) => {
   )
 })
 ```
+
+**Note**: Since `<HasIslands />` can slightly affect build performance when used, it is recommended that you do not use it in the development environment, but only at build time. `<Script />` does not cause performance degradation during development, so it's better to use it.
 
 ### Client Entry File
 
