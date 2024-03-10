@@ -661,6 +661,43 @@ export default function Top() {
 }
 ```
 
+### Cloudflare Bindings
+
+If you want to use Cloudflare's Bindings in your development environment, create `wrangler.toml` and configure it properly.
+
+```toml
+name = "my-project-name"
+compatibility_date = "2023-12-01"
+
+# [vars]
+# MY_VARIABLE = "production_value"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+In `vite.config.ts`, use the Cloudflare Adapter in `@hono/vite-dev-server`.
+
+```ts
+import honox from 'honox/vite'
+import adapter from '@hono/vite-dev-server/cloudflare'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    honox({
+      devServer: {
+        adapter,
+      },
+    }),
+  ],
+})
+```
+
+> [!NOTE]
+> The `wrangler.toml` is not used in the Cloudflare Pages production environment. Please configure Bindings from the dashboard.
+
 ## Deployment
 
 Since a HonoX instance is essentially a Hono instance, it can be deployed on any platform that Hono supports.
