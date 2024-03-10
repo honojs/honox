@@ -521,3 +521,50 @@ describe('<HasIslands /> Component with path aliases', () => {
     expect(await res.text()).toBe('<html><body><h1>No Islands</h1></body></html>')
   })
 })
+
+describe('Island Components with Preserved Files', () => {
+  const ROUTES = import.meta.glob('./app-blog/routes/**/[a-z[-][a-z-_[]*.(tsx|ts|mdx)', {
+    eager: true,
+  })
+  const RENDERER = import.meta.glob('./app-blog/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+  const NOT_FOUND = import.meta.glob('./app-blog/routes/_404.tsx', {
+    eager: true,
+  })
+  const ERROR = import.meta.glob('./app-blog/routes/_error.tsx', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: './app-blog/routes',
+    ROUTES: ROUTES as any,
+    RENDERER: RENDERER as any,
+    NOT_FOUND: NOT_FOUND as any,
+    ERROR: ERROR as any,
+  })
+
+  it('Ensures scripts are loaded for island components within preserved files on 404 routes', async () => {
+    const res = await app.request('/foo')
+    expect(res.status).toBe(404)
+    expect(await res.text()).toBe(
+      '<html><head><title>Not Found</title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+
+  it('Ensures scripts are loaded for island components within preserved files on error routes', async () => {
+    const res = await app.request('/throw_error')
+    expect(res.status).toBe(500)
+    expect(await res.text()).toBe(
+      '<html><head><title>Internal Server Error</title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+
+  it('Ensures nested components, including MDX content and islands, load scripts correctly', async () => {
+    const res = await app.request('/nested/post')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe(
+      '<html><head><title></title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><h1>Hello MDX</h1><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+})
