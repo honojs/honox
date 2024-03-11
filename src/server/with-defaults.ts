@@ -29,7 +29,7 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>) => {
       }),
     ROUTES:
       options?.ROUTES ??
-      import.meta.glob('/app/routes/**/[!_]*.(ts|tsx|mdx)', {
+      import.meta.glob('/app/routes/**/!(_*|*.test|*.spec).(ts|tsx|mdx)', {
         eager: true,
       }),
   }
