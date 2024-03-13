@@ -11,9 +11,11 @@ export default defineConfig({
       entry: './app/server.ts',
       islandComponents: {
         isIsland: (id) => {
-          const resolvedPath = path.resolve(root)
-          const regexp = new RegExp(`${resolvedPath}/app/islands/.+\.tsx?$`)
-          return regexp.test(id)
+          const resolvedPath = path.resolve(root).replace(/\\/g, '\\\\')
+          const regexp = new RegExp(
+            `${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]islands[\\\\/].+\.tsx?$`
+          )
+          return regexp.test(path.resolve(id))
         },
       },
     }),
