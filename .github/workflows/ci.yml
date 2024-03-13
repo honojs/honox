@@ -14,7 +14,7 @@ jobs:
         with:
           bun-version: 1.0.25
       - run: bun install
-      - run: bunx playwright install chromium --with-deps
+      - run: bunx playwright install chromium
       - run: bun run format
       - run: bun run lint
       - run: bun run build
@@ -28,5 +28,5 @@ jobs:
         with:
           node-version: 20.x
       - run: yarn install --frozen-lockfile
-      - run: npx playwright install chromium --with-deps
+      - run: npx playwright install chromium
       - run: yarn test:yarn
