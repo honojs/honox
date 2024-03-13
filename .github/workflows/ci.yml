@@ -24,9 +24,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
+      - uses: actions/setup-node@v4
         with:
-          bun-version: 1.0.25
-      - run: bunx playwright install --with-deps
-      - run: bun install
-      - run: bun run test
+          node-version: 20.x
+      - run: npx playwright install --with-deps
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
