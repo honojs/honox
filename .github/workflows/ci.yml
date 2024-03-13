@@ -13,8 +13,8 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.25
-      - run: bunx playwright install --with-deps
       - run: bun install
+      - run: bunx playwright install chromium --with-deps
       - run: bun run format
       - run: bun run lint
       - run: bun run build
@@ -28,5 +28,5 @@ jobs:
         with:
           node-version: 20.x
       - run: yarn install --frozen-lockfile
-      - run: npx playwright install
+      - run: npx playwright install chromium --with-deps
       - run: yarn test:yarn
