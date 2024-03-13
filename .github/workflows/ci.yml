@@ -19,3 +19,14 @@ jobs:
       - run: bun run lint
       - run: bun run build
       - run: bun run test
+
+  ci-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.0.25
+      - run: bunx playwright install --with-deps
+      - run: bun install
+      - run: bun run test
