@@ -11,6 +11,7 @@
     "test:integration:hono-jsx:watch": "vitest -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts",
     "test:integration:api": "vitest run -c ./test/api/vitest.config.ts ./test/api/integration.test.ts",
     "test:e2e": "playwright test -c ./test/hono-jsx/playwright.config.ts ./test/hono-jsx/e2e.test.ts",
+    "test:yarn": "yarn test:unit && yarn test:integration:api && yarn test:integration:hono-jsx && yarn test:e2e",
     "typecheck": "tsc --noEmit",
     "build": "tsup && publint",
     "watch": "tsup --watch",
