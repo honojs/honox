@@ -17,7 +17,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'bun run vite --port 6173 -c ./vite.config.ts',
+    command: '../../node_modules/vite/bin/vite.js --port 6173 -c ./vite.config.ts',
     port: 6173,
     reuseExistingServer: !process.env.CI,
   },
