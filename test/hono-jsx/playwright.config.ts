@@ -17,7 +17,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: '../../node_modules/vite/bin/vite.js --port 6173 -c ./vite.config.ts',
+    command: 'npm exec -c "vite --port 6173 -c ./vite.config.ts"',
     port: 6173,
     reuseExistingServer: !process.env.CI,
   },
