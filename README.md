@@ -580,7 +580,7 @@ Write `app/style.css`:
 @tailwind utilities;
 ```
 
-Finally, import it in a renderer file:
+Import it in a renderer file:
 
 ```tsx
 // app/routes/_renderer.tsx
@@ -593,7 +593,7 @@ export default jsxRenderer(({ children }) => {
         <meta charset='UTF-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
         {import.meta.env.PROD ? (
-          <link href='static/assets/style.css' rel='stylesheet' />
+          <link href='/static/assets/style.css' rel='stylesheet' />
         ) : (
           <link href='/app/style.css' rel='stylesheet' />
         )}
@@ -601,6 +601,32 @@ export default jsxRenderer(({ children }) => {
       <body>{children}</body>
     </html>
   )
+})
+```
+
+Finally, add `vite.config.ts` configuration to output assets for the production.
+
+```ts
+import honox from 'honox/vite'
+import { defineConfig } from 'vite'
+
+export default defineConfig(({ mode }) => {
+  if (mode === 'client') {
+    return {
+      build: {
+        rollupOptions: {
+          input: ['/app/style.css'],
+          output: {
+            assetFileNames: 'static/assets/[name].[ext]',
+          },
+        },
+      },
+    }
+  } else {
+    return {
+      plugins: [honox()],
+    }
+  }
 })
 ```
 
