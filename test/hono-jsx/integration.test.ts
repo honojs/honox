@@ -448,7 +448,7 @@ describe('Nested Middleware', () => {
 })
 
 describe('<Script /> component', () => {
-  const ROUTES = import.meta.glob('./app-script/routes/index.tsx', {
+  const ROUTES = import.meta.glob('./app-script/routes/**/index.tsx', {
     eager: true,
   })
 
@@ -465,6 +465,14 @@ describe('<Script /> component', () => {
 
     it('Should convert the script path correctly', async () => {
       const res = await app.request('/')
+      expect(res.status).toBe(200)
+      expect(await res.text()).toBe(
+        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
+      )
+    })
+
+    it('Should convert the script path correctly - With `app = new Hono()` style', async () => {
+      const res = await app.request('/classic')
       expect(res.status).toBe(200)
       expect(await res.text()).toBe(
         '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'

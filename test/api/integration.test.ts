@@ -19,6 +19,12 @@ describe('Basic', () => {
     const routes = [
       { path: '/*', method: 'ALL', handler: expect.anything() },
       {
+        path: '/about/*',
+        method: 'ALL',
+        handler: expect.anything(),
+      },
+
+      {
         path: '/about/:name',
         method: 'GET',
         handler: expect.anything(),
@@ -26,6 +32,11 @@ describe('Basic', () => {
       {
         path: '/about/:name/address',
         method: 'GET',
+        handler: expect.anything(),
+      },
+      {
+        path: '/middleware/*',
+        method: 'ALL',
         handler: expect.anything(),
       },
       {
@@ -43,10 +54,12 @@ describe('Basic', () => {
         method: 'GET',
         handler: expect.anything(),
       },
+      { path: '/*', method: 'ALL', handler: expect.anything() },
       { path: '/', method: 'GET', handler: expect.anything() },
       { path: '/foo', method: 'GET', handler: expect.anything() },
     ]
 
+    expect(app.routes).toHaveLength(routes.length)
     expect(app.routes).toEqual(routes)
   })
 
