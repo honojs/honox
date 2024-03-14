@@ -135,6 +135,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
 
         // Instance of Hono
         if (routeDefault && 'fetch' in routeDefault) {
+          subApp.use(setInnerMeta)
           subApp.route(path, routeDefault)
         }
 
