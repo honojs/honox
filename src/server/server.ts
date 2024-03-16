@@ -103,18 +103,14 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
       const rendererPaths = getPaths(dir, rendererList)
       rendererPaths.map((path) => {
         const renderer = RENDERER_FILE[path]
-        const setInnerMeta = createMiddleware(async function innerMeta(c, next) {
-          // @ts-expect-error renderer[importing_islands_id] is not typed
-          const importingIslands = renderer[IMPORTING_ISLANDS_ID] as boolean
-          if (importingIslands) {
-            hasIslandComponent = true
-          }
-          c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
-          await next()
-        })
+        // @ts-expect-error renderer[importing_islands_id] is not typed
+        const importingIslands = renderer[IMPORTING_ISLANDS_ID] as boolean
+        if (importingIslands) {
+          hasIslandComponent = true
+        }
         const rendererDefault = renderer.default
         if (rendererDefault) {
-          subApp.all('*', rendererDefault, setInnerMeta)
+          subApp.all('*', rendererDefault)
         }
       })
 
@@ -136,9 +132,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         // @ts-expect-error route[IMPORTING_ISLANDS_ID] is not typed
         const importingIslands = route[IMPORTING_ISLANDS_ID] as boolean
         const setInnerMeta = createMiddleware(async function innerMeta(c, next) {
-          if (!hasIslandComponent) {
-            c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
-          }
+          c.set(IMPORTING_ISLANDS_ID, importingIslands ? true : hasIslandComponent)
           await next()
         })
 
