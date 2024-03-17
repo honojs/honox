@@ -523,21 +523,24 @@ describe('<HasIslands /> Component with path aliases', () => {
 })
 
 describe('Island Components with Preserved Files', () => {
-  const ROUTES = import.meta.glob('./app-blog/routes/**/[a-z[-][a-z-_[]*.(tsx|ts|mdx)', {
+  const ROUTES = import.meta.glob(
+    './app-islands-in-preserved/routes/**/[a-z[-][a-z-_[]*.(tsx|ts|mdx)',
+    {
+      eager: true,
+    }
+  )
+  const RENDERER = import.meta.glob('./app-islands-in-preserved/routes/**/_renderer.tsx', {
     eager: true,
   })
-  const RENDERER = import.meta.glob('./app-blog/routes/**/_renderer.tsx', {
+  const NOT_FOUND = import.meta.glob('./app-islands-in-preserved/routes/_404.tsx', {
     eager: true,
   })
-  const NOT_FOUND = import.meta.glob('./app-blog/routes/_404.tsx', {
-    eager: true,
-  })
-  const ERROR = import.meta.glob('./app-blog/routes/_error.tsx', {
+  const ERROR = import.meta.glob('./app-islands-in-preserved/routes/_error.tsx', {
     eager: true,
   })
 
   const app = createApp({
-    root: './app-blog/routes',
+    root: './app-islands-in-preserved/routes',
     ROUTES: ROUTES as any,
     RENDERER: RENDERER as any,
     NOT_FOUND: NOT_FOUND as any,
