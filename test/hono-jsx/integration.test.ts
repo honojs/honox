@@ -579,3 +579,36 @@ describe('Island Components with Preserved Files', () => {
     )
   })
 })
+
+describe('Trailing Slash', () => {
+  const ROUTES = import.meta.glob('./app-nested/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: './app-nested/routes',
+    ROUTES: ROUTES as any,
+    trailingSlash: true,
+  })
+
+  const paths = ['/nested', '/nested/foo', '/nested/foo/bar', '/nested/foo/bar/baz']
+  for (const path of paths) {
+    it(`Should return 404 response - ${path}`, async () => {
+      const res = await app.request(path)
+      expect(res.status).toBe(404)
+    })
+    it(`Should return 200 response - ${path}/`, async () => {
+      const res = await app.request(`${path}/`)
+      expect(res.status).toBe(200)
+    })
+  }
+
+  it('Should return 200 response - /top', async () => {
+    const res = await app.request('/top')
+    expect(res.status).toBe(200)
+  })
+  it('Should return 404 response - /top/', async () => {
+    const res = await app.request('/top/')
+    expect(res.status).toBe(404)
+  })
+})

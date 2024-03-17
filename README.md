@@ -70,7 +70,7 @@ export default defineConfig({
 
 A server entry file is required. The file is should be placed at `app/server.ts`. This file is first called by the Vite during the development or build phase.
 
-In the entry file, simply initialize your app using the `createApp()` function. `app` will be an instance of Hono, so you can use Hono's middleware and the `showRoutes()`in`hono/dev`.
+In the entry file, simply initialize your app using the `createApp()` function. `app` will be an instance of Hono, so you can use Hono's middleware and the `showRoutes()` in `hono/dev`.
 
 ```ts
 // app/server.ts
@@ -544,6 +544,24 @@ export default createRoute(zValidator('form', schema), ...<more-middleware>)
 ```
 
 Note that is some scenarios, auto-complete for the request body within the route may be lost depending on how the middleware was written.
+
+### Trailing Slash
+
+By default, trailing slashes are removed if the root file is an index file such as `index.tsx` or `index.mdx`.
+However, if you set the `trailingSlash` option to `true` as the following, the trailing slash is not removed.
+
+```ts
+import { createApp } from 'honox/server'
+
+const app = createApp({
+  trailingSlash: true,
+})
+```
+
+Like the followings:
+
+- `trailingSlash` is `false` (default): `app/routes/path/index.mdx` => `/path`
+- `trailingSlash` is `true`: `app/routes/path/index.mdx` => `/path/`
 
 ### Using Tailwind CSS
 
