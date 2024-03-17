@@ -43,6 +43,11 @@ type BaseServerOptions<E extends Env = Env> = {
   root: string
   app?: Hono<E>
   init?: InitFunction<E>
+  /**
+   * Appends a trailing slash to URL if the route file is an index file, e.g., `index.tsx` or `index.mdx`.
+   * @default false
+   */
+  trailingSlash?: boolean
 }
 
 export type ServerOptions<E extends Env = Env> = Partial<BaseServerOptions<E>>
@@ -53,6 +58,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   const root = options.root
   const rootRegExp = new RegExp(`^${root}`)
   const app = options.app ?? new Hono()
+  const trailingSlash = options.trailingSlash ?? false
 
   if (options.init) {
     options.init(app)
@@ -178,6 +184,11 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
       applyNotFound(subApp, dir, notFoundMap)
       // Error
       applyError(subApp, dir, errorMap)
+
+      if (trailingSlash) {
+        rootPath = /\/$/.test(rootPath) ? rootPath : rootPath + '/'
+      }
+
       app.route(rootPath, subApp)
     }
   }

@@ -7,6 +7,7 @@ export const createApp = <E extends Env>(options?: ServerOptions<E>) => {
     root: options?.root ?? '/app/routes',
     app: options?.app,
     init: options?.init,
+    trailingSlash: options?.trailingSlash,
     NOT_FOUND:
       options?.NOT_FOUND ??
       import.meta.glob('/app/routes/**/_404.(ts|tsx)', {
