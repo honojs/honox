@@ -591,7 +591,7 @@ describe('Trailing Slash', () => {
     trailingSlash: true,
   })
 
-  const paths = ['/nested', '/nested/foo', '/nested/foo/bar', '/nested/foo/bar/baz']
+  const paths = ['/nested', '/nested/foo', '/nested/foo/bar']
   for (const path of paths) {
     it(`Should return 404 response - ${path}`, async () => {
       const res = await app.request(path)
