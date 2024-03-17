@@ -13,7 +13,7 @@ const generate = (_generate.default as typeof _generate) ?? _generate
 
 export async function injectImportingIslands(): Promise<Plugin> {
   const isIslandRegex = new RegExp(/\/islands\//)
-  const routesRegex = new RegExp(/routes\/.*\.[t|j]sx$/)
+  const fileRegex = new RegExp(/(routes|_renderer|_error|_404)\/.*\.[tj]sx$/)
   const cache: Record<string, string> = {}
 
   const walkDependencyTree: (
@@ -48,7 +48,7 @@ export async function injectImportingIslands(): Promise<Plugin> {
   return {
     name: 'inject-importing-islands',
     async transform(sourceCode, id) {
-      if (!routesRegex.test(id)) {
+      if (!fileRegex.test(id)) {
         return
       }
 
@@ -79,7 +79,6 @@ export async function injectImportingIslands(): Promise<Plugin> {
           kind: 'const',
         },
       }
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ast.program.body.push(hasIslandsNode as any)
 

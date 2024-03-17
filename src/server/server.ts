@@ -97,11 +97,17 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   for (const map of routesMap) {
     for (const [dir, content] of Object.entries(map)) {
       const subApp = new Hono()
+      let hasIslandComponent = false
 
       // Renderer
       const rendererPaths = getPaths(dir, rendererList)
       rendererPaths.map((path) => {
         const renderer = RENDERER_FILE[path]
+        // @ts-expect-error renderer[importing_islands_id] is not typed
+        const importingIslands = renderer[IMPORTING_ISLANDS_ID] as boolean
+        if (importingIslands) {
+          hasIslandComponent = true
+        }
         const rendererDefault = renderer.default
         if (rendererDefault) {
           subApp.all('*', rendererDefault)
@@ -126,7 +132,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         // @ts-expect-error route[IMPORTING_ISLANDS_ID] is not typed
         const importingIslands = route[IMPORTING_ISLANDS_ID] as boolean
         const setInnerMeta = createMiddleware(async function innerMeta(c, next) {
-          c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
+          c.set(IMPORTING_ISLANDS_ID, importingIslands ? true : hasIslandComponent)
           await next()
         })
 
@@ -179,6 +185,15 @@ function applyNotFound(app: Hono, dir: string, map: Record<string, Record<string
       const notFound = content[NOTFOUND_FILENAME]
       if (notFound) {
         const notFoundHandler = notFound.default
+        // @ts-expect-error: notFound[IMPORTING_ISLANDS_ID] is dynamically added and may not be typed.
+        const importingIslands = notFound[IMPORTING_ISLANDS_ID] as boolean
+        if (importingIslands) {
+          app.use('*', (c, next) => {
+            // @ts-expect-error: Dynamically setting property not recognized by type definition.
+            c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
+            return next()
+          })
+        }
         app.get('*', (c) => {
           c.status(404)
           return notFoundHandler(c)
@@ -191,10 +206,16 @@ function applyNotFound(app: Hono, dir: string, map: Record<string, Record<string
 function applyError(app: Hono, dir: string, map: Record<string, Record<string, ErrorFile>>) {
   for (const [mapDir, content] of Object.entries(map)) {
     if (dir === mapDir) {
-      const error = content[ERROR_FILENAME]
-      if (error) {
-        const errorHandler = error.default
-        app.onError((error, c) => {
+      const errorFile = content[ERROR_FILENAME]
+      if (errorFile) {
+        const errorHandler = errorFile.default
+        app.onError(async (error, c) => {
+          // @ts-expect-error: errorFile[IMPORTING_ISLANDS_ID] is dynamically added and may not be typed.
+          const importingIslands = errorFile[IMPORTING_ISLANDS_ID] as boolean
+          if (importingIslands) {
+            // @ts-expect-error: Dynamically setting property not recognized by type definition.
+            c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
+          }
           c.status(500)
           return errorHandler(error, c)
         })
