@@ -15,19 +15,21 @@ const NOTFOUND_FILENAME = '_404.tsx'
 const ERROR_FILENAME = '_error.tsx'
 const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'] as const
 
-type AppFile = { default: Hono }
-
-type InnerMeta = {
+type HasIslandFile = {
   [key in typeof IMPORTING_ISLANDS_ID]?: boolean
 }
+
+type InnerMeta = {} & HasIslandFile
+
+type AppFile = { default: Hono } & InnerMeta
 
 type RouteFile = {
   default?: Function
 } & { [M in (typeof METHODS)[number]]?: H[] } & InnerMeta
 
-type RendererFile = { default: MiddlewareHandler }
-type NotFoundFile = { default: NotFoundHandler }
-type ErrorFile = { default: ErrorHandler }
+type RendererFile = { default: MiddlewareHandler } & InnerMeta
+type NotFoundFile = { default: NotFoundHandler } & InnerMeta
+type ErrorFile = { default: ErrorHandler } & InnerMeta
 type MiddlewareFile = { default: MiddlewareHandler[] }
 
 type InitFunction<E extends Env = Env> = (app: Hono<E>) => void
@@ -44,6 +46,8 @@ type BaseServerOptions<E extends Env = Env> = {
 }
 
 export type ServerOptions<E extends Env = Env> = Partial<BaseServerOptions<E>>
+
+type Variables = {} & HasIslandFile
 
 export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E> => {
   const root = options.root
@@ -96,15 +100,16 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
 
   for (const map of routesMap) {
     for (const [dir, content] of Object.entries(map)) {
-      const subApp = new Hono()
+      const subApp = new Hono<{
+        Variables: Variables
+      }>()
       let hasIslandComponent = false
 
       // Renderer
       const rendererPaths = getPaths(dir, rendererList)
       rendererPaths.map((path) => {
         const renderer = RENDERER_FILE[path]
-        // @ts-expect-error renderer[importing_islands_id] is not typed
-        const importingIslands = renderer[IMPORTING_ISLANDS_ID] as boolean
+        const importingIslands = renderer[IMPORTING_ISLANDS_ID]
         if (importingIslands) {
           hasIslandComponent = true
         }
@@ -129,9 +134,10 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
       rootPath = filePathToPath(rootPath)
 
       for (const [filename, route] of Object.entries(content)) {
-        // @ts-expect-error route[IMPORTING_ISLANDS_ID] is not typed
-        const importingIslands = route[IMPORTING_ISLANDS_ID] as boolean
-        const setInnerMeta = createMiddleware(async function innerMeta(c, next) {
+        const importingIslands = route[IMPORTING_ISLANDS_ID]
+        const setInnerMeta = createMiddleware<{
+          Variables: Variables
+        }>(async function innerMeta(c, next) {
           c.set(IMPORTING_ISLANDS_ID, importingIslands ? true : hasIslandComponent)
           await next()
         })
@@ -179,18 +185,22 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   return app
 }
 
-function applyNotFound(app: Hono, dir: string, map: Record<string, Record<string, NotFoundFile>>) {
+function applyNotFound(
+  app: Hono<{
+    Variables: Variables
+  }>,
+  dir: string,
+  map: Record<string, Record<string, NotFoundFile>>
+) {
   for (const [mapDir, content] of Object.entries(map)) {
     if (dir === mapDir) {
       const notFound = content[NOTFOUND_FILENAME]
       if (notFound) {
         const notFoundHandler = notFound.default
-        // @ts-expect-error: notFound[IMPORTING_ISLANDS_ID] is dynamically added and may not be typed.
-        const importingIslands = notFound[IMPORTING_ISLANDS_ID] as boolean
+        const importingIslands = notFound[IMPORTING_ISLANDS_ID]
         if (importingIslands) {
           app.use('*', (c, next) => {
-            // @ts-expect-error: Dynamically setting property not recognized by type definition.
-            c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
+            c.set(IMPORTING_ISLANDS_ID, true)
             return next()
           })
         }
@@ -203,18 +213,20 @@ function applyNotFound(app: Hono, dir: string, map: Record<string, Record<string
   }
 }
 
-function applyError(app: Hono, dir: string, map: Record<string, Record<string, ErrorFile>>) {
+function applyError(
+  app: Hono<{ Variables: Variables }>,
+  dir: string,
+  map: Record<string, Record<string, ErrorFile>>
+) {
   for (const [mapDir, content] of Object.entries(map)) {
     if (dir === mapDir) {
       const errorFile = content[ERROR_FILENAME]
       if (errorFile) {
         const errorHandler = errorFile.default
         app.onError(async (error, c) => {
-          // @ts-expect-error: errorFile[IMPORTING_ISLANDS_ID] is dynamically added and may not be typed.
-          const importingIslands = errorFile[IMPORTING_ISLANDS_ID] as boolean
+          const importingIslands = errorFile[IMPORTING_ISLANDS_ID]
           if (importingIslands) {
-            // @ts-expect-error: Dynamically setting property not recognized by type definition.
-            c.set(IMPORTING_ISLANDS_ID as any, importingIslands)
+            c.set(IMPORTING_ISLANDS_ID, importingIslands)
           }
           c.status(500)
           return errorHandler(error, c)
