@@ -712,6 +712,7 @@ If you want to use Cloudflare's Bindings in your development environment, create
 ```toml
 name = "my-project-name"
 compatibility_date = "2023-12-01"
+pages_build_output_dir = "./dist"
 
 # [vars]
 # MY_VARIABLE = "production_value"
@@ -738,9 +739,6 @@ export default defineConfig({
   ],
 })
 ```
-
-> [!NOTE]
-> The `wrangler.toml` is not used in the Cloudflare Pages production environment. Please configure Bindings from the dashboard.
 
 ## Deployment
 
