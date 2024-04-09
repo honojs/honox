@@ -62,9 +62,11 @@ export const sortDirectoriesByDepth = <T>(directories: Record<string, T>) => {
     return depthA - depthB
   })
 
-  sortedKeys.push(sortedKeys[0])
-  sortedKeys.shift()
-  // .sort((a, b) => +b.includes(a) || -1) // make sure dynamic routes are registered before the root entry
+  // if we have root routes, make sure they are registered last
+  if (sortedKeys.find((x) => /.*\/routes$/.test(x))) {
+    sortedKeys.push(sortedKeys[0])
+    sortedKeys.shift()
+  }
 
   console.log(sortedKeys)
 
