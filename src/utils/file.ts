@@ -59,14 +59,18 @@ export const sortDirectoriesByDepth = <T>(directories: Record<string, T>) => {
   const sortedKeys = Object.keys(directories).sort((a, b) => {
     const depthA = a.split('/').length
     const depthB = b.split('/').length
-    return depthB - depthA
+    return depthA - depthB
   })
 
-  const sortedDirectories: Record<string, T>[] = sortedKeys.map((key) => {
-    return { [key]: directories[key] }
-  })
+  sortedKeys.push(sortedKeys[0])
+  sortedKeys.shift()
+  // .sort((a, b) => +b.includes(a) || -1) // make sure dynamic routes are registered before the root entry
 
-  return sortedDirectories
+  console.log(sortedKeys)
+
+  return sortedKeys.map((key) => ({
+    [key]: directories[key],
+  })) as Record<string, T>[]
 }
 
 /*
