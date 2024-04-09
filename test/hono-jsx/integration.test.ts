@@ -401,52 +401,52 @@ describe('Nested Layouts', () => {
   })
 })
 
-// describe('Nested Middleware', () => {
-//   const ROUTES = import.meta.glob('./app-nested-middleware/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)', {
-//     eager: true,
-//   })
+describe('Nested Middleware', () => {
+  const ROUTES = import.meta.glob('./app-nested-middleware/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)', {
+    eager: true,
+  })
 
-//   const MIDDLEWARE = import.meta.glob('./app-nested-middleware/routes/**/_middleware.(tsx|ts)', {
-//     eager: true,
-//   })
+  const MIDDLEWARE = import.meta.glob('./app-nested-middleware/routes/**/_middleware.(tsx|ts)', {
+    eager: true,
+  })
 
-//   const app = createApp({
-//     root: './app-nested-middleware/routes',
-//     ROUTES: ROUTES as any,
-//     MIDDLEWARE: MIDDLEWARE as any,
-//   })
+  const app = createApp({
+    root: './app-nested-middleware/routes',
+    ROUTES: ROUTES as any,
+    MIDDLEWARE: MIDDLEWARE as any,
+  })
 
-//   it('Should have "root" header - /nested', async () => {
-//     const res = await app.request('/nested')
-//     expect(res.status).toBe(200)
-//     expect(await res.headers.get('root')).toEqual('root')
-//     expect(await res.headers.get('root2')).toEqual('root2')
-//   })
-//   it('Should have "foo" header and parent headers - /nested/foo', async () => {
-//     const res = await app.request('/nested/foo')
-//     expect(res.status).toBe(200)
-//     expect(await res.headers.get('root')).toEqual('root')
-//     expect(await res.headers.get('root2')).toEqual('root2')
-//     expect(await res.headers.get('foo')).toEqual('foo')
-//   })
-//   it('Should have "bar" header and parent headers - /nested/foo/bar', async () => {
-//     const res = await app.request('/nested/foo/bar')
-//     expect(res.status).toBe(200)
-//     expect(await res.headers.get('root')).toEqual('root')
-//     expect(await res.headers.get('root2')).toEqual('root2')
-//     expect(await res.headers.get('foo')).toEqual('foo')
-//     expect(await res.headers.get('bar')).toEqual('bar')
-//   })
-//   it('Should have "baz" header and parent headers - /nested/foo/bar/baz', async () => {
-//     const res = await app.request('/nested/foo/bar/baz')
-//     expect(res.status).toBe(200)
-//     expect(await res.headers.get('root')).toEqual('root')
-//     expect(await res.headers.get('root2')).toEqual('root2')
-//     expect(await res.headers.get('foo')).toEqual('foo')
-//     expect(await res.headers.get('bar')).toEqual('bar')
-//     expect(await res.headers.get('baz')).toEqual('baz')
-//   })
-// })
+  it('Should have "root" header - /nested', async () => {
+    const res = await app.request('/nested')
+    expect(res.status).toBe(200)
+    expect(await res.headers.get('root')).toEqual('root')
+    expect(await res.headers.get('root2')).toEqual('root2')
+  })
+  it('Should have "foo" header and parent headers - /nested/foo', async () => {
+    const res = await app.request('/nested/foo')
+    expect(res.status).toBe(200)
+    expect(await res.headers.get('root')).toEqual('root')
+    expect(await res.headers.get('root2')).toEqual('root2')
+    expect(await res.headers.get('foo')).toEqual('foo')
+  })
+  it('Should have "bar" header and parent headers - /nested/foo/bar', async () => {
+    const res = await app.request('/nested/foo/bar')
+    expect(res.status).toBe(200)
+    expect(await res.headers.get('root')).toEqual('root')
+    expect(await res.headers.get('root2')).toEqual('root2')
+    expect(await res.headers.get('foo')).toEqual('foo')
+    expect(await res.headers.get('bar')).toEqual('bar')
+  })
+  it('Should have "baz" header and parent headers - /nested/foo/bar/baz', async () => {
+    const res = await app.request('/nested/foo/bar/baz')
+    expect(res.status).toBe(200)
+    expect(await res.headers.get('root')).toEqual('root')
+    expect(await res.headers.get('root2')).toEqual('root2')
+    expect(await res.headers.get('foo')).toEqual('foo')
+    expect(await res.headers.get('bar')).toEqual('bar')
+    expect(await res.headers.get('baz')).toEqual('baz')
+  })
+})
 
 describe('<Script /> component', () => {
   const ROUTES = import.meta.glob('./app-script/routes/**/index.tsx', {
