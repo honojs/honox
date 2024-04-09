@@ -125,15 +125,15 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         }
       })
 
-      // Middleware
-      const middlewarePaths = getPaths(dir, middlewareList)
-      middlewarePaths.map((path) => {
-        const middleware = MIDDLEWARE_FILE[path]
-        const middlewareDefault = middleware.default
-        if (middlewareDefault) {
-          subApp.use(...middlewareDefault)
+      const middlewareFile = Object.keys(MIDDLEWARE_FILE).find((x) =>
+        new RegExp(dir + '/_middleware.tsx?').test(x)
+      )
+      if (middlewareFile) {
+        const middleware = MIDDLEWARE_FILE[middlewareFile]
+        if (middleware.default) {
+          subApp.use(...middleware.default)
         }
-      })
+      }
 
       // Root path
       let rootPath = dir.replace(rootRegExp, '')

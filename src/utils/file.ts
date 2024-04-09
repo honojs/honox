@@ -68,8 +68,6 @@ export const sortDirectoriesByDepth = <T>(directories: Record<string, T>) => {
     sortedKeys.shift()
   }
 
-  console.log(sortedKeys)
-
   return sortedKeys.map((key) => ({
     [key]: directories[key],
   })) as Record<string, T>[]
