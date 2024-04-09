@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Hono } from 'hono'
 import type { Env, NotFoundHandler, ErrorHandler, MiddlewareHandler } from 'hono'
+import { showRoutes } from 'hono/dev'
 import { createMiddleware } from 'hono/factory'
 import type { H } from 'hono/types'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'

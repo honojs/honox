@@ -24,6 +24,16 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/about',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/about',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/about/:name/address',
         method: 'GET',
         handler: expect.any(Function),
@@ -156,6 +166,26 @@ describe('Basic', () => {
       },
       {
         path: '/post',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/resource',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/resource/new',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/resource/new',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/resource/:resourceId',
         method: 'GET',
         handler: expect.any(Function),
       },
@@ -171,7 +201,9 @@ describe('Basic', () => {
       },
     ]
     expect(app.routes).toHaveLength(routes.length)
-    expect(app.routes).toEqual(expect.arrayContaining(routes))
+
+    // check in a loop to get slightly more legible test results
+    app.routes.map((x) => expect(routes).toContainEqual(x))
   })
 
   it('Should return 200 response - / with a Powered By header', async () => {
@@ -191,6 +223,13 @@ describe('Basic', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe('<p>It&#39;s me</p><b>My name is me</b>')
+  })
+
+  it('Should return 200 response - /resource/new', async () => {
+    const res = await app.request('/resource/new')
+    expect(res.status).toBe(200)
+    // hono/jsx escape a single quote to &#39;
+    expect(await res.text()).toBe('<div>Create new resource</div>')
   })
 
   it('Should return 200 response - POST /about/me', async () => {
