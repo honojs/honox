@@ -78,7 +78,6 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
 
   // Middleware
   const MIDDLEWARE_FILE = options.MIDDLEWARE
-  const middlewareList = listByDirectory(MIDDLEWARE_FILE)
 
   // Routes
   const ROUTES_FILE = options.ROUTES
