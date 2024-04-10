@@ -16,7 +16,9 @@ export default defineConfig({
     islandComponents({
       isIsland: (id) => {
         const resolvedPath = path.resolve(root).replace(/\\/g, '\\\\')
-        const regexp = new RegExp(`${resolvedPath}/app[^\\\\/]*[\\\\/]islands[\\\\/].+\.tsx?$`)
+        const regexp = new RegExp(
+          `${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]islands[\\\\/].+\.tsx?$`
+        )
         return regexp.test(path.resolve(id))
       },
     }),
