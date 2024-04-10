@@ -7,19 +7,10 @@
     "strict": true,
     "declaration": true,
     "skipLibCheck": true,
-    "types": [
-      "node",
-      "vite/client",
-      "vitest/globals"
-    ],
+    "types": ["node", "vite/client", "vitest/globals"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "jsxImportSource": "hono/jsx"
   },
-  "include": [
-    "src",
-    "test"
-  ],
-  "exclude": [
-    "test/hono-jsx/app-alias",
-  ]
+  "include": ["src", "test", "test/hono-jsx/app/routes/about/[name].tsx"],
+  "exclude": ["test/hono-jsx/app-alias"]
 }

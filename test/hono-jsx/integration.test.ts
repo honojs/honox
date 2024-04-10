@@ -612,3 +612,53 @@ describe('Trailing Slash', () => {
     expect(res.status).toBe(404)
   })
 })
+
+describe('Nested Dynamic Routes', () => {
+  const ROUTES = import.meta.glob(
+    './app-nested-dynamic-routes/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)',
+    {
+      eager: true,
+    }
+  )
+
+  const app = createApp({
+    root: './app-nested-dynamic-routes/routes',
+    ROUTES: ROUTES as any,
+  })
+
+  it('Should return 200 response - /resource', async () => {
+    const res = await app.request('/resource')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<div>Resource Home</div>')
+  })
+
+  it('Should return 200 response - /resource/new', async () => {
+    const res = await app.request('/resource/new')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<div>Create new resource</div>')
+  })
+
+  it('Should return 200 response - /resource/abcdef', async () => {
+    const res = await app.request('/resource/abcdef')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<b>Resource Id abcdef</b>')
+  })
+
+  it('Should return 200 response - /resource/abcdef/resource2', async () => {
+    const res = await app.request('/resource/abcdef/resource2')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<b>Resource2 Home</b>')
+  })
+
+  it('Should return 200 response - /resource/abcdef/resource2/new', async () => {
+    const res = await app.request('/resource/abcdef/resource2/new')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<div>Create new resource 2</div>')
+  })
+
+  it('Should return 200 response - /resource/abcdef/resource2/12345', async () => {
+    const res = await app.request('/resource/abcdef/resource2/12345')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<b>Resource2 Id abcdef / 12345</b>')
+  })
+})

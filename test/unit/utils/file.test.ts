@@ -75,13 +75,13 @@ describe('sortDirectoriesByDepth', () => {
       })
     ).toEqual([
       {
-        '/app/routes/blog/posts': {
-          'index.tsx': 'file2',
+        '/app/routes/blog': {
+          'index.tsx': 'file3',
         },
       },
       {
-        '/app/routes/blog': {
-          'index.tsx': 'file3',
+        '/app/routes/blog/posts': {
+          'index.tsx': 'file2',
         },
       },
       {
