@@ -12,7 +12,7 @@ import { IMPORTING_ISLANDS_ID } from '../constants.js'
 const generate = (_generate.default as typeof _generate) ?? _generate
 
 export async function injectImportingIslands(): Promise<Plugin> {
-  const isIslandRegex = new RegExp(/\/islands\//)
+  const isIslandRegex = new RegExp(/(\/islands\/|\_[a-zA-Z0-9[-]+\.island\.[tj]sx$)/)
   const fileRegex = new RegExp(/(routes|_renderer|_error|_404)\/.*\.[tj]sx$/)
   const cache: Record<string, string> = {}
 
