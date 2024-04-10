@@ -10,7 +10,6 @@
     "test:integration:api": "vitest --run ./test-integration/api.test.ts",
     "test:integration:apps": "vitest --run -c ./test-integration/vitest.config.ts ./test-integration/apps.test.ts",
     "test:e2e": "playwright test -c ./test-e2e/playwright.config.ts ./test-e2e/e2e.test.ts",
-    "test:yarn": "yarn test:unit && yarn test:integration:api && yarn test:integration:hono-jsx && yarn test:e2e",
     "typecheck": "tsc --noEmit",
     "build": "tsup && publint",
     "watch": "tsup --watch",
