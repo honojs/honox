@@ -1,4 +1,4 @@
-import type { FC } from 'hono/jsx'
+import type { Child, FC } from 'hono/jsx'
 import type { Manifest } from 'vite'
 import { HasIslands } from './has-islands.js'
 
@@ -27,7 +27,16 @@ export const Script: FC<Options> = async (options) => {
     if (manifest) {
       const scriptInManifest = manifest[src.replace(/^\//, '')]
       if (scriptInManifest) {
-        return (
+        const elements: Child[] = []
+
+        // May make it optional to output CSS or not depending on user feedback.
+        if (scriptInManifest.css) {
+          for (const css of scriptInManifest.css) {
+            elements.push(<link href={css} rel='stylesheet' />)
+          }
+        }
+
+        elements.push(
           <HasIslands>
             <script
               type='module'
@@ -35,6 +44,14 @@ export const Script: FC<Options> = async (options) => {
               src={`/${scriptInManifest.file}`}
             ></script>
           </HasIslands>
+        )
+
+        return (
+          <>
+            {elements.map((element) => {
+              return <>{element}</>
+            })}
+          </>
         )
       }
     }

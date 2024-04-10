@@ -12,6 +12,7 @@ export default jsxRenderer(
             manifest={{
               'app/client.ts': {
                 file: 'static/client-abc.js',
+                css: ['/static/style.css'],
               },
             }}
           />
