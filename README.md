@@ -1,8 +1,8 @@
 # HonoX
 
-**HonoX** is a simple and fast - _supersonic_ - meta framework for creating full-stack websites or Web APIs - (formerly _[Sonik](https://github.com/sonikjs/sonik)_). It stands on the shoulders of giants; built on [Hono](https://hono.dev/), [Vite](https://vitejs.dev/), and UI libraries.
+**HonoX** is a simple and fast meta-framework for creating full-stack websites or Web APIs - (formerly _[Sonik](https://github.com/sonikjs/sonik)_). It stands on the shoulders of giants; built on [Hono](https://hono.dev/), [Vite](https://vitejs.dev/), and UI libraries.
 
-**Note**: _HonoX is currently in a "alpha stage". Breaking changes are introduced without following semantic versioning._
+**Note**: _HonoX is currently in the "alpha stage". Breaking changes are introduced without following semantic versioning._
 
 ## Features
 
@@ -68,7 +68,7 @@ export default defineConfig({
 
 ### Server Entry File
 
-A server entry file is required. The file is should be placed at `app/server.ts`. This file is first called by the Vite during the development or build phase.
+A server entry file is required. The file should be placed at `app/server.ts`. This file is first called by the Vite during the development or build phase.
 
 In the entry file, simply initialize your app using the `createApp()` function. `app` will be an instance of Hono, so you can use Hono's middleware and the `showRoutes()` in `hono/dev`.
 
@@ -528,22 +528,14 @@ export const POST = createRoute(zValidator('form', schema), async (c) => {
 
 Alternatively, you can use a `_middleware.(ts|tsx)` file in a directory to have that middleware applied to the current route, as well as all child routes. Middleware is ran in the order that it is listed within the array.
 
-An equivilant example to the previous Hono-style middleware configuration is as follows:
-
-```tsx
-// /app/_middleware.ts
+```ts
+// /app/routes/_middleware.ts
 import { createRoute } from 'honox/factory'
-import { z } from 'zod'
-import { zValidator } from '@hono/zod-validator'
+import { logger } from 'hono/logger'
+import { secureHeaders } from 'hono/secure-headers'
 
-const schema = z.object({
-  name: z.string().max(10),
-})
-
-export default createRoute(zValidator('form', schema), ...<more-middleware>)
+export default createRoute(logger(), secureHeaders(), ...<more-middleware>)
 ```
-
-Note that is some scenarios, auto-complete for the request body within the route may be lost depending on how the middleware was written.
 
 ### Trailing Slash
 
