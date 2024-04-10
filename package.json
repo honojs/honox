@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "test": "bun typecheck && bun test:unit && bun test:integration && bun test:e2e",
-    "test:unit": "vitest --run test/unit",
-    "test:integration": "bun test:integration:api && bun test:integration:hono-jsx",
-    "test:integration:hono-jsx": "vitest run -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts",
-    "test:integration:hono-jsx:watch": "vitest -c ./test/hono-jsx/vitest.config.ts ./test/hono-jsx/integration.test.ts",
-    "test:integration:api": "vitest run -c ./test/api/vitest.config.ts ./test/api/integration.test.ts",
-    "test:e2e": "playwright test -c ./test/hono-jsx/playwright.config.ts ./test/hono-jsx/e2e.test.ts",
+    "test:unit": "vitest --run ./src",
+    "test:integration": "bun test:integration:api && bun test:integration:apps",
+    "test:integration:api": "vitest --run ./test-integration/api.test.ts",
+    "test:integration:apps": "vitest --run -c ./test-integration/vitest.config.ts ./test-integration/apps.test.ts",
+    "test:e2e": "playwright test -c ./test-e2e/playwright.config.ts ./test-e2e/e2e.test.ts",
     "test:yarn": "yarn test:unit && yarn test:integration:api && yarn test:integration:hono-jsx && yarn test:e2e",
     "typecheck": "tsc --noEmit",
     "build": "tsup && publint",
@@ -128,8 +127,8 @@
     "publint": "^0.2.7",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vite": "^5.0.12",
-    "vitest": "^1.2.1"
+    "vite": "^5.2.8",
+    "vitest": "^1.4.0"
   },
   "engines": {
     "node": ">=18.14.1"
