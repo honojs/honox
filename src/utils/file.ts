@@ -56,20 +56,11 @@ export const groupByDirectory = <T = unknown>(files: Record<string, T>) => {
 }
 
 export const sortDirectoriesByDepth = <T>(directories: Record<string, T>) => {
-  const sortedKeys = Object.keys(directories)
-    .sort((a, b) => {
-      const depthA = a.split('/').length
-      const depthB = b.split('/').length
-      return depthA - depthB
-    })
-    .sort((a, b) => {
-      const depthA = a.split('/').length
-      const depthB = b.split('/').length
-      if (depthA === depthB) {
-        return b.localeCompare(a)
-      }
-      return 1
-    })
+  const sortedKeys = Object.keys(directories).sort((a, b) => {
+    const depthA = a.split('/').length
+    const depthB = b.split('/').length
+    return depthA - depthB || b.localeCompare(a)
+  })
 
   // if we have root routes, make sure they are registered last
   if (sortedKeys.find((x) => /.*\/routes$/.test(x))) {
