@@ -60,7 +60,7 @@ describe('Basic', () => {
     ]
 
     expect(app.routes).toHaveLength(routes.length)
-    expect(app.routes).toEqual(routes)
+    expect(app.routes).toEqual(expect.arrayContaining(routes))
   })
 
   it('Should return 200 response - / with a Powered By header', async () => {

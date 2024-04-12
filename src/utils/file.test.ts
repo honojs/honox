@@ -63,30 +63,38 @@ describe('sortDirectoriesByDepth', () => {
   it('Should sort directories by the depth', () => {
     expect(
       sortDirectoriesByDepth({
-        '/app/routes': {
+        '/dir': {
           'index.tsx': 'file1',
         },
-        '/app/routes/blog/posts': {
+        '/dir/blog/[id]': {
           'index.tsx': 'file2',
         },
-        '/app/routes/blog': {
+        '/dir/blog/posts': {
           'index.tsx': 'file3',
+        },
+        '/dir/blog': {
+          'index.tsx': 'file4',
         },
       })
-    ).toEqual([
+    ).toStrictEqual([
       {
-        '/app/routes/blog': {
+        '/dir': {
+          'index.tsx': 'file1',
+        },
+      },
+      {
+        '/dir/blog': {
+          'index.tsx': 'file4',
+        },
+      },
+      {
+        '/dir/blog/posts': {
           'index.tsx': 'file3',
         },
       },
       {
-        '/app/routes/blog/posts': {
+        '/dir/blog/[id]': {
           'index.tsx': 'file2',
-        },
-      },
-      {
-        '/app/routes': {
-          'index.tsx': 'file1',
         },
       },
     ])

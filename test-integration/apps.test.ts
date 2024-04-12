@@ -451,6 +451,14 @@ describe('Nested Middleware', () => {
     expect(res.headers.get('bar')).toEqual('bar')
     expect(res.headers.get('baz')).toEqual('baz')
   })
+  it('/nested/foo/bar/123', async () => {
+    const res = await app.request('/nested/foo/bar/123')
+    expect(res.status).toBe(200)
+    expect(res.headers.get('root')).toEqual('root')
+    expect(res.headers.get('root2')).toEqual('root2')
+    expect(res.headers.get('foo')).toEqual('foo')
+    expect(res.headers.get('bar')).toEqual('bar')
+  })
 })
 
 describe('<Script /> component', () => {
