@@ -57,6 +57,8 @@ type Variables = {} & HasIslandFile
 export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E> => {
   const root = options.root
   const rootRegExp = new RegExp(`^${root}`)
+  const getRootPath = (dir: string) => filePathToPath(dir.replace(rootRegExp, ''))
+
   const app = options.app ?? new Hono()
   const trailingSlash = options.trailingSlash ?? false
 
@@ -134,10 +136,6 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         }
       }
 
-      // Root path
-      let rootPath = dir.replace(rootRegExp, '')
-      rootPath = filePathToPath(rootPath)
-
       for (const [filename, route] of Object.entries(content)) {
         const importingIslands = route[IMPORTING_ISLANDS_ID]
         const setInnerMeta = createMiddleware<{
@@ -179,17 +177,29 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           })
         }
       }
-      // Not Found
-      applyNotFound(subApp, dir, notFoundMap)
+
       // Error
       applyError(subApp, dir, errorMap)
 
+      let rootPath = getRootPath(dir)
       if (trailingSlash) {
         rootPath = /\/$/.test(rootPath) ? rootPath : rootPath + '/'
       }
-
       app.route(rootPath, subApp)
     }
+  }
+
+  /**
+   * Set Not Found handlers
+   */
+  for (const map of routesMap.reverse()) {
+    const dir = Object.entries(map)[0][0]
+    const subApp = new Hono<{
+      Variables: Variables
+    }>()
+    applyNotFound(subApp, dir, notFoundMap)
+    const rootPath = getRootPath(dir)
+    app.route(rootPath, subApp)
   }
 
   return app
