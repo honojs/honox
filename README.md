@@ -241,7 +241,7 @@ Let's create an application that includes a client side. Here, we will use hono/
 
 ### Project Structure
 
-The below is the project structure of a minimal application including a client side:
+Below is the project structure of a minimal application including a client side:
 
 ```txt
 .
@@ -261,7 +261,7 @@ The below is the project structure of a minimal application including a client s
 
 ### Renderer
 
-This is a `_renderer.tsx`, which will load the `/app/client.ts` entry file for the client. It will load the JavaScript file for the production according to the variable `import.meta.env.PROD`. And renders the inside of `<HasIslands />` if there are islands on that page.
+This is a `_renderer.tsx`, which will load the `/app/client.ts` entry file for the client. It will load the JavaScript file for production according to the variable `import.meta.env.PROD`. And renders the inside of `<HasIslands />` if there are islands on that page.
 
 ```tsx
 // app/routes/_renderer.tsx
@@ -324,7 +324,12 @@ createClient()
 
 ### Interactions
 
-Function components placed in `app/islands/*` - Island components - are also sent to the client side. For example, you can write interactive component such as the following counter:
+If you want to add interactions to your page, create Island components. Islands components should be:
+
+- Placed under `app/islands` directory or named with `_` prefix and `island.tsx` suffix like `_componentName.island.tsx`.
+- Should `default export function`.
+
+For example, you can write an interactive component such as the following counter:
 
 ```tsx
 // app/islands/counter.tsx
@@ -341,7 +346,7 @@ export default function Counter() {
 }
 ```
 
-When you load the component in a route file, it is rendered as Server-Side rendering and JavaScript is also send to the client-side.
+When you load the component in a route file, it is rendered as Server-Side rendering and JavaScript is also sent to the client side.
 
 ```tsx
 // app/routes/index.tsx
@@ -358,7 +363,7 @@ export default createRoute((c) => {
 })
 ```
 
-**Note**: You cannot access a Context object in Island components. Therefore, you should pass the value from components outside of Island.
+**Note**: You cannot access a Context object in Island components. Therefore, you should pass the value from components outside of the Island.
 
 ```ts
 import { useRequestContext } from 'hono/jsx-renderer'
@@ -779,7 +784,7 @@ Build command (including a client):
 vite build --mode client && vite build
 ```
 
-Deploy with the following commands after build. Ensure you have [Wrangler](https://developers.cloudflare.com/workers/wrangler/) installed:
+Deploy with the following commands after the build. Ensure you have [Wrangler](https://developers.cloudflare.com/workers/wrangler/) installed:
 
 ```txt
 wrangler pages deploy ./dist
