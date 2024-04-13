@@ -327,7 +327,7 @@ createClient()
 If you want to add interactions to your page, create Island components. Islands components should be:
 
 - Placed under `app/islands` directory or named with `_` prefix and `island.tsx` suffix like `_componentName.island.tsx`.
-- Should `default export function`.
+- Should `export default function`.
 
 For example, you can write an interactive component such as the following counter:
 
