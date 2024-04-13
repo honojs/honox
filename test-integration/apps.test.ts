@@ -134,6 +134,16 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/directory',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/directory',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/fc',
         method: 'GET',
         handler: expect.any(Function),
@@ -290,7 +300,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
@@ -308,7 +318,7 @@ describe('With preserved', () => {
          <body>
             <div>
                <h1>Nested Island Test</h1>
-               <honox-island component-name="Counter.tsx" data-serialized-props="{}">
+               <honox-island component-name="/islands/Counter.tsx" data-serialized-props="{}">
                   <div id="">
                      <p>Count: 0</p>
                      <button>Increment</button>
@@ -319,6 +329,15 @@ describe('With preserved', () => {
          </body>
       </html>
 `.replace(/\n|\s{2,}/g, '')
+    )
+  })
+
+  it('Should return 200 response - /directory', async () => {
+    const res = await app.request('/directory')
+    expect(res.status).toBe(200)
+    // hono/jsx escape a single quote to &#39;
+    expect(await res.text()).toBe(
+      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/routes/directory/_Counter.island.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
@@ -481,7 +500,7 @@ describe('<Script /> component', () => {
       const res = await app.request('/')
       expect(res.status).toBe(200)
       expect(await res.text()).toBe(
-        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
+        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="/islands/Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
       )
     })
 
@@ -489,7 +508,7 @@ describe('<Script /> component', () => {
       const res = await app.request('/classic')
       expect(res.status).toBe(200)
       expect(await res.text()).toBe(
-        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
+        '<html><head><script type="module" src="/static/client-abc.js"></script></head><body><main><honox-island component-name="/islands/Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
       )
     })
   })
@@ -509,7 +528,7 @@ describe('<Script /> component', () => {
       const res = await app.request('/')
       expect(res.status).toBe(200)
       expect(await res.text()).toBe(
-        '<html><body><main><honox-island component-name="Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main><script type="module" async="" src="/static/client-abc.js"></script></body></html>'
+        '<html><body><main><honox-island component-name="/islands/Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main><script type="module" async="" src="/static/client-abc.js"></script></body></html>'
       )
     })
   })
@@ -533,7 +552,7 @@ describe('<HasIslands /> Component with path aliases', () => {
     const res = await app.request('/has-islands')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe(
-      '<html><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div>Counter</div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<html><body><honox-island component-name="/islands/Counter.tsx" data-serialized-props="{}"><div>Counter</div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
@@ -573,7 +592,7 @@ describe('Island Components with Preserved Files', () => {
     const res = await app.request('/foo')
     expect(res.status).toBe(404)
     expect(await res.text()).toBe(
-      '<html><head><title>Not Found</title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<html><head><title>Not Found</title></head><body><honox-island component-name="/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
@@ -581,7 +600,7 @@ describe('Island Components with Preserved Files', () => {
     const res = await app.request('/throw_error')
     expect(res.status).toBe(500)
     expect(await res.text()).toBe(
-      '<html><head><title>Internal Server Error</title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<html><head><title>Internal Server Error</title></head><body><honox-island component-name="/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
@@ -589,7 +608,7 @@ describe('Island Components with Preserved Files', () => {
     const res = await app.request('/nested/post')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe(
-      '<html><head><title></title></head><body><honox-island component-name="Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><h1>Hello MDX</h1><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<html><head><title></title></head><body><honox-island component-name="/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><h1>Hello MDX</h1><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 })

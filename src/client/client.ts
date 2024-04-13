@@ -28,8 +28,12 @@ export type ClientOptions = {
 }
 
 export const createClient = async (options?: ClientOptions) => {
-  const FILES = options?.ISLAND_FILES ?? import.meta.glob('/app/islands/**/[a-zA-Z0-9[-]+.(tsx|ts)')
-  const root = options?.island_root ?? '/app/islands/'
+  const FILES = options?.ISLAND_FILES ?? {
+    ...import.meta.glob('/app/islands/**/[a-zA-Z0-9[-]+.(tsx|ts)'),
+    ...import.meta.glob('/app/routes/**/_[a-zA-Z0-9[-]+.island.(tsx|ts)'),
+  }
+
+  const root = options?.island_root ?? '/app'
 
   const hydrateComponent: HydrateComponent = async (document) => {
     const filePromises = Object.keys(FILES).map(async (filePath) => {
