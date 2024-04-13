@@ -440,41 +440,46 @@ describe('Nested Middleware', () => {
     MIDDLEWARE: MIDDLEWARE as any,
   })
 
-  it('Should have "root" header - /nested', async () => {
+  it('Should have "top" header - /', async () => {
+    const res = await app.request('/')
+    expect(res.status).toBe(200)
+    expect(res.headers.get('top')).toEqual('top')
+  })
+  it('Should have "sub" header - /nested', async () => {
     const res = await app.request('/nested')
     expect(res.status).toBe(200)
-    expect(res.headers.get('root')).toEqual('root')
-    expect(res.headers.get('root2')).toEqual('root2')
+    expect(res.headers.get('top')).toEqual('top')
+    expect(res.headers.get('sub')).toEqual('sub')
   })
   it('Should have "foo" header and parent headers - /nested/foo', async () => {
     const res = await app.request('/nested/foo')
     expect(res.status).toBe(200)
-    expect(res.headers.get('root')).toEqual('root')
-    expect(res.headers.get('root2')).toEqual('root2')
+    expect(res.headers.get('top')).toEqual('top')
+    expect(res.headers.get('sub')).toEqual('sub')
     expect(res.headers.get('foo')).toEqual('foo')
   })
   it('Should have "bar" header and parent headers - /nested/foo/bar', async () => {
     const res = await app.request('/nested/foo/bar')
     expect(res.status).toBe(200)
-    expect(res.headers.get('root')).toEqual('root')
-    expect(res.headers.get('root2')).toEqual('root2')
+    expect(res.headers.get('top')).toEqual('top')
+    expect(res.headers.get('sub')).toEqual('sub')
     expect(res.headers.get('foo')).toEqual('foo')
     expect(res.headers.get('bar')).toEqual('bar')
   })
   it('Should have "baz" header and parent headers - /nested/foo/bar/baz', async () => {
     const res = await app.request('/nested/foo/bar/baz')
     expect(res.status).toBe(200)
-    expect(res.headers.get('root')).toEqual('root')
-    expect(res.headers.get('root2')).toEqual('root2')
+    expect(res.headers.get('top')).toEqual('top')
+    expect(res.headers.get('sub')).toEqual('sub')
     expect(res.headers.get('foo')).toEqual('foo')
     expect(res.headers.get('bar')).toEqual('bar')
     expect(res.headers.get('baz')).toEqual('baz')
   })
-  it('/nested/foo/bar/123', async () => {
+  it('Should have headers added by parent middleware - /nested/foo/bar/123', async () => {
     const res = await app.request('/nested/foo/bar/123')
     expect(res.status).toBe(200)
-    expect(res.headers.get('root')).toEqual('root')
-    expect(res.headers.get('root2')).toEqual('root2')
+    expect(res.headers.get('top')).toEqual('top')
+    expect(res.headers.get('sub')).toEqual('sub')
     expect(res.headers.get('foo')).toEqual('foo')
     expect(res.headers.get('bar')).toEqual('bar')
   })

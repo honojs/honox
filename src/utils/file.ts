@@ -62,12 +62,6 @@ export const sortDirectoriesByDepth = <T>(directories: Record<string, T>) => {
     return depthA - depthB || b.localeCompare(a)
   })
 
-  // if we have root routes, make sure they are registered last
-  if (sortedKeys.find((x) => /.*\/routes$/.test(x))) {
-    sortedKeys.push(sortedKeys[0])
-    sortedKeys.shift()
-  }
-
   return sortedKeys.map((key) => ({
     [key]: directories[key],
   })) as Record<string, T>[]
