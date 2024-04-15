@@ -227,13 +227,9 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
     },
     async resolveId(source, importer) {
       const resolution = await this.resolve(source, importer)
-      if (!resolution) {
-        return
-      }
-      if (importer && getIslandComponentName(root, importer, options)) {
+      if (resolution && importer && getIslandComponentName(root, importer, options)) {
         return `${resolution.id}?no-island`
       }
-      return resolution.id
     },
     async load(id) {
       if (id.endsWith('?no-island')) {
