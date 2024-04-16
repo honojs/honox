@@ -218,6 +218,7 @@ function getIslandComponentName(
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
+  const insideIslandSuffix = '?inside-island'
   let root = ''
   return {
     name: 'transform-island-components',
@@ -228,11 +229,11 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
     async resolveId(source, importer) {
       const resolution = await this.resolve(source, importer)
       if (resolution && importer && getIslandComponentName(root, importer, options)) {
-        return `${resolution.id}?no-island`
+        return resolution.id + insideIslandSuffix
       }
     },
     async load(id) {
-      if (id.endsWith('?no-island')) {
+      if (id.endsWith(insideIslandSuffix)) {
         return
       }
       const componentName = getIslandComponentName(root, id, options)
