@@ -7,6 +7,7 @@ type Options = {
   async?: boolean
   prod?: boolean
   manifest?: Manifest
+  nonce?: string
 }
 
 export const Script: FC<Options> = async (options) => {
@@ -33,6 +34,7 @@ export const Script: FC<Options> = async (options) => {
               type='module'
               async={!!options.async}
               src={`/${scriptInManifest.file}`}
+              nonce={options.nonce}
             ></script>
           </HasIslands>
         )
@@ -40,6 +42,6 @@ export const Script: FC<Options> = async (options) => {
     }
     return <></>
   } else {
-    return <script type='module' async={!!options.async} src={src}></script>
+    return <script type='module' async={!!options.async} src={src} nonce={options.nonce}></script>
   }
 }
