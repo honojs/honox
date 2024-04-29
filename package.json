@@ -59,6 +59,10 @@
     "./vite/client": {
       "types": "./dist/vite/client.d.ts",
       "import": "./dist/vite/client.js"
+    },
+    "./vite/components": {
+      "types": "./dist/vite/components.d.ts",
+      "import": "./dist/vite/components.js"
     }
   },
   "typesVersions": {

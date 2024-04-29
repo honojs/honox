@@ -17,7 +17,6 @@ import {
   jsxIdentifier,
   jsxOpeningElement,
   stringLiteral,
-  callExpression,
   variableDeclarator,
   variableDeclaration,
   functionExpression,
@@ -28,10 +27,12 @@ import {
   exportDefaultDeclaration,
   conditionalExpression,
   memberExpression,
+  importDeclaration,
+  importSpecifier,
 } from '@babel/types'
+import { parse as parseJsonc } from 'jsonc-parser'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
-import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
 
 function addSSRCheck(funcName: string, componentName: string) {
   const isSSR = memberExpression(
@@ -39,57 +40,18 @@ function addSSRCheck(funcName: string, componentName: string) {
     identifier('env.SSR')
   )
 
-  // serialize props by excluding the children
-  const serializedProps = callExpression(identifier('JSON.stringify'), [
-    callExpression(memberExpression(identifier('Object'), identifier('fromEntries')), [
-      callExpression(
-        memberExpression(
-          callExpression(memberExpression(identifier('Object'), identifier('entries')), [
-            identifier('props'),
-          ]),
-          identifier('filter')
-        ),
-        [identifier('([key]) => key !== "children"')]
-      ),
-    ]),
-  ])
-
   const ssrElement = jsxElement(
     jsxOpeningElement(
-      jsxIdentifier('honox-island'),
+      jsxIdentifier('HonoXIsland'),
       [
-        jsxAttribute(jsxIdentifier(COMPONENT_NAME), stringLiteral(componentName)),
-        jsxAttribute(jsxIdentifier(DATA_SERIALIZED_PROPS), jsxExpressionContainer(serializedProps)),
+        jsxAttribute(jsxIdentifier('componentName'), stringLiteral(componentName)),
+        jsxAttribute(jsxIdentifier('Component'), jsxExpressionContainer(identifier(funcName))),
+        jsxAttribute(jsxIdentifier('props'), jsxExpressionContainer(identifier('props'))),
       ],
-      false
+      true
     ),
-    jsxClosingElement(jsxIdentifier('honox-island')),
-    [
-      jsxElement(
-        jsxOpeningElement(
-          jsxIdentifier(funcName),
-          [jsxSpreadAttribute(identifier('props'))],
-          false
-        ),
-        jsxClosingElement(jsxIdentifier(funcName)),
-        []
-      ),
-      jsxExpressionContainer(
-        conditionalExpression(
-          memberExpression(identifier('props'), identifier('children')),
-          jsxElement(
-            jsxOpeningElement(
-              jsxIdentifier('template'),
-              [jsxAttribute(jsxIdentifier(DATA_HONO_TEMPLATE), stringLiteral(''))],
-              false
-            ),
-            jsxClosingElement(jsxIdentifier('template')),
-            [jsxExpressionContainer(memberExpression(identifier('props'), identifier('children')))]
-          ),
-          identifier('null')
-        )
-      ),
-    ]
+    null,
+    []
   )
 
   const clientElement = jsxElement(
@@ -103,6 +65,10 @@ function addSSRCheck(funcName: string, componentName: string) {
 }
 
 export const transformJsxTags = (contents: string, componentName: string) => {
+  if (!contents) {
+    return ''
+  }
+
   const ast = parse(contents, {
     sourceType: 'module',
     plugins: ['typescript', 'jsx'],
@@ -187,6 +153,13 @@ export const transformJsxTags = (contents: string, componentName: string) => {
       ast.program.body.push(exportDefaultDeclaration(wrappedFunctionId))
     }
 
+    ast.program.body.unshift(
+      importDeclaration(
+        [importSpecifier(identifier('HonoXIsland'), identifier('HonoXIsland'))],
+        stringLiteral('honox/vite/components')
+      )
+    )
+
     const { code } = generate(ast)
     return code
   }
@@ -199,12 +172,39 @@ export type IslandComponentsOptions = {
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
   let root = ''
+  let jsxImportSource: string | undefined
   return {
     name: 'transform-island-components',
-    configResolved: (config) => {
+    configResolved: async (config) => {
       root = config.root
+
+      const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
+      try {
+        const tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
+        const tsConfig = parseJsonc(tsConfigRaw)
+
+        jsxImportSource =
+          tsConfig.compilerOptions?.honoxReactImportSource ??
+          tsConfig.compilerOptions?.jsxImportSource
+      } catch (error) {
+        console.warn('Error reading tsconfig.json:', error)
+      }
     },
     async load(id) {
+      if (/\/honox\/.*?\/vite\/components\./.test(id)) {
+        if (!jsxImportSource) {
+          return
+        }
+        const contents = await fs.readFile(id, 'utf-8')
+        if (jsxImportSource === 'hono/jsx/dom') {
+          jsxImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
+        }
+        return {
+          code: contents.replaceAll('hono/jsx', jsxImportSource),
+          map: null,
+        }
+      }
+
       const defaultIsIsland: IsIsland = (id) => {
         const islandDirectoryPath = path.join(root, 'app')
         return path.resolve(id).startsWith(islandDirectoryPath)
