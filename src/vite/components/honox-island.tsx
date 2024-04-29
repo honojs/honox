@@ -1,5 +1,10 @@
 import { createContext, useContext } from 'hono/jsx'
-import { COMPONENT_NAME, DATA_SERIALIZED_PROPS, DATA_HONO_TEMPLATE } from '../../constants'
+import {
+  COMPONENT_NAME,
+  COMPONENT_EXPORT,
+  DATA_SERIALIZED_PROPS,
+  DATA_HONO_TEMPLATE,
+} from '../../constants'
 
 const inIsland = Symbol()
 const inChildren = Symbol()
@@ -10,10 +15,12 @@ const IslandContext = createContext({
 
 export const HonoXIsland = ({
   componentName,
+  componentExport,
   Component,
   props,
 }: {
   componentName: string
+  componentExport: string
   Component: Function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: any
@@ -23,7 +30,11 @@ export const HonoXIsland = ({
   return islandState[inChildren] || !islandState[inIsland] ? (
     // top-level or slot content
     <honox-island
-      {...{ [COMPONENT_NAME]: componentName, [DATA_SERIALIZED_PROPS]: JSON.stringify(rest) }}
+      {...{
+        [COMPONENT_NAME]: componentName,
+        [COMPONENT_EXPORT]: componentExport || undefined,
+        [DATA_SERIALIZED_PROPS]: JSON.stringify(rest),
+      }}
     >
       <IslandContext.Provider value={{ ...islandState, [inIsland]: true }}>
         <Component {...props} />

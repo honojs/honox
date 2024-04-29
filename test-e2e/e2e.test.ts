@@ -10,6 +10,16 @@ test('test counter', async ({ page }) => {
   await container.getByText('Count: 6').click()
 })
 
+test('test named export', async ({ page }) => {
+  await page.goto('/interaction')
+  await page.waitForSelector('body[data-client-loaded]')
+
+  const container = page.locator('id=named')
+  await container.getByText('Count: 30').click()
+  await container.locator('button').click()
+  await container.getByText('Count: 31').click()
+})
+
 test('test counter - island in the same directory', async ({ page }) => {
   await page.goto('/directory')
   await page.waitForSelector('body[data-client-loaded]')

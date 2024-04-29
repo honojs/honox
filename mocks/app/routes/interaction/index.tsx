@@ -1,4 +1,5 @@
 import Counter from '../../islands/Counter'
+import { NamedCounter } from '../../islands/NamedCounter'
 
 export default function Interaction() {
   return (
@@ -7,6 +8,7 @@ export default function Interaction() {
       <Counter initial={10}>
         <Counter initial={15} />
       </Counter>
+      <NamedCounter initial={30} id='named' />
     </>
   )
 }
