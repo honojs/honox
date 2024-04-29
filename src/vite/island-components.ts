@@ -229,10 +229,7 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
     async resolveId(source, importer) {
       const resolution = await this.resolve(source, importer)
       if (resolution && importer && getIslandComponentName(root, importer, options)) {
-        // Check if it should add a suffix to that file.
-        if (getIslandComponentName(root, resolution.id, options)) {
-          return resolution.id + insideIslandSuffix
-        }
+        return resolution.id + insideIslandSuffix
       }
     },
     async load(id) {
