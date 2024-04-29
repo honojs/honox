@@ -186,6 +186,9 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
         jsxImportSource =
           tsConfig.compilerOptions?.honoxReactImportSource ??
           tsConfig.compilerOptions?.jsxImportSource
+        if (jsxImportSource === 'hono/jsx/dom') {
+          jsxImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
+        }
       } catch (error) {
         console.warn('Error reading tsconfig.json:', error)
       }
@@ -196,9 +199,6 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
           return
         }
         const contents = await fs.readFile(id, 'utf-8')
-        if (jsxImportSource === 'hono/jsx/dom') {
-          jsxImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
-        }
         return {
           code: contents.replaceAll('hono/jsx', jsxImportSource),
           map: null,
