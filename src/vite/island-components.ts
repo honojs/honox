@@ -197,47 +197,25 @@ export type IslandComponentsOptions = {
   isIsland: IsIsland
 }
 
-function getIslandComponentName(
-  root: string,
-  id: string,
-  options?: IslandComponentsOptions
-): string | null {
-  const defaultIsIsland: IsIsland = (id) => {
-    const islandDirectoryPath = path.join(root, 'app')
-    return path.resolve(id).startsWith(islandDirectoryPath)
-  }
-  const matchIslandPath = options?.isIsland ?? defaultIsIsland
-  if (!matchIslandPath(id)) {
-    return null
-  }
-  const match = id.match(/(\/islands\/.+?\.tsx$)|(\/routes\/.*\_[a-zA-Z0-9[-]+\.island\.tsx$)/)
-  if (!match) {
-    return null
-  }
-  return match[0]
-}
-
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
-  const insideIslandSuffix = '?inside-island'
   let root = ''
   return {
     name: 'transform-island-components',
-    enforce: 'pre',
     configResolved: (config) => {
       root = config.root
     },
-    async resolveId(source, importer) {
-      const resolution = await this.resolve(source, importer)
-      if (resolution && importer && getIslandComponentName(root, importer, options)) {
-        return resolution.id + insideIslandSuffix
-      }
-    },
     async load(id) {
-      if (id.endsWith(insideIslandSuffix)) {
+      const defaultIsIsland: IsIsland = (id) => {
+        const islandDirectoryPath = path.join(root, 'app')
+        return path.resolve(id).startsWith(islandDirectoryPath)
+      }
+      const matchIslandPath = options?.isIsland ?? defaultIsIsland
+      if (!matchIslandPath(id)) {
         return
       }
-      const componentName = getIslandComponentName(root, id, options)
-      if (componentName) {
+      const match = id.match(/(\/islands\/.+?\.tsx$)|(\/routes\/.*\_[a-zA-Z0-9[-]+\.island\.tsx$)/)
+      if (match) {
+        const componentName = match[0]
         const contents = await fs.readFile(id, 'utf-8')
         const code = transformJsxTags(contents, componentName)
         if (code) {

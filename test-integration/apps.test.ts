@@ -300,7 +300,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Counter</p><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 
@@ -320,7 +320,6 @@ describe('With preserved', () => {
                <h1>Nested Island Test</h1>
                <honox-island component-name="/islands/Counter.tsx" data-serialized-props="{}">
                   <div id="">
-                     <p>Counter</p>
                      <p>Count: 0</p>
                      <button>Increment</button>
                   </div>
