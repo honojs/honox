@@ -167,40 +167,42 @@ export const transformJsxTags = (contents: string, componentName: string) => {
 
 type IsIsland = (id: string) => boolean
 export type IslandComponentsOptions = {
-  isIsland: IsIsland
+  isIsland?: IsIsland
+  reactApiImportSource?: string
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
   let root = ''
-  let jsxImportSource: string | undefined
+  let reactApiImportSource = options?.reactApiImportSource
   return {
     name: 'transform-island-components',
     configResolved: async (config) => {
       root = config.root
 
-      const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
-      try {
-        const tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
-        const tsConfig = parseJsonc(tsConfigRaw)
+      if (!reactApiImportSource) {
+        const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
+        try {
+          const tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
+          const tsConfig = parseJsonc(tsConfigRaw)
 
-        jsxImportSource =
-          tsConfig.compilerOptions?.honoxReactImportSource ??
-          tsConfig.compilerOptions?.jsxImportSource
-        if (jsxImportSource === 'hono/jsx/dom') {
-          jsxImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
+          reactApiImportSource = tsConfig.compilerOptions?.jsxImportSource
+          if (reactApiImportSource === 'hono/jsx/dom') {
+            reactApiImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
+          }
+        } catch (error) {
+          console.warn('Error reading tsconfig.json:', error)
         }
-      } catch (error) {
-        console.warn('Error reading tsconfig.json:', error)
       }
     },
+
     async load(id) {
       if (/\/honox\/.*?\/vite\/components\./.test(id)) {
-        if (!jsxImportSource) {
+        if (!reactApiImportSource) {
           return
         }
         const contents = await fs.readFile(id, 'utf-8')
         return {
-          code: contents.replaceAll('hono/jsx', jsxImportSource),
+          code: contents.replaceAll('hono/jsx', reactApiImportSource),
           map: null,
         }
       }

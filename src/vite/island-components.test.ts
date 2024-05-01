@@ -1,4 +1,5 @@
-import { transformJsxTags } from './island-components'
+import path from 'path'
+import { transformJsxTags, islandComponents } from './island-components'
 
 describe('transformJsxTags', () => {
   it('Should add component-wrapper and component-name attribute', () => {
@@ -112,5 +113,29 @@ const WrappedExportViaVariable = function (props) {
 };
 export { utilityFn, WrappedExportViaVariable as default };`
     )
+  })
+})
+
+describe('options', () => {
+  describe('reactApiImportSource', () => {
+    // get full path of ./components.tsx
+    const component = path.resolve(__dirname, 'components.tsx')
+    it('use \'hono/jsx\' by default', async () => {
+      const plugin = islandComponents()
+      await (plugin.configResolved as Function)({ root: 'root' })
+      const res = await (plugin.load as Function)(component)
+      expect(res.code).toMatch(/'hono\/jsx'/)
+      expect(res.code).not.toMatch(/'react'/)
+    })
+
+    it('enable to specify \'react\'', async () => {
+      const plugin = islandComponents({
+        reactApiImportSource: 'react',
+      })
+      await (plugin.configResolved as Function)({ root: 'root' })
+      const res = await (plugin.load as Function)(component)
+      expect(res.code).not.toMatch(/'hono\/jsx'/)
+      expect(res.code).toMatch(/'react'/)
+    })
   })
 })
