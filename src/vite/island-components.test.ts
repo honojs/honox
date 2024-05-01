@@ -119,7 +119,7 @@ export { utilityFn, WrappedExportViaVariable as default };`
 describe('options', () => {
   describe('reactApiImportSource', () => {
     // get full path of ./components.tsx
-    const component = path.resolve(__dirname, 'components.tsx')
+    const component = path.resolve(__dirname, 'components.tsx').replace(/\\/g, '/')
 
     // prettier-ignore
     it('use \'hono/jsx\' by default', async () => {
