@@ -120,6 +120,8 @@ describe('options', () => {
   describe('reactApiImportSource', () => {
     // get full path of ./components.tsx
     const component = path.resolve(__dirname, 'components.tsx')
+
+    // prettier-ignore
     it('use \'hono/jsx\' by default', async () => {
       const plugin = islandComponents()
       await (plugin.configResolved as Function)({ root: 'root' })
@@ -128,6 +130,7 @@ describe('options', () => {
       expect(res.code).not.toMatch(/'react'/)
     })
 
+    // prettier-ignore
     it('enable to specify \'react\'', async () => {
       const plugin = islandComponents({
         reactApiImportSource: 'react',
