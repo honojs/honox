@@ -8,7 +8,7 @@ const root = './'
 export default defineConfig({
   resolve: {
     alias: {
-      'honox/vite': path.resolve(__dirname, '../src/vite'),
+      'honox/site': path.resolve(__dirname, '../src/site'),
     },
   },
   plugins: [
