@@ -8,7 +8,7 @@ describe('transformJsxTags', () => {
     }`
     const result = transformJsxTags(code, 'Badge.tsx')
     expect(result).toBe(
-      `import { HonoXIsland } from "honox/vite/components";
+      `import { HonoXIsland } from "honox/site/components";
 const BadgeOriginal = function () {
   return <h1>Hello</h1>;
 };
@@ -29,7 +29,7 @@ export default WrappedBadge;`
     }`
     const result = transformJsxTags(code, 'AsyncComponent.tsx')
     expect(result).toBe(
-      `import { HonoXIsland } from "honox/vite/components";
+      `import { HonoXIsland } from "honox/site/components";
 const AsyncComponentOriginal = async function () {
   return <h1>Hello</h1>;
 };
@@ -46,7 +46,7 @@ export default WrappedAsyncComponent;`
     }`
     const result = transformJsxTags(code, 'UnnamedComponent.tsx')
     expect(result).toBe(
-      `import { HonoXIsland } from "honox/vite/components";
+      `import { HonoXIsland } from "honox/site/components";
 const __HonoIsladComponent__Original = async function () {
   return <h1>Hello</h1>;
 };
@@ -63,7 +63,7 @@ export default Wrapped__HonoIsladComponent__;`
     }`
     const result = transformJsxTags(code, 'UnnamedComponent.tsx')
     expect(result).toBe(
-      `import { HonoXIsland } from "honox/vite/components";
+      `import { HonoXIsland } from "honox/site/components";
 const __HonoIsladComponent__Original = () => {
   return <h1>Hello</h1>;
 };
@@ -78,7 +78,7 @@ export default Wrapped__HonoIsladComponent__;`
     const code = 'export default () => <h1>Hello</h1>'
     const result = transformJsxTags(code, 'UnnamedComponent.tsx')
     expect(result).toBe(
-      `import { HonoXIsland } from "honox/vite/components";
+      `import { HonoXIsland } from "honox/site/components";
 const __HonoIsladComponent__Original = () => <h1>Hello</h1>;
 const Wrapped__HonoIsladComponent__ = function (props) {
   return import.meta.env.SSR ? <HonoXIsland componentName="UnnamedComponent.tsx" Component={__HonoIsladComponent__Original} props={props} /> : <__HonoIsladComponent__Original {...props}></__HonoIsladComponent__Original>;
@@ -91,7 +91,7 @@ export default Wrapped__HonoIsladComponent__;`
     const code = 'export default ExportViaVariable'
     const result = transformJsxTags(code, 'ExportViaVariable.tsx')
     expect(result).toBe(
-      `import { HonoXIsland } from "honox/vite/components";
+      `import { HonoXIsland } from "honox/site/components";
 const WrappedExportViaVariable = function (props) {
   return import.meta.env.SSR ? <HonoXIsland componentName="ExportViaVariable.tsx" Component={ExportViaVariable} props={props} /> : <ExportViaVariable {...props}></ExportViaVariable>;
 };
@@ -105,7 +105,7 @@ const ExportViaVariable = () => <h1>Hello</h1>
 export { utilityFn, ExportViaVariable as default }`
     const result = transformJsxTags(code, 'ExportViaVariable.tsx')
     expect(result).toBe(
-      `import { HonoXIsland } from "honox/vite/components";
+      `import { HonoXIsland } from "honox/site/components";
 const utilityFn = () => {};
 const ExportViaVariable = () => <h1>Hello</h1>;
 const WrappedExportViaVariable = function (props) {
@@ -118,8 +118,11 @@ export { utilityFn, WrappedExportViaVariable as default };`
 
 describe('options', () => {
   describe('reactApiImportSource', () => {
-    // get full path of ./components.tsx
-    const component = path.resolve(__dirname, 'components.tsx').replace(/\\/g, '/')
+    // get full path of honox-island.tsx
+    const component = path
+      .resolve(__dirname, '../site/components/honox-island.tsx')
+      // replace backslashes for Windows
+      .replace(/\\/g, '/')
 
     // prettier-ignore
     it('use \'hono/jsx\' by default', async () => {

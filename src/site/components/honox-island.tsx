@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'hono/jsx'
-import { COMPONENT_NAME, DATA_SERIALIZED_PROPS, DATA_HONO_TEMPLATE } from '../constants'
+import { COMPONENT_NAME, DATA_SERIALIZED_PROPS, DATA_HONO_TEMPLATE } from '../../constants'
 
 const inIsland = Symbol()
 const inChildren = Symbol()

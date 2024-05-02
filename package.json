@@ -60,9 +60,9 @@
       "types": "./dist/vite/client.d.ts",
       "import": "./dist/vite/client.js"
     },
-    "./vite/components": {
-      "types": "./dist/vite/components.d.ts",
-      "import": "./dist/vite/components.js"
+    "./site/components": {
+      "types": "./dist/site/components/index.d.ts",
+      "import": "./dist/site/components/index.js"
     }
   },
   "typesVersions": {
@@ -90,6 +90,9 @@
       ],
       "vite/client": [
         "./dist/vite/client"
+      ],
+      "site/components": [
+        "./dist/site/components"
       ]
     }
   },
