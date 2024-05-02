@@ -538,6 +538,26 @@ describe('<Script /> component', () => {
       )
     })
   })
+
+  describe('With nonce', () => {
+    const RENDERER = import.meta.glob('../mocks/app-script/routes/**/_nonce_renderer.tsx', {
+      eager: true,
+    })
+
+    const app = createApp({
+      root: '../mocks/app-script/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    it('Should convert the script path correctly', async () => {
+      const res = await app.request('/')
+      expect(res.status).toBe(200)
+      expect(await res.text()).toBe(
+        '<html><body><main><honox-island component-name="/islands/Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main><script type="module" src="/static/client-abc.js" nonce="hono"></script></body></html>'
+      )
+    })
+  })
 })
 
 describe('<HasIslands /> Component with path aliases', () => {
