@@ -4,11 +4,10 @@ test('test counter', async ({ page }) => {
   await page.goto('/interaction')
   await page.waitForSelector('body[data-client-loaded]')
 
-  await page.getByText('Count: 5').click()
-  await page.getByRole('button', { name: 'Increment' }).click({
-    clickCount: 1,
-  })
-  await page.getByText('Count: 6').click()
+  const container = page.locator('id=first')
+  await container.getByText('Count: 5').click()
+  await container.locator('button').click()
+  await container.getByText('Count: 6').click()
 })
 
 test('test counter - island in the same directory', async ({ page }) => {

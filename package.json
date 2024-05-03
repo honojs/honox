@@ -59,6 +59,10 @@
     "./vite/client": {
       "types": "./dist/vite/client.d.ts",
       "import": "./dist/vite/client.js"
+    },
+    "./vite/components": {
+      "types": "./dist/vite/components/index.d.ts",
+      "import": "./dist/vite/components/index.js"
     }
   },
   "typesVersions": {
@@ -86,6 +90,9 @@
       ],
       "vite/client": [
         "./dist/vite/client"
+      ],
+      "vite/components": [
+        "./dist/vite/components"
       ]
     }
   },
@@ -106,6 +113,7 @@
     "@babel/traverse": "^7.23.6",
     "@babel/types": "^7.23.6",
     "@hono/vite-dev-server": "^0.12.0",
+    "jsonc-parser": "^3.2.1",
     "precinct": "^12.0.2"
   },
   "peerDependencies": {

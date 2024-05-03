@@ -17,7 +17,6 @@ import {
   jsxIdentifier,
   jsxOpeningElement,
   stringLiteral,
-  callExpression,
   variableDeclarator,
   variableDeclaration,
   functionExpression,
@@ -28,10 +27,12 @@ import {
   exportDefaultDeclaration,
   conditionalExpression,
   memberExpression,
+  importDeclaration,
+  importSpecifier,
 } from '@babel/types'
+import { parse as parseJsonc } from 'jsonc-parser'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
-import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
 
 function addSSRCheck(funcName: string, componentName: string) {
   const isSSR = memberExpression(
@@ -39,57 +40,18 @@ function addSSRCheck(funcName: string, componentName: string) {
     identifier('env.SSR')
   )
 
-  // serialize props by excluding the children
-  const serializedProps = callExpression(identifier('JSON.stringify'), [
-    callExpression(memberExpression(identifier('Object'), identifier('fromEntries')), [
-      callExpression(
-        memberExpression(
-          callExpression(memberExpression(identifier('Object'), identifier('entries')), [
-            identifier('props'),
-          ]),
-          identifier('filter')
-        ),
-        [identifier('([key]) => key !== "children"')]
-      ),
-    ]),
-  ])
-
   const ssrElement = jsxElement(
     jsxOpeningElement(
-      jsxIdentifier('honox-island'),
+      jsxIdentifier('HonoXIsland'),
       [
-        jsxAttribute(jsxIdentifier(COMPONENT_NAME), stringLiteral(componentName)),
-        jsxAttribute(jsxIdentifier(DATA_SERIALIZED_PROPS), jsxExpressionContainer(serializedProps)),
+        jsxAttribute(jsxIdentifier('componentName'), stringLiteral(componentName)),
+        jsxAttribute(jsxIdentifier('Component'), jsxExpressionContainer(identifier(funcName))),
+        jsxAttribute(jsxIdentifier('props'), jsxExpressionContainer(identifier('props'))),
       ],
-      false
+      true
     ),
-    jsxClosingElement(jsxIdentifier('honox-island')),
-    [
-      jsxElement(
-        jsxOpeningElement(
-          jsxIdentifier(funcName),
-          [jsxSpreadAttribute(identifier('props'))],
-          false
-        ),
-        jsxClosingElement(jsxIdentifier(funcName)),
-        []
-      ),
-      jsxExpressionContainer(
-        conditionalExpression(
-          memberExpression(identifier('props'), identifier('children')),
-          jsxElement(
-            jsxOpeningElement(
-              jsxIdentifier('template'),
-              [jsxAttribute(jsxIdentifier(DATA_HONO_TEMPLATE), stringLiteral(''))],
-              false
-            ),
-            jsxClosingElement(jsxIdentifier('template')),
-            [jsxExpressionContainer(memberExpression(identifier('props'), identifier('children')))]
-          ),
-          identifier('null')
-        )
-      ),
-    ]
+    null,
+    []
   )
 
   const clientElement = jsxElement(
@@ -103,6 +65,10 @@ function addSSRCheck(funcName: string, componentName: string) {
 }
 
 export const transformJsxTags = (contents: string, componentName: string) => {
+  if (!contents) {
+    return ''
+  }
+
   const ast = parse(contents, {
     sourceType: 'module',
     plugins: ['typescript', 'jsx'],
@@ -187,6 +153,13 @@ export const transformJsxTags = (contents: string, componentName: string) => {
       ast.program.body.push(exportDefaultDeclaration(wrappedFunctionId))
     }
 
+    ast.program.body.unshift(
+      importDeclaration(
+        [importSpecifier(identifier('HonoXIsland'), identifier('HonoXIsland'))],
+        stringLiteral('honox/vite/components')
+      )
+    )
+
     const { code } = generate(ast)
     return code
   }
@@ -194,53 +167,57 @@ export const transformJsxTags = (contents: string, componentName: string) => {
 
 type IsIsland = (id: string) => boolean
 export type IslandComponentsOptions = {
-  isIsland: IsIsland
-}
-
-function getIslandComponentName(
-  root: string,
-  id: string,
-  options?: IslandComponentsOptions
-): string | null {
-  const defaultIsIsland: IsIsland = (id) => {
-    const islandDirectoryPath = path.join(root, 'app')
-    return path.resolve(id).startsWith(islandDirectoryPath)
-  }
-  const matchIslandPath = options?.isIsland ?? defaultIsIsland
-  if (!matchIslandPath(id)) {
-    return null
-  }
-  const match = id.match(/(\/islands\/.+?\.tsx$)|(\/routes\/.*\_[a-zA-Z0-9[-]+\.island\.tsx$)/)
-  if (!match) {
-    return null
-  }
-  return match[0]
+  isIsland?: IsIsland
+  reactApiImportSource?: string
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
-  const insideIslandSuffix = '?inside-island'
   let root = ''
+  let reactApiImportSource = options?.reactApiImportSource
   return {
     name: 'transform-island-components',
-    enforce: 'pre',
-    configResolved: (config) => {
+    configResolved: async (config) => {
       root = config.root
-    },
-    async resolveId(source, importer) {
-      const resolution = await this.resolve(source, importer)
-      if (resolution && importer && getIslandComponentName(root, importer, options)) {
-        // Check if it should add a suffix to that file.
-        if (getIslandComponentName(root, resolution.id, options)) {
-          return resolution.id + insideIslandSuffix
+
+      if (!reactApiImportSource) {
+        const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
+        try {
+          const tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
+          const tsConfig = parseJsonc(tsConfigRaw)
+
+          reactApiImportSource = tsConfig.compilerOptions?.jsxImportSource
+          if (reactApiImportSource === 'hono/jsx/dom') {
+            reactApiImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
+          }
+        } catch (error) {
+          console.warn('Error reading tsconfig.json:', error)
         }
       }
     },
+
     async load(id) {
-      if (id.endsWith(insideIslandSuffix)) {
+      if (/\/honox\/.*?\/vite\/components\//.test(id)) {
+        if (!reactApiImportSource) {
+          return
+        }
+        const contents = await fs.readFile(id, 'utf-8')
+        return {
+          code: contents.replaceAll('hono/jsx', reactApiImportSource),
+          map: null,
+        }
+      }
+
+      const defaultIsIsland: IsIsland = (id) => {
+        const islandDirectoryPath = path.join(root, 'app')
+        return path.resolve(id).startsWith(islandDirectoryPath)
+      }
+      const matchIslandPath = options?.isIsland ?? defaultIsIsland
+      if (!matchIslandPath(id)) {
         return
       }
-      const componentName = getIslandComponentName(root, id, options)
-      if (componentName) {
+      const match = id.match(/(\/islands\/.+?\.tsx$)|(\/routes\/.*\_[a-zA-Z0-9[-]+\.island\.tsx$)/)
+      if (match) {
+        const componentName = match[0]
         const contents = await fs.readFile(id, 'utf-8')
         const code = transformJsxTags(contents, componentName)
         if (code) {

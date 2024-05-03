@@ -6,6 +6,11 @@ import honox from '../src/vite'
 const root = './'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      'honox/vite': path.resolve(__dirname, '../src/vite'),
+    },
+  },
   plugins: [
     honox({
       entry: './app/server.ts',
