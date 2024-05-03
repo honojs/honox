@@ -21,6 +21,11 @@ describe('Basic', () => {
       {
         path: '/*',
         method: 'ALL',
+        handler: expect.any(Function), // ShareContext
+      },
+      {
+        path: '/*',
+        method: 'ALL',
         handler: expect.any(Function),
       },
       {
