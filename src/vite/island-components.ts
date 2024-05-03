@@ -156,7 +156,7 @@ export const transformJsxTags = (contents: string, componentName: string) => {
     ast.program.body.unshift(
       importDeclaration(
         [importSpecifier(identifier('HonoXIsland'), identifier('HonoXIsland'))],
-        stringLiteral('honox/site/components')
+        stringLiteral('honox/vite/components')
       )
     )
 
@@ -196,7 +196,7 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
     },
 
     async load(id) {
-      if (/\/honox\/.*?\/site\/components\//.test(id)) {
+      if (/\/honox\/.*?\/vite\/components\//.test(id)) {
         if (!reactApiImportSource) {
           return
         }

@@ -10,7 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../mocks/app-alias'),
-      'honox/site': path.resolve(__dirname, '../src/site'),
+      'honox/vite': path.resolve(__dirname, '../src/vite'),
     },
   },
   plugins: [
