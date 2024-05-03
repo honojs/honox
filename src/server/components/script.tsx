@@ -1,4 +1,3 @@
-import type { FC } from 'hono/jsx'
 import type { Manifest } from 'vite'
 import { HasIslands } from './has-islands.js'
 
@@ -10,7 +9,8 @@ type Options = {
   nonce?: string
 }
 
-export const Script: FC<Options> = async (options) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const Script = (options: Options): any => {
   const src = options.src
   if (options.prod ?? import.meta.env.PROD) {
     let manifest: Manifest | undefined = options.manifest
