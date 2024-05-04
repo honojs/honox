@@ -208,7 +208,7 @@ export { utilityFn, WrappedExportViaVariable as default };`
       'MAX_LENGTH', // all capital with underscore (constant)
       'M', // single capital (constant)
       'M1', // single capital with number (constant)
-    ])('Should transform %s as component name', (name) => {
+    ])('Should not transform %s as component name', (name) => {
       const code = codeTemplate.replace('%s', name)
       const result = transformJsxTags(code, `${name}.tsx`)
       expect(result).toBe(code)
