@@ -1,6 +1,11 @@
 import { render } from 'hono/jsx/dom'
 import { jsx as jsxFn } from 'hono/jsx/dom/jsx-runtime'
-import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
+import {
+  COMPONENT_NAME,
+  COMPONENT_EXPORT,
+  DATA_HONO_TEMPLATE,
+  DATA_SERIALIZED_PROPS,
+} from '../constants.js'
 import type {
   CreateElement,
   CreateChildren,
@@ -10,7 +15,7 @@ import type {
 } from '../types.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FileCallback = () => Promise<{ default: Promise<any> }>
+type FileCallback = () => Promise<Record<string, Promise<any>>>
 
 export type ClientOptions = {
   hydrate?: Hydrate
@@ -44,10 +49,11 @@ export const createClient = async (options?: ClientOptions) => {
       if (elements) {
         const elementPromises = Array.from(elements).map(async (element) => {
           element.setAttribute('data-hono-hydrated', 'true') // mark as hydrated
+          const exportName = element.getAttribute(COMPONENT_EXPORT) || 'default'
 
           const fileCallback = FILES[filePath] as FileCallback
           const file = await fileCallback()
-          const Component = await file.default
+          const Component = await file[exportName]
 
           const serializedProps = element.attributes.getNamedItem(DATA_SERIALIZED_PROPS)?.value
           const props = JSON.parse(serializedProps ?? '{}') as Record<string, unknown>

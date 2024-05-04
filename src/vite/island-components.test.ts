@@ -18,6 +18,75 @@ const WrappedBadge = function (props) {
 export default WrappedBadge;`
     )
   })
+
+  it('Should add component-wrapper and component-name attribute for named export', () => {
+    const code = `function Badge() {
+      return <h1>Hello</h1>
+    }
+    export { Badge }
+    `
+    const result = transformJsxTags(code, 'Badge.tsx')
+    expect(result).toBe(
+      `import { HonoXIsland } from "honox/vite/components";
+function Badge() {
+  return <h1>Hello</h1>;
+}
+const WrappedBadge = function (props) {
+  return import.meta.env.SSR ? <HonoXIsland componentName="Badge.tsx" Component={Badge} props={props} componentExport="Badge" /> : <Badge {...props}></Badge>;
+};
+export { WrappedBadge as Badge };`
+    )
+  })
+
+  it('Should add component-wrapper and component-name attribute for named function', () => {
+    const code = `export function Badge() {
+      return <h1>Hello</h1>
+    }
+    `
+    const result = transformJsxTags(code, 'Badge.tsx')
+    expect(result).toBe(
+      `import { HonoXIsland } from "honox/vite/components";
+function Badge() {
+  return <h1>Hello</h1>;
+}
+const WrappedBadge = function (props) {
+  return import.meta.env.SSR ? <HonoXIsland componentName="Badge.tsx" Component={Badge} props={props} componentExport="Badge" /> : <Badge {...props}></Badge>;
+};
+export { WrappedBadge as Badge };`
+    )
+  })
+
+  it('Should add component-wrapper and component-name attribute for variable', () => {
+    const code = `export const Badge = () => {
+      return <h1>Hello</h1>
+    }
+    `
+    const result = transformJsxTags(code, 'Badge.tsx')
+    expect(result).toBe(
+      `import { HonoXIsland } from "honox/vite/components";
+const Badge = () => {
+  return <h1>Hello</h1>;
+};
+const WrappedBadge = function (props) {
+  return import.meta.env.SSR ? <HonoXIsland componentName="Badge.tsx" Component={Badge} props={props} componentExport="Badge" /> : <Badge {...props}></Badge>;
+};
+export { WrappedBadge as Badge };`
+    )
+  })
+
+  it('Should not transform constant', () => {
+    const code = `export const MAX = 10
+    const MIN = 0
+    export { MIN }
+    `
+    const result = transformJsxTags(code, 'Badge.tsx')
+    expect(result).toBe(
+      `export const MAX = 10;
+const MIN = 0;
+export { MIN };`
+    )
+  })
+
   it('Should not transform if it is blank', () => {
     const code = transformJsxTags('', 'Badge.tsx')
     expect(code).toBe('')
@@ -113,6 +182,37 @@ const WrappedExportViaVariable = function (props) {
 };
 export { utilityFn, WrappedExportViaVariable as default };`
     )
+  })
+
+  describe('component name or not', () => {
+    const codeTemplate = `export function %s() {
+  return <h1>Hello</h1>;
+}`
+    test.each([
+      'Badge', // simple name
+      'BadgeComponent', // camel case
+      'BadgeComponent0', // end with number
+      'BadgeComponentA', // end with capital letter
+      'B1Badge', // "B1" prefix
+    ])('Should transform %s as component name', (name) => {
+      const code = codeTemplate.replace('%s', name)
+      const result = transformJsxTags(code, `${name}.tsx`)
+      expect(result).not.toBe(code)
+    })
+
+    test.each([
+      'utilityFn', // lower camel case
+      'utility_fn', // snake case
+      'Utility_Fn', // capital snake case
+      'MAX', // all capital (constant)
+      'MAX_LENGTH', // all capital with underscore (constant)
+      'M', // single capital (constant)
+      'M1', // single capital with number (constant)
+    ])('Should not transform %s as component name', (name) => {
+      const code = codeTemplate.replace('%s', name)
+      const result = transformJsxTags(code, `${name}.tsx`)
+      expect(result).toBe(code)
+    })
   })
 })
 
