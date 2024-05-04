@@ -49,7 +49,7 @@ import type { Plugin } from 'vite'
  * isComponentName('Badge_Component') // false
  */
 function isComponentName(name: string) {
-  return /^[A-Z][A-Za-z0-9]*[a-z][A-Za-z0-9]*$/.test(name)
+  return /^[A-Z][A-Z0-9]*[a-z][A-Za-z0-9]*$/.test(name)
 }
 
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
