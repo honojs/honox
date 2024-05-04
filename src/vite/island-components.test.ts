@@ -170,20 +170,49 @@ export default WrappedExportViaVariable;`
 
   it('export via specifier', () => {
     const code = `const utilityFn = () => {}
-const Utility_Fn = () => {}
 const ExportViaVariable = () => <h1>Hello</h1>
-export { utilityFn, Utility_Fn, ExportViaVariable as default }`
+export { utilityFn, ExportViaVariable as default }`
     const result = transformJsxTags(code, 'ExportViaVariable.tsx')
     expect(result).toBe(
       `import { HonoXIsland } from "honox/vite/components";
 const utilityFn = () => {};
-const Utility_Fn = () => {};
 const ExportViaVariable = () => <h1>Hello</h1>;
 const WrappedExportViaVariable = function (props) {
   return import.meta.env.SSR ? <HonoXIsland componentName="ExportViaVariable.tsx" Component={ExportViaVariable} props={props} /> : <ExportViaVariable {...props}></ExportViaVariable>;
 };
-export { utilityFn, Utility_Fn, WrappedExportViaVariable as default };`
+export { utilityFn, WrappedExportViaVariable as default };`
     )
+  })
+
+  describe('component name or not', () => {
+    const codeTemplate = `export function %s() {
+  return <h1>Hello</h1>;
+}`
+    test.each([
+      'Badge', // simple name
+      'BadgeComponent', // camel case
+      'BadgeComponent0', // end with number
+      'BadgeComponentA', // end with capital letter
+      'B1Badge', // "B1" prefix
+    ])('Should transform %s as component name', (name) => {
+      const code = codeTemplate.replace('%s', name)
+      const result = transformJsxTags(code, `${name}.tsx`)
+      expect(result).not.toBe(code)
+    })
+
+    test.each([
+      'utilityFn', // lower camel case
+      'utility_fn', // snake case
+      'Utility_Fn', // capital snake case
+      'MAX', // all capital (constant)
+      'MAX_LENGTH', // all capital with underscore (constant)
+      'M', // single capital (constant)
+      'M1', // single capital with number (constant)
+    ])('Should transform %s as component name', (name) => {
+      const code = codeTemplate.replace('%s', name)
+      const result = transformJsxTags(code, `${name}.tsx`)
+      expect(result).toBe(code)
+    })
   })
 })
 
