@@ -61,11 +61,13 @@ export const createClient = async (options?: ClientOptions) => {
           const hydrate = options?.hydrate ?? render
           const createElement = options?.createElement ?? jsxFn
 
-          const maybeTemplate = element.childNodes[element.childNodes.length - 1]
-          if (
-            maybeTemplate?.nodeName === 'TEMPLATE' &&
-            (maybeTemplate as HTMLElement)?.attributes.getNamedItem(DATA_HONO_TEMPLATE) !== null
-          ) {
+          let maybeTemplate = element.childNodes[element.childNodes.length - 1]
+          while (maybeTemplate?.nodeName === 'TEMPLATE') {
+            const propKey = (maybeTemplate as HTMLElement).getAttribute(DATA_HONO_TEMPLATE)
+            if (propKey == null) {
+              break
+            }
+
             let createChildren = options?.createChildren
             if (!createChildren) {
               const { buildCreateChildrenFn } = await import('./runtime')
@@ -74,9 +76,11 @@ export const createClient = async (options?: ClientOptions) => {
                 async (name: string) => (await (FILES[`${root}${name}`] as FileCallback)()).default
               )
             }
-            props.children = await createChildren(
+            props[propKey] = await createChildren(
               (maybeTemplate as HTMLTemplateElement).content.childNodes
             )
+
+            maybeTemplate = maybeTemplate.previousSibling as ChildNode
           }
 
           const newElem = await createElement(Component, props)
