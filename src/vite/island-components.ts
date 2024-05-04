@@ -36,8 +36,20 @@ import { parse as parseJsonc } from 'jsonc-parser'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
 
+/**
+ * Check if the name is a valid component name
+ *
+ * @param name - The name to check
+ * @returns true if the name is a valid component name
+ * @example
+ * isComponentName('Badge') // true
+ * isComponentName('BadgeComponent') // true
+ * isComponentName('badge') // false
+ * isComponentName('MIN') // false
+ * isComponentName('Badge_Component') // false
+ */
 function isComponentName(name: string) {
-  return /^[A-Z]/.test(name) && /[a-z]/.test(name)
+  return /^[A-Z][A-Za-z0-9]*[a-z][A-Za-z0-9]*$/.test(name)
 }
 
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
