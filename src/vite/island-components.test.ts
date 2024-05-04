@@ -172,7 +172,7 @@ export default WrappedExportViaVariable;`
     const code = `const utilityFn = () => {}
 const Utility_Fn = () => {}
 const ExportViaVariable = () => <h1>Hello</h1>
-export { utilityFn, ExportViaVariable as default }`
+export { utilityFn, Utility_Fn, ExportViaVariable as default }`
     const result = transformJsxTags(code, 'ExportViaVariable.tsx')
     expect(result).toBe(
       `import { HonoXIsland } from "honox/vite/components";
@@ -182,7 +182,7 @@ const ExportViaVariable = () => <h1>Hello</h1>;
 const WrappedExportViaVariable = function (props) {
   return import.meta.env.SSR ? <HonoXIsland componentName="ExportViaVariable.tsx" Component={ExportViaVariable} props={props} /> : <ExportViaVariable {...props}></ExportViaVariable>;
 };
-export { utilityFn, WrappedExportViaVariable as default };`
+export { utilityFn, Utility_Fn, WrappedExportViaVariable as default };`
     )
   })
 })
