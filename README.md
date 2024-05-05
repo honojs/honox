@@ -131,7 +131,7 @@ export default createRoute((c) => {
 })
 ```
 
-#### 2. Using Hono instance
+#### 2. Using a Hono instance
 
 You can create API endpoints by exporting an instance of the Hono object.
 
@@ -311,9 +311,49 @@ export default jsxRenderer(({ children }) => {
 
 **Note**: Since `<HasIslands />` can slightly affect build performance when used, it is recommended that you do not use it in the development environment, but only at build time. `<Script />` does not cause performance degradation during development, so it's better to use it.
 
+#### nonce Attribute
+
+If you want to add a `nonce` attribute to `<Script />`, `<script />`, or `<style />` element, you can use [Security Headers Middleware](https://hono.dev/middleware/builtin/secure-headers).
+
+Define the middleware:
+
+```ts
+// app/routes/_middleware.ts
+import { createRoute } from 'honox/factory'
+import { secureHeaders, NONCE } from 'hono/secure-headers'
+
+export default createRoute(
+  secureHeaders({
+    contentSecurityPolicy: {
+      scriptSrc: [NONCE],
+      styleSrc: [NONCE],
+    },
+  })
+)
+```
+
+You can get the `nonce` value with `c.get('secureHeadersNonce')`:
+
+```tsx
+// app/routes/_renderer.tsx
+import { jsxRenderer } from 'hono/jsx-renderer'
+import { Script } from 'honox/server'
+
+export default jsxRenderer(({ children }, c) => {
+  return (
+    <html lang='en'>
+      <head>
+        <Script src='/app/client.ts' async nonce={c.get('secureHeadersNonce')} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+})
+```
+
 ### Client Entry File
 
-A client side entry file should be in `app/client.ts`. Simply, write `createClient()`.
+A client-side entry file should be in `app/client.ts`. Simply, write `createClient()`.
 
 ```ts
 // app/client.ts
@@ -327,7 +367,7 @@ createClient()
 If you want to add interactions to your page, create Island components. Islands components should be:
 
 - Placed under `app/islands` directory or named with `_` prefix and `island.tsx` suffix like `_componentName.island.tsx`.
-- Should `export default function`.
+- It should be exported as a `default` or a proper component name that uses camel case but does not contain `_` and is not all uppercase.
 
 For example, you can write an interactive component such as the following counter:
 
@@ -379,7 +419,7 @@ export default function Component() {
 
 You can bring your own renderer using a UI library like React, Preact, Solid, or others.
 
-**Note**: We may not provide supports for the renderer you bring.
+**Note**: We may not provide support for the renderer you bring.
 
 ### React case
 
@@ -531,7 +571,7 @@ export const POST = createRoute(zValidator('form', schema), async (c) => {
 })
 ```
 
-Alternatively, you can use a `_middleware.(ts|tsx)` file in a directory to have that middleware applied to the current route, as well as all child routes. Middleware is ran in the order that it is listed within the array.
+Alternatively, you can use a `_middleware.(ts|tsx)` file in a directory to have that middleware applied to the current route, as well as all child routes. Middleware is run in the order that it is listed within the array.
 
 ```ts
 // /app/routes/_middleware.ts
@@ -756,7 +796,7 @@ export default defineConfig({
 })
 ```
 
-If you want to include client side scripts and assets:
+If you want to include client-side scripts and assets:
 
 ```ts
 // vite.config.ts
@@ -808,7 +848,7 @@ export default defineConfig(() => {
 })
 ```
 
-If you want to include client side scripts and assets:
+If you want to include client-side scripts and assets:
 
 ```ts
 // vite.config.ts
