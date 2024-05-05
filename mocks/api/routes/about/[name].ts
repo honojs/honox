@@ -3,14 +3,16 @@ import { Hono } from 'hono'
 const app = new Hono()
 
 app.get('/', (c) => {
-  const name = c.req.param<'/:name'>('name')
+  // @ts-expect-error It throws a type error with hono@4.0.3
+  const name = c.req.param('name')
   return c.json({
     path: `/about/${name}`,
   })
 })
 
 app.get('/address', (c) => {
-  const name = c.req.param<'/:name'>('name')
+  // @ts-expect-error It throws a type error with hono@4.0.3
+  const name = c.req.param('name')
   return c.json({
     path: `/about/${name}/address`,
   })
