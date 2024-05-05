@@ -217,11 +217,13 @@ type IsIsland = (id: string) => boolean
 export type IslandComponentsOptions = {
   isIsland?: IsIsland
   reactApiImportSource?: string
+  rendererImportSource?: string
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
   let root = ''
   let reactApiImportSource = options?.reactApiImportSource
+  let rendererImportSource = options?.rendererImportSource
   return {
     name: 'transform-island-components',
     configResolved: async (config) => {
@@ -241,6 +243,12 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
           console.warn('Error reading tsconfig.json:', error)
         }
       }
+      if (!rendererImportSource && reactApiImportSource) {
+        rendererImportSource =
+          reactApiImportSource === 'hono/jsx'
+            ? 'hono/jsx-renderer'
+            : `@hono/${reactApiImportSource}-renderer`
+      }
     },
 
     async load(id) {
@@ -248,9 +256,12 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
         if (!reactApiImportSource) {
           return
         }
+
         const contents = await fs.readFile(id, 'utf-8')
         return {
-          code: contents.replaceAll('hono/jsx', reactApiImportSource),
+          code: contents
+            .replace(/hono\/jsx(?=[\/"'])/g, reactApiImportSource)
+            .replace(/hono\/jsx-renderer/g, rendererImportSource as string),
           map: null,
         }
       }

@@ -244,4 +244,43 @@ describe('options', () => {
       expect(res.code).toMatch(/'react'/)
     })
   })
+
+  describe('rendererImportSource', () => {
+    // get full path of honox-island.tsx
+    const component = path
+      .resolve(__dirname, '../server/components/has-islands.tsx')
+      // replace backslashes for Windows
+      .replace(/\\/g, '/')
+
+    // prettier-ignore
+    it('use \'hono/jsx\' by default', async () => {
+      const plugin = islandComponents()
+      await (plugin.configResolved as Function)({ root: 'root' })
+      const res = await (plugin.load as Function)(component)
+      expect(res.code).toMatch(/'hono\/jsx-renderer'/)
+      expect(res.code).not.toMatch(/'@hono\/react-renderer'/)
+    })
+
+    // prettier-ignore
+    it('enable to specify \'@hono/react-renderer\'', async () => {
+      const plugin = islandComponents({
+        rendererImportSource: '@hono/react-renderer',
+      })
+      await (plugin.configResolved as Function)({ root: 'root' })
+      const res = await (plugin.load as Function)(component)
+      expect(res.code).not.toMatch(/'hono\/jsx-renderer'/)
+      expect(res.code).toMatch(/'@hono\/react-renderer'/)
+    })
+
+    // prettier-ignore
+    it('implicitly set from reactApiImportSource', async () => {
+      const plugin = islandComponents({
+        reactApiImportSource: 'react',
+      })
+      await (plugin.configResolved as Function)({ root: 'root' })
+      const res = await (plugin.load as Function)(component)
+      expect(res.code).not.toMatch(/'hono\/jsx-renderer'/)
+      expect(res.code).toMatch(/'@hono\/react-renderer'/)
+    })
+  })
 })
