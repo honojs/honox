@@ -313,7 +313,7 @@ export default jsxRenderer(({ children }) => {
 
 #### nonce Attribute
 
-If you want to add a `nonce` attribute to `<Script />`, `<script />`, or `<style />` element, you can use [Security Headers Middleware](https://hono.dev/middleware/builtin/secure-headers).
+If you want to add a `nonce` attribute to `<Script />` or `<script />` element, you can use [Security Headers Middleware](https://hono.dev/middleware/builtin/secure-headers).
 
 Define the middleware:
 
@@ -322,14 +322,13 @@ Define the middleware:
 import { createRoute } from 'honox/factory'
 import { secureHeaders, NONCE } from 'hono/secure-headers'
 
-export default createRoute(
-  secureHeaders({
-    contentSecurityPolicy: {
-      scriptSrc: [NONCE],
-      styleSrc: [NONCE],
-    },
-  })
-)
+secureHeaders({
+  contentSecurityPolicy: import.meta.env.PROD
+    ? {
+        scriptSrc: [NONCE],
+      }
+    : undefined,
+})
 ```
 
 You can get the `nonce` value with `c.get('secureHeadersNonce')`:
