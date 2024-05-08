@@ -1,5 +1,11 @@
-import Counter from './_Counter.island'
+import DollarCounter from './$counter'
+import UnderScoreCounter from './_Counter.island'
 
 export default function Interaction() {
-  return <Counter initial={5} />
+  return (
+    <>
+      <UnderScoreCounter id='under-score' initial={5} />
+      <DollarCounter id='dollar' initial={5} />
+    </>
+  )
 }

@@ -1,5 +1,27 @@
 import path from 'path'
-import { transformJsxTags, islandComponents } from './island-components'
+import { matchIslandComponentId, transformJsxTags, islandComponents } from './island-components'
+
+describe('matchIslandComponentId', () => {
+  it('Should match /islands/counter.tsx', () => {
+    const match = matchIslandComponentId('/islands/counter.tsx')
+    expect(match).not.toBeNull()
+    expect(match![0]).toBe('/islands/counter.tsx')
+  })
+  it('Should match /routes/directory/$counter.tsx', () => {
+    const match = matchIslandComponentId('/routes/directory/$counter.tsx')
+    expect(match).not.toBeNull()
+    expect(match![0]).toBe('/routes/directory/$counter.tsx')
+  })
+  it('Should match /routes/directory/_counter.island.tsx', () => {
+    const match = matchIslandComponentId('/routes/directory/_counter.island.tsx')
+    expect(match).not.toBeNull()
+    expect(match![0]).toBe('/routes/directory/_counter.island.tsx')
+  })
+  it('Should not match /routes/directory/component.tsx', () => {
+    const match = matchIslandComponentId('/routes/directory/component.tsx')
+    expect(match).toBeNull()
+  })
+})
 
 describe('transformJsxTags', () => {
   it('Should add component-wrapper and component-name attribute', () => {
