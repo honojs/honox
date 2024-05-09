@@ -60,7 +60,7 @@ function isComponentName(name: string) {
  */
 export function matchIslandComponentId(id: string) {
   return id.match(
-    /(\/islands\/.+?\.tsx$)|(\/routes\/.*\_[a-zA-Z0-9[-]+\.island\.tsx$)|(\/routes.*\/\$[a-zA-Z0-9[-]+\.tsx$)/
+    /\/islands\/.+?\.tsx$|\/routes\/(?:.*\/)?(?:\_[a-zA-Z0-9-]+\.island\.tsx$|\$[a-zA-Z0-9-]+\.tsx$)/
   )
 }
 

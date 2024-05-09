@@ -2,24 +2,39 @@ import path from 'path'
 import { matchIslandComponentId, transformJsxTags, islandComponents } from './island-components'
 
 describe('matchIslandComponentId', () => {
-  it('Should match /islands/counter.tsx', () => {
-    const match = matchIslandComponentId('/islands/counter.tsx')
-    expect(match).not.toBeNull()
-    expect(match![0]).toBe('/islands/counter.tsx')
+  describe('match', () => {
+    const paths = [
+      '/islands/counter.tsx',
+      '/islands/directory/counter.tsx',
+      '/routes/$counter.tsx',
+      '/routes/directory/$counter.tsx',
+      '/routes/_counter.island.tsx',
+      '/routes/directory/_counter.island.tsx',
+    ]
+
+    paths.forEach((path) => {
+      it(`Should match ${path}`, () => {
+        const match = matchIslandComponentId(path)
+        expect(match).not.toBeNull()
+        expect(match![0]).toBe(path)
+      })
+    })
   })
-  it('Should match /routes/directory/$counter.tsx', () => {
-    const match = matchIslandComponentId('/routes/directory/$counter.tsx')
-    expect(match).not.toBeNull()
-    expect(match![0]).toBe('/routes/directory/$counter.tsx')
-  })
-  it('Should match /routes/directory/_counter.island.tsx', () => {
-    const match = matchIslandComponentId('/routes/directory/_counter.island.tsx')
-    expect(match).not.toBeNull()
-    expect(match![0]).toBe('/routes/directory/_counter.island.tsx')
-  })
-  it('Should not match /routes/directory/component.tsx', () => {
-    const match = matchIslandComponentId('/routes/directory/component.tsx')
-    expect(match).toBeNull()
+
+  describe('not match', () => {
+    const paths = [
+      '/routes/directory/component.tsx',
+      '/routes/directory/foo$component.tsx',
+      '/routes/directory/foo_component.island.tsx',
+      '/routes/directory/component.island.tsx',
+    ]
+
+    paths.forEach((path) => {
+      it(`Should not match ${path}`, () => {
+        const match = matchIslandComponentId(path)
+        expect(match).toBeNull()
+      })
+    })
   })
 })
 
