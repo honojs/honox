@@ -1,3 +1,5 @@
+import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import { transformJsxTags, islandComponents } from './island-components'
 
@@ -218,30 +220,67 @@ export { utilityFn, WrappedExportViaVariable as default };`
 
 describe('options', () => {
   describe('reactApiImportSource', () => {
-    // get full path of honox-island.tsx
-    const component = path
-      .resolve(__dirname, '../vite/components/honox-island.tsx')
-      // replace backslashes for Windows
-      .replace(/\\/g, '/')
+    describe('vite/components', () => {
+      // get full path of honox-island.tsx
+      const component = path
+        .resolve(__dirname, '../vite/components/honox-island.tsx')
+        // replace backslashes for Windows
+        .replace(/\\/g, '/')
 
-    // prettier-ignore
-    it('use \'hono/jsx\' by default', async () => {
-      const plugin = islandComponents()
-      await (plugin.configResolved as Function)({ root: 'root' })
-      const res = await (plugin.load as Function)(component)
-      expect(res.code).toMatch(/'hono\/jsx'/)
-      expect(res.code).not.toMatch(/'react'/)
+      // prettier-ignore
+      it('use \'hono/jsx\' by default', async () => {
+        const plugin = islandComponents()
+        await (plugin.configResolved as Function)({ root: 'root' })
+        const res = await (plugin.load as Function)(component)
+        expect(res.code).toMatch(/'hono\/jsx'/)
+        expect(res.code).not.toMatch(/'react'/)
+      })
+
+      // prettier-ignore
+      it('enable to specify \'react\'', async () => {
+        const plugin = islandComponents({
+          reactApiImportSource: 'react',
+        })
+        await (plugin.configResolved as Function)({ root: 'root' })
+        const res = await (plugin.load as Function)(component)
+        expect(res.code).not.toMatch(/'hono\/jsx'/)
+        expect(res.code).toMatch(/'react'/)
+      })
     })
 
-    // prettier-ignore
-    it('enable to specify \'react\'', async () => {
-      const plugin = islandComponents({
-        reactApiImportSource: 'react',
+    describe('server/components', () => {
+      const tmpdir = os.tmpdir()
+
+      // has-islands.tsx under src/server/components does not contain 'hono/jsx'
+      // 'hono/jsx' is injected by `npm run build`
+      // so we need to create a file with 'hono/jsx' manually for testing
+      const component = path
+        .resolve(tmpdir, 'honox/dist/server/components/has-islands.js')
+        // replace backslashes for Windows
+        .replace(/\\/g, '/')
+      fs.mkdirSync(path.dirname(component), { recursive: true })
+      // prettier-ignore
+      fs.writeFileSync(component, 'import { jsx } from \'hono/jsx/jsx-runtime\'')
+
+      // prettier-ignore
+      it('use \'hono/jsx\' by default', async () => {
+        const plugin = islandComponents()
+        await (plugin.configResolved as Function)({ root: 'root' })
+        const res = await (plugin.load as Function)(component)
+        expect(res.code).toMatch(/'hono\/jsx\/jsx-runtime'/)
+        expect(res.code).not.toMatch(/'react\/jsx-runtime'/)
       })
-      await (plugin.configResolved as Function)({ root: 'root' })
-      const res = await (plugin.load as Function)(component)
-      expect(res.code).not.toMatch(/'hono\/jsx'/)
-      expect(res.code).toMatch(/'react'/)
+
+      // prettier-ignore
+      it('enable to specify \'react\'', async () => {
+        const plugin = islandComponents({
+          reactApiImportSource: 'react',
+        })
+        await (plugin.configResolved as Function)({ root: 'root' })
+        const res = await (plugin.load as Function)(component)
+        expect(res.code).not.toMatch(/'hono\/jsx\/jsx-runtime'/)
+        expect(res.code).toMatch(/'react\/jsx-runtime'/)
+      })
     })
   })
 })

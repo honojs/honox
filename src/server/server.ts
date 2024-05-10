@@ -10,6 +10,7 @@ import {
   listByDirectory,
   sortDirectoriesByDepth,
 } from '../utils/file.js'
+import { contextStorage } from './context-storage.js'
 
 const NOTFOUND_FILENAME = '_404.tsx'
 const ERROR_FILENAME = '_error.tsx'
@@ -61,6 +62,11 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
 
   const app = options.app ?? new Hono()
   const trailingSlash = options.trailingSlash ?? false
+
+  // Share context by AsyncLocalStorage
+  app.use(async function ShareContext(c, next) {
+    await contextStorage.run(c, () => next())
+  })
 
   if (options.init) {
     options.init(app)

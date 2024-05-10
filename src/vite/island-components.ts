@@ -244,7 +244,7 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
     },
 
     async load(id) {
-      if (/\/honox\/.*?\/vite\/components\//.test(id)) {
+      if (/\/honox\/.*?\/(?:server|vite)\/components\//.test(id)) {
         if (!reactApiImportSource) {
           return
         }
