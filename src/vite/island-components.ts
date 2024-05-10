@@ -252,7 +252,7 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
         return
       }
 
-      const pathFromAppPath = id.replace(appPath, '')
+      const pathFromAppPath = '/' + path.relative(appPath, id).replace(/\\/g, '/')
       const match = matchIslandComponentId(pathFromAppPath)
       if (match) {
         const componentName = match[0]
