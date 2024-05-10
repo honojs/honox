@@ -343,7 +343,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/routes/directory/_Counter.island.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div id=""><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/routes/directory/_Counter.island.tsx" data-serialized-props="{&quot;id&quot;:&quot;under-score&quot;,&quot;initial&quot;:5}"><div id="under-score"><p>UnderScoreCount: 5</p><button>UnderScore Increment</button></div></honox-island><honox-island component-name="/routes/directory/$counter.tsx" data-serialized-props="{&quot;id&quot;:&quot;dollar&quot;,&quot;initial&quot;:5}"><div id="dollar"><p>DollarCount: 5</p><button>Dollar Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
     )
   })
 

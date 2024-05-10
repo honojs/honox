@@ -52,6 +52,18 @@ function isComponentName(name: string) {
   return /^[A-Z][A-Z0-9]*[a-z][A-Za-z0-9]*$/.test(name)
 }
 
+/**
+ * Matches when id is the filename of Island component
+ *
+ * @param id - The id to match
+ * @returns The result object if id is matched or null
+ */
+export function matchIslandComponentId(id: string) {
+  return id.match(
+    /\/islands\/.+?\.tsx$|\/routes\/(?:.*\/)?(?:\_[a-zA-Z0-9-]+\.island\.tsx$|\$[a-zA-Z0-9-]+\.tsx$)/
+  )
+}
+
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
   const isSSR = memberExpression(
     memberExpression(identifier('import'), identifier('meta')),
@@ -263,7 +275,7 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
       if (!matchIslandPath(id)) {
         return
       }
-      const match = id.match(/(\/islands\/.+?\.tsx$)|(\/routes\/.*\_[a-zA-Z0-9[-]+\.island\.tsx$)/)
+      const match = matchIslandComponentId(id)
       if (match) {
         const componentName = match[0]
         const contents = await fs.readFile(id, 'utf-8')

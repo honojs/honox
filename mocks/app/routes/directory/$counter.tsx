@@ -13,8 +13,8 @@ export default function Counter({
   const increment = () => setCount(count + 1)
   return (
     <div id={id}>
-      <p>UnderScoreCount: {count}</p>
-      <button onClick={increment}>UnderScore Increment</button>
+      <p>DollarCount: {count}</p>
+      <button onClick={increment}>Dollar Increment</button>
       {children}
     </div>
   )
