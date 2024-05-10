@@ -35,34 +35,7 @@ import {
 import { parse as parseJsonc } from 'jsonc-parser'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
-
-/**
- * Check if the name is a valid component name
- *
- * @param name - The name to check
- * @returns true if the name is a valid component name
- * @example
- * isComponentName('Badge') // true
- * isComponentName('BadgeComponent') // true
- * isComponentName('badge') // false
- * isComponentName('MIN') // false
- * isComponentName('Badge_Component') // false
- */
-function isComponentName(name: string) {
-  return /^[A-Z][A-Z0-9]*[a-z][A-Za-z0-9]*$/.test(name)
-}
-
-/**
- * Matches when id is the filename of Island component
- *
- * @param id - The id to match
- * @returns The result object if id is matched or null
- */
-export function matchIslandComponentId(id: string) {
-  return id.match(
-    /\/islands\/.+?\.tsx$|\/routes\/(?:.*\/)?(?:\_[a-zA-Z0-9-]+\.island\.tsx$|\$[a-zA-Z0-9-]+\.tsx$)/
-  )
-}
+import { matchIslandComponentId, isComponentName } from './utils/path.js'
 
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
   const isSSR = memberExpression(
@@ -228,16 +201,19 @@ export const transformJsxTags = (contents: string, componentName: string) => {
 type IsIsland = (id: string) => boolean
 export type IslandComponentsOptions = {
   isIsland?: IsIsland
+  appDir?: string
   reactApiImportSource?: string
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
   let root = ''
   let reactApiImportSource = options?.reactApiImportSource
+  let appPath = ''
   return {
     name: 'transform-island-components',
     configResolved: async (config) => {
       root = config.root
+      appPath = path.join(root, options?.appDir ?? '/app')
 
       if (!reactApiImportSource) {
         const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
@@ -268,14 +244,16 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
       }
 
       const defaultIsIsland: IsIsland = (id) => {
-        const islandDirectoryPath = path.join(root, 'app')
-        return path.resolve(id).startsWith(islandDirectoryPath)
+        return path.resolve(id).startsWith(appPath)
       }
+
       const matchIslandPath = options?.isIsland ?? defaultIsIsland
       if (!matchIslandPath(id)) {
         return
       }
-      const match = matchIslandComponentId(id)
+
+      const pathFromAppPath = id.replace(appPath, '')
+      const match = matchIslandComponentId(pathFromAppPath)
       if (match) {
         const componentName = match[0]
         const contents = await fs.readFile(id, 'utf-8')

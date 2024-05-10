@@ -5,6 +5,7 @@ import { injectImportingIslands } from '../src/vite/inject-importing-islands'
 import { islandComponents } from '../src/vite/island-components'
 
 const root = './mocks'
+const appDir = '/mocks'
 
 export default defineConfig({
   resolve: {
@@ -18,12 +19,15 @@ export default defineConfig({
       isIsland: (id) => {
         const resolvedPath = path.resolve(root).replace(/\\/g, '\\\\')
         const regexp = new RegExp(
-          `${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]islands[\\\\/].+\.tsx?$|${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]routes[\\\\/].+\.island\.tsx?$|${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]routes[\\\\/].*\\$.+\.tsx?$`
+          `${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]islands[\\\\/].+\.tsx?$|${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]routes[\\\\/].+\.island\.tsx?$|${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]routes[\\\\/].*\\$.+\.tsx?$|${resolvedPath}[\\\\/]app[^\\\\/]*[\\\\/]components[\\\\/].*\\$.+\.tsx?$`
         )
         return regexp.test(path.resolve(id))
       },
+      appDir,
     }),
-    injectImportingIslands(),
+    injectImportingIslands({
+      appDir,
+    }),
     mdx({
       jsxImportSource: 'hono/jsx',
     }),

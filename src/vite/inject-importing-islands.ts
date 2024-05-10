@@ -6,14 +6,20 @@ import { parse } from '@babel/parser'
 import precinct from 'precinct'
 import { normalizePath, type Plugin } from 'vite'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
+import { matchIslandComponentId } from './utils/path.js'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const generate = (_generate.default as typeof _generate) ?? _generate
 
-export async function injectImportingIslands(): Promise<Plugin> {
-  const isIslandRegex = new RegExp(/(\/islands\/|\_[a-zA-Z0-9[-]+\.island\.[tj]sx$)/)
-  const fileRegex = new RegExp(/(routes|_renderer|_error|_404)\/.*\.[tj]sx$/)
+type InjectImportingIslandsOptions = {
+  appDir?: string
+}
+
+export async function injectImportingIslands(
+  options?: InjectImportingIslandsOptions
+): Promise<Plugin> {
+  let appPath = ''
   const cache: Record<string, string> = {}
 
   const walkDependencyTree: (
@@ -47,14 +53,17 @@ export async function injectImportingIslands(): Promise<Plugin> {
 
   return {
     name: 'inject-importing-islands',
+    configResolved: async (config) => {
+      appPath = path.join(config.root, options?.appDir ?? '/app')
+    },
     async transform(sourceCode, id) {
-      if (!fileRegex.test(id)) {
+      if (!path.resolve(id).startsWith(appPath)) {
         return
       }
 
       const hasIslandsImport = (await walkDependencyTree(id))
         .flat()
-        .some((x) => isIslandRegex.test(normalizePath(x)))
+        .some((x) => matchIslandComponentId(normalizePath(x)))
 
       if (!hasIslandsImport) {
         return
