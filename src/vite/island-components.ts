@@ -200,20 +200,22 @@ export const transformJsxTags = (contents: string, componentName: string) => {
 
 type IsIsland = (id: string) => boolean
 export type IslandComponentsOptions = {
+  /**
+   * @deprecated
+   */
   isIsland?: IsIsland
-  appDir?: string
+  islandDir?: string
   reactApiImportSource?: string
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
   let root = ''
   let reactApiImportSource = options?.reactApiImportSource
-  let appPath = ''
+  const islandDir = options?.islandDir ?? '/app/islands'
   return {
     name: 'transform-island-components',
     configResolved: async (config) => {
       root = config.root
-      appPath = path.join(root, options?.appDir ?? '/app')
 
       if (!reactApiImportSource) {
         const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
@@ -243,17 +245,8 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
         }
       }
 
-      const defaultIsIsland: IsIsland = (id) => {
-        return path.resolve(id).startsWith(appPath)
-      }
-
-      const matchIslandPath = options?.isIsland ?? defaultIsIsland
-      if (!matchIslandPath(id)) {
-        return
-      }
-
-      const pathFromAppPath = '/' + path.relative(appPath, id).replace(/\\/g, '/')
-      const match = matchIslandComponentId(pathFromAppPath)
+      const rootPath = '/' + path.relative(root, id).replace(/\\/g, '/')
+      const match = matchIslandComponentId(rootPath, islandDir)
       if (match) {
         const componentName = match[0]
         const contents = await fs.readFile(id, 'utf-8')

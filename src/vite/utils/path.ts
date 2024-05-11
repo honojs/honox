@@ -20,8 +20,9 @@ export function isComponentName(name: string) {
  * @param id - The id to match
  * @returns The result object if id is matched or null
  */
-export function matchIslandComponentId(id: string) {
-  return id.match(
-    /\/islands\/.+?\.tsx$|.*\/(?:\_[a-zA-Z0-9-]+\.island\.tsx$|\$[a-zA-Z0-9-]+\.tsx$)/
+export function matchIslandComponentId(id: string, islandDir: string = '/islands') {
+  const regExp = new RegExp(
+    `^${islandDir}\/.+?\.tsx$|.*\/(?:\_[a-zA-Z0-9-]+\.island\.tsx$|\\\$[a-zA-Z0-9-]+\.tsx$)`
   )
+  return id.match(regExp)
 }
