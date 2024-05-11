@@ -30,11 +30,23 @@ describe('matchIslandComponentId', () => {
       '/routes/directory/foo$component.tsx',
       '/routes/directory/foo_component.island.tsx',
       '/routes/directory/component.island.tsx',
+      '/directory/islands/component.tsx',
     ]
 
     paths.forEach((path) => {
       it(`Should not match ${path}`, () => {
         const match = matchIslandComponentId(path)
+        expect(match).toBeNull()
+      })
+    })
+  })
+
+  describe('not match - with `islandDir`', () => {
+    const paths = ['/islands/component.tsx']
+
+    paths.forEach((path) => {
+      it(`Should not match ${path}`, () => {
+        const match = matchIslandComponentId(path, '/directory/islands')
         expect(match).toBeNull()
       })
     })
