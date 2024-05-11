@@ -29,20 +29,22 @@ export type ClientOptions = {
    */
   triggerHydration?: TriggerHydration
   ISLAND_FILES?: Record<string, () => Promise<unknown>>
+  /**
+   * @deprecated
+   */
   island_root?: string
 }
 
 export const createClient = async (options?: ClientOptions) => {
   const FILES = options?.ISLAND_FILES ?? {
-    ...import.meta.glob('/app/islands/**/[a-zA-Z0-9[-]+.(tsx|ts)'),
-    ...import.meta.glob('/app/routes/**/_[a-zA-Z0-9[-]+.island.(tsx|ts)'),
+    ...import.meta.glob('/app/islands/**/[a-zA-Z0-9-]+.tsx'),
+    ...import.meta.glob('/app/**/_[a-zA-Z0-9-]+.island.tsx'),
+    ...import.meta.glob('/app/**/$[a-zA-Z0-9-]+.tsx'),
   }
-
-  const root = options?.island_root ?? '/app'
 
   const hydrateComponent: HydrateComponent = async (document) => {
     const filePromises = Object.keys(FILES).map(async (filePath) => {
-      const componentName = filePath.replace(root, '')
+      const componentName = filePath
       const elements = document.querySelectorAll(
         `[${COMPONENT_NAME}="${componentName}"]:not([data-hono-hydrated])`
       )
@@ -73,7 +75,7 @@ export const createClient = async (options?: ClientOptions) => {
               const { buildCreateChildrenFn } = await import('./runtime')
               createChildren = buildCreateChildrenFn(
                 createElement as CreateElement,
-                async (name: string) => (await (FILES[`${root}${name}`] as FileCallback)()).default
+                async (name: string) => (await (FILES[`${name}`] as FileCallback)()).default
               )
             }
             props[propKey] = await createChildren(

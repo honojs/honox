@@ -35,34 +35,7 @@ import {
 import { parse as parseJsonc } from 'jsonc-parser'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
-
-/**
- * Check if the name is a valid component name
- *
- * @param name - The name to check
- * @returns true if the name is a valid component name
- * @example
- * isComponentName('Badge') // true
- * isComponentName('BadgeComponent') // true
- * isComponentName('badge') // false
- * isComponentName('MIN') // false
- * isComponentName('Badge_Component') // false
- */
-function isComponentName(name: string) {
-  return /^[A-Z][A-Z0-9]*[a-z][A-Za-z0-9]*$/.test(name)
-}
-
-/**
- * Matches when id is the filename of Island component
- *
- * @param id - The id to match
- * @returns The result object if id is matched or null
- */
-export function matchIslandComponentId(id: string) {
-  return id.match(
-    /\/islands\/.+?\.tsx$|\/routes\/(?:.*\/)?(?:\_[a-zA-Z0-9-]+\.island\.tsx$|\$[a-zA-Z0-9-]+\.tsx$)/
-  )
-}
+import { matchIslandComponentId, isComponentName } from './utils/path.js'
 
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
   const isSSR = memberExpression(
@@ -227,13 +200,18 @@ export const transformJsxTags = (contents: string, componentName: string) => {
 
 type IsIsland = (id: string) => boolean
 export type IslandComponentsOptions = {
+  /**
+   * @deprecated
+   */
   isIsland?: IsIsland
+  islandDir?: string
   reactApiImportSource?: string
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
   let root = ''
   let reactApiImportSource = options?.reactApiImportSource
+  const islandDir = options?.islandDir ?? '/app/islands'
   return {
     name: 'transform-island-components',
     configResolved: async (config) => {
@@ -267,15 +245,8 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
         }
       }
 
-      const defaultIsIsland: IsIsland = (id) => {
-        const islandDirectoryPath = path.join(root, 'app')
-        return path.resolve(id).startsWith(islandDirectoryPath)
-      }
-      const matchIslandPath = options?.isIsland ?? defaultIsIsland
-      if (!matchIslandPath(id)) {
-        return
-      }
-      const match = matchIslandComponentId(id)
+      const rootPath = '/' + path.relative(root, id).replace(/\\/g, '/')
+      const match = matchIslandComponentId(rootPath, islandDir)
       if (match) {
         const componentName = match[0]
         const contents = await fs.readFile(id, 'utf-8')

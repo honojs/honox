@@ -28,10 +28,21 @@ test('test counter - island in the same directory', async ({ page }) => {
   await page.getByRole('button', { name: 'UnderScore Increment' }).click({
     clickCount: 1,
   })
-  await page.getByText('Count: 6').click()
+  await page.getByText('UnderScoreCount: 6').click()
 
   await page.getByText('DollarCount: 5').click()
   await page.getByRole('button', { name: 'Dollar Increment' }).click({
+    clickCount: 1,
+  })
+  await page.getByText('DollarCount: 6').click()
+})
+
+test('test counter - island in anywhere', async ({ page }) => {
+  await page.goto('/interaction/anywhere')
+  await page.waitForSelector('body[data-client-loaded]')
+
+  await page.getByText('Count: 5').click()
+  await page.getByRole('button', { name: 'Increment' }).click({
     clickCount: 1,
   })
   await page.getByText('Count: 6').click()
