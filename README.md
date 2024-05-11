@@ -365,7 +365,7 @@ createClient()
 
 If you want to add interactions to your page, create Island components. Islands components should be:
 
-- Placed under `app/islands` directory or named with `_` prefix and `island.tsx` suffix like `_componentName.island.tsx`.
+- Placed under `app/islands` directory or named with `$` prefix like `$componentName.tsx`.
 - It should be exported as a `default` or a proper component name that uses camel case but does not contain `_` and is not all uppercase.
 
 For example, you can write an interactive component such as the following counter:
@@ -747,7 +747,8 @@ If you want to use Cloudflare's Bindings in your development environment, create
 
 ```toml
 name = "my-project-name"
-compatibility_date = "2023-12-01"
+compatibility_date = "2024-04-01"
+compatibility_flags = [ "nodejs_compat" ]
 pages_build_output_dir = "./dist"
 
 # [vars]
@@ -781,6 +782,16 @@ export default defineConfig({
 Since a HonoX instance is essentially a Hono instance, it can be deployed on any platform that Hono supports.
 
 ### Cloudflare Pages
+
+Add the `wrangler.toml`:
+
+```toml
+# wrangler.toml
+name = "my-project-name"
+compatibility_date = "2024-04-01"
+compatibility_flags = [ "nodejs_compat" ]
+pages_build_output_dir = "./dist"
+```
 
 Setup the `vite.config.ts`:
 
@@ -826,7 +837,7 @@ vite build --mode client && vite build
 Deploy with the following commands after the build. Ensure you have [Wrangler](https://developers.cloudflare.com/workers/wrangler/) installed:
 
 ```txt
-wrangler pages deploy ./dist
+wrangler pages deploy
 ```
 
 ### SSG - Static Site Generation
