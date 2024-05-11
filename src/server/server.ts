@@ -4,13 +4,13 @@ import type { Env, NotFoundHandler, ErrorHandler, MiddlewareHandler } from 'hono
 import { createMiddleware } from 'hono/factory'
 import type { H } from 'hono/types'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
+import { contextStorage } from './context-storage.js'
 import {
   filePathToPath,
   groupByDirectory,
   listByDirectory,
   sortDirectoriesByDepth,
-} from '../utils/file.js'
-import { contextStorage } from './context-storage.js'
+} from './utils/file.js'
 
 const NOTFOUND_FILENAME = '_404.tsx'
 const ERROR_FILENAME = '_error.tsx'
