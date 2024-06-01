@@ -583,6 +583,32 @@ describe('<Script /> component', () => {
   })
 })
 
+describe('<Link /> component', () => {
+  const ROUTES = import.meta.glob('../mocks/app-link/routes/**/index.tsx', {
+    eager: true,
+  })
+
+  describe('default (rel=stylesheet, absolute path)', () => {
+    const RENDERER = import.meta.glob('../mocks/app-link/routes/**/_renderer.tsx', {
+      eager: true,
+    })
+
+    const app = createApp({
+      root: '../mocks/app-link/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    it('Should convert the link path correctly', async () => {
+      const res = await app.request('/')
+      expect(res.status).toBe(200)
+      expect(await res.text()).toBe(
+        '<html><head><link href="/static/globals-abc.css" rel="stylesheet"></link></head><body><main><div></div></main></body></html>'
+      )
+    })
+  })
+})
+
 describe('<HasIslands /> Component with path aliases', () => {
   const ROUES = import.meta.glob('../mocks/app-alias/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)', {
     eager: true,
