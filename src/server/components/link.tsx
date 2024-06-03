@@ -1,7 +1,7 @@
 import type { FC } from 'hono/jsx'
 import type { Manifest } from 'vite'
 
-type Options = { manifest?: Manifest; prod: boolean } & JSX.IntrinsicElements['link']
+type Options = { manifest?: Manifest; prod?: boolean } & JSX.IntrinsicElements['link']
 
 export const Link: FC<Options> = async (options) => {
   let { href, prod, manifest, ...rest } = options
