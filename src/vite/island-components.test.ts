@@ -1,7 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import { transformJsxTags, islandComponents } from './island-components.js'
+import { islandComponents, transformJsxTags } from './island-components.js'
 
 describe('transformJsxTags', () => {
   it('Should add component-wrapper and component-name attribute', () => {

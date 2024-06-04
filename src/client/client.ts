@@ -1,14 +1,14 @@
 import { render } from 'hono/jsx/dom'
 import { jsx as jsxFn } from 'hono/jsx/dom/jsx-runtime'
 import {
-  COMPONENT_NAME,
   COMPONENT_EXPORT,
+  COMPONENT_NAME,
   DATA_HONO_TEMPLATE,
   DATA_SERIALIZED_PROPS,
 } from '../constants.js'
 import type {
-  CreateElement,
   CreateChildren,
+  CreateElement,
   Hydrate,
   HydrateComponent,
   TriggerHydration,
