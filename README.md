@@ -634,11 +634,12 @@ Write `app/style.css`:
 @tailwind utilities;
 ```
 
-Import it in a renderer file:
+Import it in a renderer file. Using the `Link` component will refer to the correct CSS file path after it is built.
 
 ```tsx
 // app/routes/_renderer.tsx
 import { jsxRenderer } from 'hono/jsx-renderer'
+import { Link } from 'honox/server'
 
 export default jsxRenderer(({ children }) => {
   return (
@@ -646,11 +647,7 @@ export default jsxRenderer(({ children }) => {
       <head>
         <meta charset='UTF-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-        {import.meta.env.PROD ? (
-          <link href='/static/assets/style.css' rel='stylesheet' />
-        ) : (
-          <link href='/app/style.css' rel='stylesheet' />
-        )}
+        <Link href='/app/style.css' rel='stylesheet' />
       </head>
       <body>{children}</body>
     </html>
@@ -670,9 +667,6 @@ export default defineConfig(({ mode }) => {
       build: {
         rollupOptions: {
           input: ['/app/style.css'],
-          output: {
-            assetFileNames: 'static/assets/[name].[ext]',
-          },
         },
       },
     }
