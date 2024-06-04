@@ -10,32 +10,32 @@ import _traverse from '@babel/traverse'
 // @ts-ignore
 const traverse = (_traverse.default as typeof _traverse) ?? _traverse
 import {
+  blockStatement,
+  conditionalExpression,
+  exportDefaultDeclaration,
+  exportNamedDeclaration,
+  exportSpecifier,
+  functionExpression,
   identifier,
+  importDeclaration,
+  importSpecifier,
   jsxAttribute,
   jsxClosingElement,
   jsxElement,
+  jsxExpressionContainer,
   jsxIdentifier,
   jsxOpeningElement,
-  stringLiteral,
-  variableDeclarator,
-  variableDeclaration,
-  functionExpression,
-  blockStatement,
-  returnStatement,
   jsxSpreadAttribute,
-  jsxExpressionContainer,
-  exportDefaultDeclaration,
-  conditionalExpression,
   memberExpression,
-  importDeclaration,
-  importSpecifier,
-  exportNamedDeclaration,
-  exportSpecifier,
+  returnStatement,
+  stringLiteral,
+  variableDeclaration,
+  variableDeclarator,
 } from '@babel/types'
 import { parse as parseJsonc } from 'jsonc-parser'
 // eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
-import { matchIslandComponentId, isComponentName } from './utils/path.js'
+import { isComponentName, matchIslandComponentId } from './utils/path.js'
 
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
   const isSSR = memberExpression(

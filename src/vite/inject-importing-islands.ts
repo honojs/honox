@@ -4,7 +4,8 @@ import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
 // @ts-expect-error `precinct` is not typed
 import precinct from 'precinct'
-import { normalizePath, type Plugin } from 'vite'
+import { normalizePath } from 'vite'
+import type { Plugin } from 'vite'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
 import { matchIslandComponentId } from './utils/path.js'
 

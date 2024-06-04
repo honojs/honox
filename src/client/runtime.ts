@@ -1,6 +1,6 @@
 import { Suspense, use } from 'hono/jsx/dom'
 import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
-import type { CreateElement, CreateChildren, HydrateComponent } from '../types.js'
+import type { CreateChildren, CreateElement, HydrateComponent } from '../types.js'
 
 type ImportComponent = (name: string) => Promise<Function | undefined>
 export const buildCreateChildrenFn = (
