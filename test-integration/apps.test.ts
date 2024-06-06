@@ -268,12 +268,17 @@ describe('With preserved', () => {
     eager: true,
   })
 
+  const MIDDLEWARE = import.meta.glob('../mocks/app/routes/**/_middleware.(tsx|ts)', {
+    eager: true,
+  })
+
   const app = createApp({
     root: '../mocks/app/routes',
     ROUTES: ROUTES as any,
     RENDERER: RENDERER as any,
     NOT_FOUND: NOT_FOUND as any,
     ERROR: ERROR as any,
+    MIDDLEWARE: MIDDLEWARE as any,
   })
 
   it('Should return 200 response - /', async () => {
@@ -304,6 +309,7 @@ describe('With preserved', () => {
   it('Should return 200 response - /about/me/address', async () => {
     const res = await app.request('/about/me/address')
     expect(res.status).toBe(200)
+    expect(res.headers.get('x-message')).toBe('from middleware')
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
       '<!DOCTYPE html><html><head><title>me&#39;s address</title></head><body><h1>About</h1><address><b>me&#39;s address</b></address></body></html>'

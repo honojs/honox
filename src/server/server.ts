@@ -132,9 +132,11 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         }
       })
 
-      const middlewareFile = Object.keys(MIDDLEWARE_FILE).find((x) =>
-        new RegExp(dir + '/_middleware.tsx?').test(x)
-      )
+      const middlewareFile = Object.keys(MIDDLEWARE_FILE).find((x) => {
+        const replacedDir = dir.replace('[', '\\[').replace(']', '\\]')
+        return new RegExp(replacedDir + '/_middleware.tsx?').test(x)
+      })
+
       if (middlewareFile) {
         const middleware = MIDDLEWARE_FILE[middlewareFile]
         if (middleware.default) {
