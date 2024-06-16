@@ -93,6 +93,7 @@ There are three ways to define routes.
 Each route should return an array of `Handler | MiddlewareHandler`. `createRoute()` is a helper function to return it. You can write a route for a GET request with `default export`.
 
 ```tsx
+// app/routes/index.tsx
 // `createRoute()` helps you create handlers
 import { createRoute } from 'honox/factory'
 
@@ -108,6 +109,7 @@ export default createRoute((c) => {
 You can also handle methods other than GET by `export` `POST`, `PUT`, and `DELETE`.
 
 ```tsx
+// app/routes/index.tsx
 import { createRoute } from 'honox/factory'
 import { getCookie, setCookie } from 'hono/cookie'
 
@@ -157,6 +159,7 @@ export default app
 Or simply, you can just return JSX.
 
 ```tsx
+// app/routes/index.tsx
 export default function Home(_c: Context) {
   return <h1>Welcome!</h1>
 }
@@ -660,21 +663,17 @@ Finally, add `vite.config.ts` configuration to output assets for the production.
 ```ts
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
+import pages from '@hono/vite-cloudflare-pages'
 
-export default defineConfig(({ mode }) => {
-  if (mode === 'client') {
-    return {
-      build: {
-        rollupOptions: {
-          input: ['/app/style.css'],
-        },
+export default defineConfig({
+  plugins: [
+    honox({
+      client: {
+        input: ['/app/style.css'],
       },
-    }
-  } else {
-    return {
-      plugins: [honox()],
-    }
-  }
+    }),
+    pages(),
+  ],
 })
 ```
 
@@ -690,13 +689,10 @@ import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import { defineConfig } from 'vite'
 
-const entry = './app/server.ts'
-
 export default defineConfig(() => {
   return {
     plugins: [
       honox(),
-      devServer({ entry }),
       mdx({
         jsxImportSource: 'hono/jsx',
         remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
@@ -797,28 +793,6 @@ import pages from '@hono/vite-cloudflare-pages'
 
 export default defineConfig({
   plugins: [honox(), pages()],
-})
-```
-
-If you want to include client-side scripts and assets:
-
-```ts
-// vite.config.ts
-import pages from '@hono/vite-cloudflare-pages'
-import honox from 'honox/vite'
-import client from 'honox/vite/client'
-import { defineConfig } from 'vite'
-
-export default defineConfig(({ mode }) => {
-  if (mode === 'client') {
-    return {
-      plugins: [client()],
-    }
-  } else {
-    return {
-      plugins: [honox(), pages()],
-    }
-  }
 })
 ```
 
