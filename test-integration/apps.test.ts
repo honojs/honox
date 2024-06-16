@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { poweredBy } from 'hono/powered-by'
-import { describe, expect, it, vi } from 'vitest'
 import { createApp } from '../src/server'
 
 describe('Basic', () => {
@@ -17,206 +16,99 @@ describe('Basic', () => {
   })
 
   it('Should have correct routes', () => {
-    const routes = [
+    const routes: { path: string; method: string }[] = [
       {
         path: '/*',
         method: 'ALL',
-        handler: expect.any(Function), // ShareContext
-      },
-      {
-        path: '/*',
-        method: 'ALL',
-        handler: expect.any(Function),
       },
       {
         path: '/about/:name/address',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/about/:name/address',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/about/:name',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/about/:name',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/about/:name',
         method: 'POST',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/about/:name',
-        method: 'POST',
-        handler: expect.any(Function),
       },
       {
         path: '/non-interactive',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/non-interactive',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction/anywhere',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction/anywhere',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction/children',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction/children',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction/error-boundary',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction/error-boundary',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction/suspense-never',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction/suspense-never',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction/suspense',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction/suspense',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction/suspense-islands',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction/suspense-islands',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/interaction/nested',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/interaction/nested',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/directory',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/directory',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/directory/throw_error',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/directory/throw_error',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/directory/sub/throw_error',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/directory/sub/throw_error',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/fc',
         method: 'GET',
-        handler: expect.any(Function),
       },
-      {
-        path: '/fc',
-        method: 'GET',
-        handler: expect.any(Function),
-      },
-      { path: '/api', method: 'POST', handler: expect.any(Function) },
-      { path: '/api', method: 'POST', handler: expect.any(Function) },
-      { path: '/api', method: 'GET', handler: expect.any(Function) },
-      { path: '/api', method: 'GET', handler: expect.any(Function) },
-      { path: '/', method: 'GET', handler: expect.any(Function) },
-      { path: '/', method: 'GET', handler: expect.any(Function) },
+      { path: '/api', method: 'POST' },
+      { path: '/api', method: 'GET' },
+      { path: '/', method: 'GET' },
       {
         path: '/post',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/post',
-        method: 'GET',
-        handler: expect.any(Function),
       },
       {
         path: '/throw_error',
         method: 'GET',
-        handler: expect.any(Function),
-      },
-      {
-        path: '/throw_error',
-        method: 'GET',
-        handler: expect.any(Function),
       },
     ]
-    expect(app.routes).toHaveLength(routes.length)
-    expect(app.routes).toEqual(expect.arrayContaining(routes))
+    expect(app.routes).toHaveLength(routes.length * 2)
+    expect(app.routes).toEqual(
+      expect.arrayContaining(
+        routes.map(({ path, method }) => {
+          return {
+            path,
+            method,
+            handler: expect.any(Function),
+          }
+        })
+      )
+    )
   })
 
   it('Should return 200 response - / with a Powered By header', async () => {

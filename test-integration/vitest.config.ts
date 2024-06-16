@@ -8,6 +8,9 @@ const appDir = '/mocks'
 const islandDir = '/mocks/[^/]+/islands'
 
 export default defineConfig({
+  test: {
+    globals: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../mocks/app-alias'),
