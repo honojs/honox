@@ -159,6 +159,26 @@ describe('Basic', () => {
         handler: expect.any(Function),
       },
       {
+        path: '/directory/throw_error',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/directory/throw_error',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/directory/sub/throw_error',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
+        path: '/directory/sub/throw_error',
+        method: 'GET',
+        handler: expect.any(Function),
+      },
+      {
         path: '/fc',
         method: 'GET',
         handler: expect.any(Function),
@@ -264,7 +284,7 @@ describe('With preserved', () => {
     eager: true,
   })
 
-  const ERROR = import.meta.glob('../mocks/app/routes/_error.tsx', {
+  const ERROR = import.meta.glob('../mocks/app/routes/**/_error.tsx', {
     eager: true,
   })
 
@@ -376,6 +396,22 @@ describe('With preserved', () => {
     expect(res.status).toBe(500)
     expect(await res.text()).toBe(
       '<!DOCTYPE html><html><head><title>Internal Server Error</title></head><body><h1>Custom Error Message: Foo</h1></body></html>'
+    )
+  })
+
+  it('Should return 500 response - /directory/throw_error', async () => {
+    const res = await app.request('/directory/throw_error')
+    expect(res.status).toBe(500)
+    expect(await res.text()).toBe(
+      '<!DOCTYPE html><html><head><title></title></head><body><h1>Custom Error in /directory: Foo</h1></body></html>'
+    )
+  })
+
+  it('Should return 500 response - /directory/sub/throw_error', async () => {
+    const res = await app.request('/directory/sub/throw_error')
+    expect(res.status).toBe(500)
+    expect(await res.text()).toBe(
+      '<!DOCTYPE html><html><head><title></title></head><body><h1>Custom Error in /directory: Foo</h1></body></html>'
     )
   })
 })
