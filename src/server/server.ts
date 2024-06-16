@@ -111,6 +111,8 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
     return paths
   }
 
+  const errorHandlerMap: Record<string, ErrorHandler> = {}
+
   for (const map of routesMap) {
     for (const [dir, content] of Object.entries(map)) {
       const subApp = new Hono<{
@@ -186,8 +188,19 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         }
       }
 
-      // Error
-      applyError(subApp, dir, errorMap)
+      // Get an error handler
+      const errorHandler = getErrorHandler(dir, errorMap)
+      if (errorHandler) {
+        errorHandlerMap[dir] = errorHandler
+      }
+
+      // Apply an error handler
+      for (const [path, errorHandler] of Object.entries(errorHandlerMap)) {
+        const regExp = new RegExp(`^${path}`)
+        if (regExp.test(dir) && errorHandler) {
+          subApp.onError(errorHandler)
+        }
+      }
 
       let rootPath = getRootPath(dir)
       if (trailingSlash) {
@@ -241,24 +254,23 @@ function applyNotFound(
   }
 }
 
-function applyError(
-  app: Hono<{ Variables: Variables }>,
-  dir: string,
-  map: Record<string, Record<string, ErrorFile>>
-) {
+function getErrorHandler(dir: string, map: Record<string, Record<string, ErrorFile>>) {
   for (const [mapDir, content] of Object.entries(map)) {
     if (dir === mapDir) {
       const errorFile = content[ERROR_FILENAME]
       if (errorFile) {
-        const errorHandler = errorFile.default
-        app.onError(async (error, c) => {
-          const importingIslands = errorFile[IMPORTING_ISLANDS_ID]
-          if (importingIslands) {
-            c.set(IMPORTING_ISLANDS_ID, importingIslands)
+        const matchedErrorHandler = errorFile.default
+        if (matchedErrorHandler) {
+          const errorHandler: ErrorHandler = async (error, c) => {
+            const importingIslands = errorFile[IMPORTING_ISLANDS_ID]
+            if (importingIslands) {
+              c.set(IMPORTING_ISLANDS_ID, importingIslands)
+            }
+            c.status(500)
+            return matchedErrorHandler(error, c)
           }
-          c.status(500)
-          return errorHandler(error, c)
-        })
+          return errorHandler
+        }
       }
     }
   }
