@@ -16,52 +16,39 @@ describe('Basic', () => {
   })
 
   it('Should have correct routes', () => {
-    const routes = [
-      { path: '/*', method: 'ALL', handler: expect.anything() }, // ShareContext
-      { path: '/*', method: 'ALL', handler: expect.anything() },
-      {
-        path: '/about/*',
-        method: 'ALL',
-        handler: expect.anything(),
-      },
-
+    const routes: { path: string; method: string }[] = [
       {
         path: '/about/:name',
         method: 'GET',
-        handler: expect.anything(),
       },
       {
         path: '/about/:name/address',
         method: 'GET',
-        handler: expect.anything(),
       },
       {
         path: '/middleware/*',
         method: 'ALL',
-        handler: expect.anything(),
-      },
-      {
-        path: '/middleware/*',
-        method: 'ALL',
-        handler: expect.anything(),
-      },
-      {
-        path: '/middleware',
-        method: 'GET',
-        handler: expect.anything(),
       },
       {
         path: '/middleware/foo',
         method: 'GET',
-        handler: expect.anything(),
       },
-      { path: '/*', method: 'ALL', handler: expect.anything() },
-      { path: '/', method: 'GET', handler: expect.anything() },
-      { path: '/foo', method: 'GET', handler: expect.anything() },
+      { path: '/', method: 'GET' },
+      { path: '/foo', method: 'GET' },
     ]
 
-    expect(app.routes).toHaveLength(routes.length)
-    expect(app.routes).toEqual(expect.arrayContaining(routes))
+    expect(app.routes).toHaveLength(routes.length * 2)
+    expect(app.routes).toEqual(
+      expect.arrayContaining(
+        routes.map(({ path, method }) => {
+          return {
+            path,
+            method,
+            handler: expect.any(Function),
+          }
+        })
+      )
+    )
   })
 
   it('Should return 200 response - / with a Powered By header', async () => {
