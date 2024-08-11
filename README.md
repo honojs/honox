@@ -22,7 +22,7 @@ npm install hono honox
 
 ## Starter template
 
-If you are starting a new HonoX project, use the `hono-create` command. Run the following and choose `x-basic`.
+If you are starting a new HonoX project, use the `hono-create` command. Run the following and choose `x-basic` (use the arrow keys to find the option).
 
 ```txt
 npm create hono@latest
