@@ -319,7 +319,7 @@
   resolved "https://registry.npmjs.org/@hono/node-server/-/node-server-1.12.0.tgz"
   integrity sha512-e6oHjNiErRxsZRZBmc2KucuvY3btlO/XPncIpP2X75bRdTilF9GLjm3NHvKKunpJbbJJj31/FoPTksTf8djAVw==
 
-"@hono/vite-dev-server@latest":
+"@hono/vite-dev-server@^0.14.0":
   version "0.14.0"
   resolved "https://registry.npmjs.org/@hono/vite-dev-server/-/vite-dev-server-0.14.0.tgz"
   integrity sha512-rhd+hxIIG6wSS73WQxXF7/CiOHBlxdynrRUihSwEszpysB0HWOMN2Q7QprnPHsZSNmGohoTXZxwo7iM4hukGzw==
