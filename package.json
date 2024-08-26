@@ -60,6 +60,10 @@
       "types": "./dist/vite/client.d.ts",
       "import": "./dist/vite/client.js"
     },
+    "./vite/sitemap": {
+      "types": "./dist/vite/sitemap.d.ts",
+      "import": "./dist/vite/sitemap.js"
+    },
     "./vite/components": {
       "types": "./dist/vite/components/index.d.ts",
       "import": "./dist/vite/components/index.js"
@@ -90,6 +94,9 @@
       ],
       "vite/client": [
         "./dist/vite/client"
+      ],
+      "vite/sitemap": [
+        "./dist/vite/sitemap"
       ],
       "vite/components": [
         "./dist/vite/components"
