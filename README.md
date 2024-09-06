@@ -817,31 +817,32 @@ export default defineConfig({
 
 ### Generate Sitemap
 
-To generate a sitemap, use the `sitemap` plugin provided by HonoX.
-
-Update your `vite.config.ts` as follows:
+To generate a sitemap, use the `honox/dev/sitemap`.
 
 ```ts
-import honox from 'honox/vite'
-import adapter from '@hono/vite-dev-server/cloudflare'
-import { defineConfig } from 'vite'
-import sitemap from 'honox/vite/sitemap'
+// app/routes/sitemap.xml.ts
+import { Hono } from 'hono'
+import { sitemap } from 'hono/vite/sitemap'
+import app from '../server'
 
-export default defineConfig({
-  plugins: [
-    honox({
-      devServer: {
-        adapter,
-      },
-    }),
-    sitemap({
-      hostname: 'https://example.com',
-      exclude: ['/404', 'error'],
-      priority: { '/': '1.0', '/about': '0.8', '/posts/*': '0.6' },
-      frequency: { '/': 'daily', '/about': 'monthly', '/posts/*': 'weekly' },
-    }),
-  ],
+const route = new Hono()
+
+route.get('/', async c => {
+  const { data , status, headers } = await sitemap({
+    app,
+    hostname: 'https://example.com',
+    exclude: ['/hidden'],
+    priority: {'/': '1.0', '/posts/*': '0.6'},
+    frequency: {'/': 'daily', '/posts/*': 'weekly'},
+  })
+  return c.body(
+    data,
+    status,
+    headers
+  )
 })
+
+export default route
 ```
 
 For deployment to Cloudflare Pages, you can use the following configuration:
@@ -849,33 +850,35 @@ For deployment to Cloudflare Pages, you can use the following configuration:
 Register the IS_PROD = true environment variable in the Cloudflare Pages settings:
 
 1. Navigate to the Cloudflare Workers & Pages Dashboard.
-1. Go to [Settings] -> [Environment Variables] -> [Production]
-1. Add `IS_PROD` with the value `true`.
+2. Go to [Settings] -> [Environment Variables] -> [Production]
+3. Add `IS_PROD` with the value `true`.
 
 Update your `vite.config.ts`:
 
 ```ts
-import pages from '@hono/vite-cloudflare-pages'
-import honox from 'honox/vite'
-import adapter from '@hono/vite-dev-server/cloudflare'
-import { defineConfig } from 'vite'
-import sitemap from 'honox/vite/sitemap'
+// app/routes/sitemap.xml.ts
+import { Hono } from 'hono'
+import { sitemap } from 'hono/vite/sitemap'
+import app from '../server'
 
-export default defineConfig({
-  plugins: [
-    honox({
-      devServer: {
-        adapter,
-      },
-    }),
-    pages(),
-    sitemap({
-      hostname: process.env.IS_PROD
-        ? 'https://your-project-name.pages.dev/'
-        : process.env.CF_PAGES_URL,
-    }),
-  ],
+const route = new Hono()
+
+route.get('/', async c => {
+  const { data , status, headers } = await sitemap({
+    app,
+    hostname: import.meta.env.IS_PROD ? 'https://example.com' : import.meta.env.CF_PAGES_URL,
+    exclude: ['/hidden'],
+    priority: {'/': '1.0', '/posts/*': '0.6'},
+    frequency: {'/': 'daily', '/posts/*': 'weekly'},
+  })
+  return c.body(
+    data,
+    status,
+    headers
+  )
 })
+
+export default route
 ```
 
 Note: `CF_PAGES_URL` is an environment variable that Cloudflare Pages automatically sets.
