@@ -1,14 +1,6 @@
-import fs from 'fs/promises'
-import path from 'path'
 import _generate from '@babel/generator'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const generate = (_generate.default as typeof _generate) ?? _generate
 import { parse } from '@babel/parser'
 import _traverse from '@babel/traverse'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const traverse = (_traverse.default as typeof _traverse) ?? _traverse
 import {
   blockStatement,
   conditionalExpression,
@@ -33,9 +25,16 @@ import {
   variableDeclarator,
 } from '@babel/types'
 import { parse as parseJsonc } from 'jsonc-parser'
-// eslint-disable-next-line node/no-extraneous-import
 import type { Plugin } from 'vite'
+import fs from 'fs/promises'
+import path from 'path'
 import { isComponentName, matchIslandComponentId } from './utils/path.js'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const generate = (_generate.default as typeof _generate) ?? _generate
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const traverse = (_traverse.default as typeof _traverse) ?? _traverse
 
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
   const isSSR = memberExpression(

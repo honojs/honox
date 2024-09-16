@@ -1,5 +1,5 @@
-import { createRoute } from '../../../../../src/factory'
 import { createMiddleware } from 'hono/factory'
+import { createRoute } from '../../../../../src/factory'
 
 const addHeader = createMiddleware(async (c, next) => {
   await next()
