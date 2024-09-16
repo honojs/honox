@@ -492,7 +492,7 @@ Configure react in `vite.config.ts`.
 
 ```ts
 // vite.config.ts
-import pages from '@hono/vite-cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-pages'
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
 
@@ -505,18 +505,18 @@ export default defineConfig(({ mode }) => {
           output: {
             entryFileNames: 'static/client.js',
             chunkFileNames: 'static/assets/[name]-[hash].js',
-            assetFileNames: 'static/assets/[name].[ext]'
-          }
+            assetFileNames: 'static/assets/[name].[ext]',
+          },
         },
-        emptyOutDir: false
-      }
+        emptyOutDir: false,
+      },
     }
   } else {
     return {
       ssr: {
-        external: ['react', 'react-dom']
+        external: ['react', 'react-dom'],
       },
-      plugins: [honox(), pages()]
+      plugins: [honox(), build()],
     }
   }
 })
@@ -711,7 +711,7 @@ Finally, add `vite.config.ts` configuration to output assets for the production.
 ```ts
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
-import pages from '@hono/vite-cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-pages'
 
 export default defineConfig({
   plugins: [
@@ -720,7 +720,7 @@ export default defineConfig({
         input: ['/app/style.css'],
       },
     }),
-    pages(),
+    build(),
   ],
 })
 ```
@@ -837,10 +837,10 @@ Setup the `vite.config.ts`:
 // vite.config.ts
 import { defineConfig } from 'vite'
 import honox from 'honox/vite'
-import pages from '@hono/vite-cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-pages'
 
 export default defineConfig({
-  plugins: [honox(), pages()],
+  plugins: [honox(), build()],
 })
 ```
 
@@ -911,6 +911,21 @@ You can also deploy it to Cloudflare Pages.
 
 ```txt
 wrangler pages deploy ./dist
+```
+
+### Others
+
+Using `@hono/vite-build`, you can build the HonoX app for various platforms. For example, you can make it for the Bun:
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import honox from 'honox/vite'
+import build from '@hono/vite-build/bun'
+
+export default defineConfig({
+  plugins: [honox(), build()],
+})
 ```
 
 ## Examples
