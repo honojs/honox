@@ -1,13 +1,13 @@
-import path from 'path'
 import devServer, { defaultOptions as devServerDefaultOptions } from '@hono/vite-dev-server'
 import type { DevServerOptions } from '@hono/vite-dev-server'
 import type { PluginOption } from 'vite'
+import path from 'path'
+import type { ClientOptions } from './client.js'
+import client from './client.js'
 import { injectImportingIslands } from './inject-importing-islands.js'
 import { islandComponents } from './island-components.js'
 import type { IslandComponentsOptions } from './island-components.js'
 import { restartOnAddUnlink } from './restart-on-add-unlink.js'
-import type { ClientOptions } from './client.js'
-import client from './client.js'
 
 type Options = {
   islands?: boolean
