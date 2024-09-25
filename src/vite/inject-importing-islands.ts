@@ -1,6 +1,5 @@
 import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
-// @ts-expect-error `precinct` is not typed
 import precinct from 'precinct'
 import { normalizePath } from 'vite'
 import type { Plugin } from 'vite'

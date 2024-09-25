@@ -109,19 +109,19 @@
   },
   "homepage": "https://hono.dev",
   "dependencies": {
-    "@babel/generator": "^7.23.6",
-    "@babel/parser": "^7.23.6",
-    "@babel/traverse": "^7.23.6",
-    "@babel/types": "^7.23.6",
-    "@hono/vite-dev-server": "^0.16.0",
-    "jsonc-parser": "^3.2.1",
-    "precinct": "^12.0.2"
+    "@babel/generator": "7.25.6",
+    "@babel/parser": "7.25.6",
+    "@babel/traverse": "7.25.6",
+    "@babel/types": "7.25.6",
+    "@hono/vite-dev-server": "0.16.0",
+    "jsonc-parser": "^3.3.1",
+    "precinct": "^12.1.2"
   },
   "peerDependencies": {
     "hono": ">=4.*"
   },
   "devDependencies": {
-    "@hono/eslint-config": "^1.0.1",
+    "@hono/eslint-config": "^1.0.2",
     "@mdx-js/rollup": "^3.0.0",
     "@playwright/test": "^1.42.0",
     "@types/babel__generator": "^7",
@@ -129,7 +129,7 @@
     "@types/node": "^20.10.5",
     "eslint": "^9.10.0",
     "glob": "^10.3.10",
-    "hono": "^4.6.1",
+    "hono": "4.4.13",
     "np": "7.7.0",
     "prettier": "^3.1.1",
     "publint": "^0.2.7",
