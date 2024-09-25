@@ -114,8 +114,8 @@
     "@babel/traverse": "7.25.6",
     "@babel/types": "7.25.6",
     "@hono/vite-dev-server": "0.16.0",
-    "jsonc-parser": "^3.3.1",
-    "precinct": "^12.1.2"
+    "jsonc-parser": "3.3.1",
+    "precinct": "12.1.2"
   },
   "peerDependencies": {
     "hono": ">=4.*"
