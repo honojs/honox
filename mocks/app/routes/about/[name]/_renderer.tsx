@@ -8,7 +8,7 @@ export default jsxRenderer(({ children, title }) => {
       </head>
       <body>
         <h1>About</h1>
-        <address>{children}</address>
+        <div>{children}</div>
       </body>
     </html>
   )
