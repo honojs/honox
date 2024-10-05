@@ -97,7 +97,7 @@ describe('Basic', () => {
         method: 'GET',
       },
     ]
-    expect(app.routes).toHaveLength(routes.length * 2)
+    expect(app.routes).toHaveLength(46)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
@@ -224,7 +224,18 @@ describe('With preserved', () => {
     expect(res.headers.get('x-message')).toBe('from middleware')
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title>me&#39;s address</title></head><body><h1>About</h1><address><b>me&#39;s address</b></address></body></html>'
+      '<!DOCTYPE html><html><head><title>me&#39;s address</title></head><body><h1>About</h1><div><b>me&#39;s address</b></div></body></html>'
+    )
+  })
+
+  it('Should return 200 response - /about/me/hobbies/baseball', async () => {
+    const res = await app.request('/about/me/hobbies/baseball')
+    expect(res.status).toBe(200)
+    expect(res.headers.get('x-message')).toBe('from middleware')
+    expect(res.headers.get('x-message-nested')).toBe('from nested middleware')
+    // hono/jsx escape a single quote to &#39;
+    expect(await res.text()).toBe(
+      '<!DOCTYPE html><html><head><title></title></head><body><h1>About</h1><div><p>me&#39;s hobby is baseball</p></div></body></html>'
     )
   })
 
