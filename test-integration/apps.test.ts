@@ -583,6 +583,38 @@ describe('<HasIslands /> Component with path aliases', () => {
   })
 })
 
+describe('<HasIslands /> Component with path alias with vite-tsconfig-paths', () => {
+  const ROUES = import.meta.glob(
+    '../mocks/app-alias-tsconfig-paths/routes/**/[a-z[-][a-z-_[]*.(tsx|ts)',
+    {
+      eager: true,
+    }
+  )
+  const RENDERER = import.meta.glob('../mocks/app-alias-tsconfig-paths/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: '../mocks/app-alias-tsconfig-paths/routes',
+    ROUTES: ROUES as any,
+    RENDERER: RENDERER as any,
+  })
+
+  it('Should return a script tag with tagged HasIslands - /has-islands', async () => {
+    const res = await app.request('/has-islands')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe(
+      '<html><body><honox-island component-name="/mocks/app-alias-tsconfig-paths/islands/Counter.tsx" data-serialized-props="{}"><div>Counter</div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+    )
+  })
+
+  it('Should no return a script tag - /has-no-islands', async () => {
+    const res = await app.request('/has-no-islands')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<html><body><h1>No Islands</h1></body></html>')
+  })
+})
+
 describe('Island Components with Preserved Files', () => {
   const ROUTES = import.meta.glob(
     '../mocks/app-islands-in-preserved/routes/**/[a-z[-][a-z-_[]*.(tsx|ts|mdx)',

@@ -2,7 +2,7 @@ import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
 import precinct from 'precinct'
 import { normalizePath } from 'vite'
-import type { Plugin } from 'vite'
+import type { Plugin, ResolvedConfig } from 'vite'
 import { readFile } from 'fs/promises'
 import path from 'path'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
@@ -27,6 +27,8 @@ export async function injectImportingIslands(
   let appPath = ''
   const islandDir = options?.islandDir ?? '/app/islands'
   let root = ''
+  let config: ResolvedConfig
+  const resolvedCache = new Map()
   const cache: Record<string, string> = {}
 
   const walkDependencyTree: (
@@ -66,7 +68,8 @@ export async function injectImportingIslands(
 
   return {
     name: 'inject-importing-islands',
-    configResolved: async (config) => {
+    configResolved: async (resolveConfig) => {
+      config = resolveConfig
       appPath = path.join(config.root, options?.appDir ?? '/app')
       root = config.root
     },
@@ -75,14 +78,22 @@ export async function injectImportingIslands(
         return
       }
 
+      const resolve = async (importee: string, importer?: string) => {
+        if (resolvedCache.has(importee)) {
+          return this.resolve(importee)
+        }
+        const resolvedId = await this.resolve(importee, importer)
+        // Cache to prevent infinite loops in recursive calls.
+        resolvedCache.set(importee, true)
+        return resolvedId
+      }
+
       const hasIslandsImport = (
         await Promise.all(
-          (await walkDependencyTree(id, async (id: string) => await this.resolve(id)))
-            .flat()
-            .map(async (x) => {
-              const rootPath = '/' + path.relative(root, normalizePath(x)).replace(/\\/g, '/')
-              return matchIslandComponentId(rootPath, islandDir)
-            })
+          (await walkDependencyTree(id, resolve)).flat().map(async (x) => {
+            const rootPath = '/' + path.relative(root, normalizePath(x)).replace(/\\/g, '/')
+            return matchIslandComponentId(rootPath, islandDir)
+          })
         )
       ).some((matched) => matched)
 

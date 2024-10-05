@@ -13,13 +13,19 @@
       "vitest/globals"
     ],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@mocks/*": [
+        "./mocks/app-alias-tsconfig-paths/*"
+      ]
+    }
   },
   "include": [
     "src",
     "test-integration",
     "test-e2e",
-    "mocks",
+    "mocks"
   ],
   "exclude": [
     "mocks/app-alias"

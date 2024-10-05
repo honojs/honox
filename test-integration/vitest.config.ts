@@ -1,4 +1,5 @@
 import mdx from '@mdx-js/rollup'
+import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 import path from 'path'
 import { injectImportingIslands } from '../src/vite/inject-importing-islands'
@@ -28,5 +29,6 @@ export default defineConfig({
     mdx({
       jsxImportSource: 'hono/jsx',
     }),
+    tsconfigPaths(),
   ],
 })
