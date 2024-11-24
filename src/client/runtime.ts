@@ -7,6 +7,7 @@ export const buildCreateChildrenFn = (
   createElement: CreateElement,
   importComponent: ImportComponent
 ): CreateChildren => {
+  let keyIndex = 0
   const setChildrenFromTemplate = async (props: { children?: Node[] }, element: HTMLElement) => {
     const maybeTemplate = element.childNodes[element.childNodes.length - 1]
     if (
@@ -26,7 +27,10 @@ export const buildCreateChildrenFn = (
     for (let i = 0; i < attributes.length; i++) {
       props[attributes[i].name] = attributes[i].value
     }
-    return createElement(element.nodeName, props)
+    return createElement(element.nodeName, {
+      key: ++keyIndex,
+      ...props,
+    })
   }
   const createChildren = async (childNodes: NodeListOf<ChildNode>): Promise<Node[]> => {
     const children = []
@@ -117,7 +121,12 @@ export const buildCreateChildrenFn = (
         if (component) {
           const props = JSON.parse(child.getAttribute(DATA_SERIALIZED_PROPS) || '{}')
           await setChildrenFromTemplate(props, child)
-          children.push(await createElement(component, props))
+          children.push(
+            await createElement(component, {
+              key: ++keyIndex,
+              ...props,
+            })
+          )
         } else {
           children.push(await createElementFromHTMLElement(child))
         }
