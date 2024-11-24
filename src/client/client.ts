@@ -1,5 +1,4 @@
-import { render } from 'hono/jsx/dom'
-import { jsx as jsxFn } from 'hono/jsx/dom/jsx-runtime'
+import { render, createElement as createElementHono } from 'hono/jsx/dom'
 import {
   COMPONENT_EXPORT,
   COMPONENT_NAME,
@@ -61,7 +60,7 @@ export const createClient = async (options?: ClientOptions) => {
           const props = JSON.parse(serializedProps ?? '{}') as Record<string, unknown>
 
           const hydrate = options?.hydrate ?? render
-          const createElement = options?.createElement ?? jsxFn
+          const createElement = options?.createElement ?? createElementHono
 
           let maybeTemplate = element.childNodes[element.childNodes.length - 1]
           while (maybeTemplate?.nodeName === 'TEMPLATE') {

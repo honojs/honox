@@ -57,7 +57,7 @@ export const HonoXIsland = ({
         <Component {...props} />
       </IslandContext.Provider>
       {Object.entries(elementProps).map(([key, children]) => (
-        <template {...{ [DATA_HONO_TEMPLATE]: key }}>
+        <template {...{ [DATA_HONO_TEMPLATE]: key }} key={key}>
           <IslandContext.Provider value={{ ...islandState, [inChildren]: true }}>
             {children}
           </IslandContext.Provider>
