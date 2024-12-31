@@ -117,6 +117,12 @@
     "jsonc-parser": "3.3.1",
     "precinct": "12.1.2"
   },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": "^8.19.0"
+  },
+  "resolutions": {
+    "@typescript-eslint/typescript-estree": "^8.19.0"
+  },
   "peerDependencies": {
     "hono": ">=4.*"
   },
