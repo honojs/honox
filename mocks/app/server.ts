@@ -10,7 +10,7 @@ const RENDERER = import.meta.glob('./routes/**/_renderer.tsx', {
   eager: true,
 })
 
-const NOT_FOUND = import.meta.glob('./routes/**/_404.(ts|tsx', {
+const NOT_FOUND = import.meta.glob('./routes/**/_404.(ts|tsx)', {
   eager: true,
 })
 
