@@ -4,7 +4,7 @@ import type { Manifest } from 'vite'
 
 type Options = { manifest?: Manifest; prod?: boolean } & JSX.IntrinsicElements['link']
 
-export const Link: FC<Options> = async (options) => {
+export const Link: FC<Options> = (options) => {
   let { href, prod, manifest, ...rest } = options
   if (href) {
     if (prod ?? import.meta.env.PROD) {
