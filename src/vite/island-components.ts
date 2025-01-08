@@ -218,16 +218,23 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
 
       if (!reactApiImportSource) {
         const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
+        const denoJsonPath = path.resolve(process.cwd(), 'deno.json')
+        let tsConfigRaw: string
         try {
-          const tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
-          const tsConfig = parseJsonc(tsConfigRaw)
-
-          reactApiImportSource = tsConfig.compilerOptions?.jsxImportSource
-          if (reactApiImportSource === 'hono/jsx/dom') {
-            reactApiImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
+          tsConfigRaw = await fs.readFile(denoJsonPath, 'utf8')
+        } catch (error1) {
+          try {
+            tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
+          } catch (error2) {
+            console.warn('Cannot find neither tsconfig.json nor deno.json', error1, error2)
+            return
           }
-        } catch (error) {
-          console.warn('Error reading tsconfig.json:', error)
+        }
+        const tsConfig = parseJsonc(tsConfigRaw)
+
+        reactApiImportSource = tsConfig?.compilerOptions?.jsxImportSource
+        if (reactApiImportSource === 'hono/jsx/dom') {
+          reactApiImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
         }
       }
     },
