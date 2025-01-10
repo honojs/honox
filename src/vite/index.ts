@@ -33,7 +33,7 @@ function honox(options?: Options): PluginOption[] {
       entry,
       exclude: [
         ...devServerDefaultOptions.exclude,
-        /^\/app\/.+/,
+        /^\/app\/.+\.tsx?/,
         /^\/favicon.ico/,
         /^\/static\/.+/,
       ],

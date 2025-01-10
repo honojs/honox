@@ -131,3 +131,9 @@ test('server-side suspense contains island components', async ({ page }) => {
   await container.getByText('Count: 7').click()
   await container.getByText('Suspense Islands').click()
 })
+
+test('/app/nested', async ({ page }) => {
+  await page.goto('/app/nested')
+  const contentH1 = await page.textContent('h1')
+  expect(contentH1).toBe('Nested')
+})
