@@ -96,8 +96,12 @@ describe('Basic', () => {
         path: '/throw_error',
         method: 'GET',
       },
+      {
+        path: '/app/nested',
+        method: 'GET',
+      },
     ]
-    expect(app.routes).toHaveLength(46)
+    expect(app.routes).toHaveLength(48)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
