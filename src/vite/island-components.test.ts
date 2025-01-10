@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'fs/promises'
 import os from 'os'
 import path from 'path'
 import { islandComponents, transformJsxTags } from './island-components.js'
@@ -220,35 +220,94 @@ export { utilityFn, WrappedExportViaVariable as default };`
 
 describe('options', () => {
   describe('reactApiImportSource', () => {
-    describe('vite/components', () => {
-      // get full path of honox-island.tsx
-      const component = path
-        .resolve(__dirname, '../vite/components/honox-island.tsx')
-        // replace backslashes for Windows
-        .replace(/\\/g, '/')
+    describe('vite/components', async () => {
+      const honoPattern = /'hono\/jsx'/
+      const reactPattern = /'react'/
+      const setup = async () => {
+        // get full path of honox-island.tsx
+        const component = path
+          .resolve(__dirname, '../vite/components/honox-island.tsx')
+          // replace backslashes for Windows
+          .replace(/\\/g, '/')
+        const componentContent = await fs.readFile(component, 'utf8')
+        return { component, componentContent }
+      }
 
-      // prettier-ignore
-      it('use \'hono/jsx\' by default', async () => {
-        const plugin = islandComponents()
-        await (plugin.configResolved as Function)({ root: 'root' })
-        const res = await (plugin.load as Function)(component)
-        expect(res.code).toMatch(/'hono\/jsx'/)
-        expect(res.code).not.toMatch(/'react'/)
-      })
+      test.each([
+        {
+          name: 'default with both config files (deno.json preferred)',
+          configFiles: {
+            'deno.json': { jsxImportSource: 'react' },
+            'tsconfig.json': { jsxImportSource: 'hono/jsx' },
+          },
+          config: {},
+          expect: { hono: false, react: true },
+        },
+        {
+          name: 'default with only deno.json',
+          configFiles: {
+            'deno.json': { jsxImportSource: 'react' },
+          },
+          config: {},
+          expect: { hono: false, react: true },
+        },
+        {
+          name: 'default with only tsconfig.json',
+          configFiles: {
+            'tsconfig.json': { jsxImportSource: 'react' },
+          },
+          config: {},
+          expect: { hono: false, react: true },
+        },
+        {
+          name: 'explicit react config overrides all',
+          configFiles: {
+            'deno.json': { jsxImportSource: 'hono/jsx' },
+            'tsconfig.json': { jsxImportSource: 'hono/jsx' },
+          },
+          config: { reactApiImportSource: 'react' },
+          expect: { hono: false, react: true },
+        },
+      ])('should handle $name', async (testCase) => {
+        const { component, componentContent } = await setup()
 
-      // prettier-ignore
-      it('enable to specify \'react\'', async () => {
-        const plugin = islandComponents({
-          reactApiImportSource: 'react',
+        vi.spyOn(fs, 'readFile').mockImplementation(async (filePath) => {
+          if (filePath.toString().includes('honox-island.tsx')) {
+            return componentContent
+          }
+          for (const [fileName, config] of Object.entries(testCase.configFiles)) {
+            if (filePath.toString().includes(fileName)) {
+              return JSON.stringify({ compilerOptions: config })
+            }
+            throw new Error('Config file does not exist')
+          }
+          return ''
         })
+
+        const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+        const plugin = islandComponents(testCase.config)
         await (plugin.configResolved as Function)({ root: 'root' })
         const res = await (plugin.load as Function)(component)
-        expect(res.code).not.toMatch(/'hono\/jsx'/)
-        expect(res.code).toMatch(/'react'/)
+
+        expect(honoPattern.test(res.code)).toBe(testCase.expect.hono)
+        expect(reactPattern.test(res.code)).toBe(testCase.expect.react)
+
+        if (Object.keys(testCase.configFiles).length === 0) {
+          expect(consoleWarnSpy).toHaveBeenCalledWith(
+            'Cannot find neither tsconfig.json nor deno.json',
+            expect.any(Error),
+            expect.any(Error)
+          )
+        }
       })
     })
 
-    describe('server/components', () => {
+    describe('server/components', async () => {
+      beforeEach(() => {
+        vi.restoreAllMocks()
+      })
+
       const tmpdir = os.tmpdir()
 
       // has-islands.tsx under src/server/components does not contain 'hono/jsx'
@@ -258,9 +317,9 @@ describe('options', () => {
         .resolve(tmpdir, 'honox/dist/server/components/has-islands.js')
         // replace backslashes for Windows
         .replace(/\\/g, '/')
-      fs.mkdirSync(path.dirname(component), { recursive: true })
+      await fs.mkdir(path.dirname(component), { recursive: true })
       // prettier-ignore
-      fs.writeFileSync(component, 'import { jsx } from \'hono/jsx/jsx-runtime\'')
+      await fs.writeFile(component, 'import { jsx } from \'hono/jsx/jsx-runtime\'')
 
       // prettier-ignore
       it('use \'hono/jsx\' by default', async () => {
