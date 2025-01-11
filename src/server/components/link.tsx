@@ -23,7 +23,9 @@ export const Link: FC<Options> = (options) => {
         const assetInManifest = manifest[href.replace(/^\//, '')]
         if (assetInManifest) {
           if (href.startsWith('/')) {
-            return <link href={`/${assetInManifest.file}`} {...rest}></link>
+            return (
+              <link href={`${import.meta.env.BASE_URL}${assetInManifest.file}`} {...rest}></link>
+            )
           }
 
           return <link href={assetInManifest.file} {...rest}></link>

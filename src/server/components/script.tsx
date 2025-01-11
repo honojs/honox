@@ -33,7 +33,7 @@ export const Script = (options: Options): any => {
             <script
               type='module'
               async={!!options.async}
-              src={`/${scriptInManifest.file}`}
+              src={`${import.meta.env.BASE_URL}${scriptInManifest.file}`}
               nonce={options.nonce}
             ></script>
           </HasIslands>
