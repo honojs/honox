@@ -230,7 +230,6 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
           console.warn('Cannot find tsconfig.json or deno.json(c)')
           return
         }
-
         const tsConfig = parseJsonc(tsConfigRaw)
 
         reactApiImportSource = tsConfig?.compilerOptions?.jsxImportSource
