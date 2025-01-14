@@ -235,9 +235,27 @@ describe('options', () => {
 
       test.each([
         {
-          name: 'default with both config files (deno.json preferred)',
+          name: 'default with both config files (prefers deno.json over tsconfig.json)',
           configFiles: {
             'deno.json': { jsxImportSource: 'react' },
+            'tsconfig.json': { jsxImportSource: 'hono/jsx' },
+          },
+          config: {},
+          expect: { hono: false, react: true },
+        },
+        {
+          name: 'default with both config files (prefers deno.json over deno.jsonc)',
+          configFiles: {
+            'deno.json': { jsxImportSource: 'react' },
+            'deno.jsonc': { jsxImportSource: 'hono/jsx' },
+          },
+          config: {},
+          expect: { hono: false, react: true },
+        },
+        {
+          name: 'default with both config files (prefers deno.jsonc over tsconfig.json)',
+          configFiles: {
+            'deno.jsonc': { jsxImportSource: 'react' },
             'tsconfig.json': { jsxImportSource: 'hono/jsx' },
           },
           config: {},
@@ -247,6 +265,14 @@ describe('options', () => {
           name: 'default with only deno.json',
           configFiles: {
             'deno.json': { jsxImportSource: 'react' },
+          },
+          config: {},
+          expect: { hono: false, react: true },
+        },
+        {
+          name: 'default with only deno.jsonc',
+          configFiles: {
+            'deno.jsonc': { jsxImportSource: 'react' },
           },
           config: {},
           expect: { hono: false, react: true },
@@ -263,6 +289,7 @@ describe('options', () => {
           name: 'explicit react config overrides all',
           configFiles: {
             'deno.json': { jsxImportSource: 'hono/jsx' },
+            'deno.jsonc': { jsxImportSource: 'hono/jsx' },
             'tsconfig.json': { jsxImportSource: 'hono/jsx' },
           },
           config: { reactApiImportSource: 'react' },
