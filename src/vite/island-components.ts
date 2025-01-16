@@ -217,18 +217,18 @@ export function islandComponents(options?: IslandComponentsOptions): Plugin {
       root = config.root
 
       if (!reactApiImportSource) {
-        const tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json')
-        const denoJsonPath = path.resolve(process.cwd(), 'deno.json')
-        let tsConfigRaw: string
-        try {
-          tsConfigRaw = await fs.readFile(denoJsonPath, 'utf8')
-        } catch (error1) {
+        const tsConfigFiles = ['deno.json', 'deno.jsonc', 'tsconfig.json']
+        let tsConfigRaw: string | undefined
+        for (const tsConfigFile of tsConfigFiles) {
           try {
+            const tsConfigPath = path.resolve(process.cwd(), tsConfigFile)
             tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
-          } catch (error2) {
-            console.warn('Cannot find neither tsconfig.json nor deno.json', error1, error2)
-            return
-          }
+            break
+          } catch {}
+        }
+        if (!tsConfigRaw) {
+          console.warn('Cannot find tsconfig.json or deno.json(c)')
+          return
         }
         const tsConfig = parseJsonc(tsConfigRaw)
 
