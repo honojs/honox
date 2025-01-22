@@ -511,6 +511,27 @@ describe('<Script /> component', () => {
       })
     })
 
+    describe('with base path - root relative, without trailing slash', () => {
+      const originalBaseURL = import.meta.env.BASE_URL
+
+      beforeAll(() => {
+        // this means `base: "/base/path"` in vite.config.ts
+        import.meta.env.BASE_URL = '/base/path'
+      })
+
+      afterAll(() => {
+        import.meta.env.BASE_URL = originalBaseURL
+      })
+
+      it('Should convert the script path correctly', async () => {
+        const res = await app.request('/')
+        expect(res.status).toBe(200)
+        expect(await res.text()).toBe(
+          '<html><head><script type="module" src="/base/path/static/client-abc.js"></script></head><body><main><honox-island component-name="/mocks/app-script/islands/Component.tsx" data-serialized-props="{}"><p>Component</p></honox-island></main></body></html>'
+        )
+      })
+    })
+
     describe('with base path - absolute url', () => {
       const originalBaseURL = import.meta.env.BASE_URL
 
@@ -604,6 +625,27 @@ describe('<Link /> component', () => {
       beforeAll(() => {
         // this means `base: "/base/path/"` in vite.config.ts
         import.meta.env.BASE_URL = '/base/path/'
+      })
+
+      afterAll(() => {
+        import.meta.env.BASE_URL = originalBaseURL
+      })
+
+      it('Should convert the link path correctly', async () => {
+        const res = await app.request('/')
+        expect(res.status).toBe(200)
+        expect(await res.text()).toBe(
+          '<html><head><link href="/base/path/static/globals-abc.css" rel="stylesheet"></link></head><body><main><div></div></main></body></html>'
+        )
+      })
+    })
+
+    describe('with base path - root relative, without trailing slash', () => {
+      const originalBaseURL = import.meta.env.BASE_URL
+
+      beforeAll(() => {
+        // this means `base: "/base/path"` in vite.config.ts
+        import.meta.env.BASE_URL = '/base/path'
       })
 
       afterAll(() => {
