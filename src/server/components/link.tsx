@@ -1,7 +1,7 @@
 import type { FC } from 'hono/jsx'
 import type { JSX } from 'hono/jsx/jsx-runtime'
 import type { Manifest } from 'vite'
-import { ensureTrailngSlash } from '../utils/path'
+import { ensureTrailngSlash } from '../utils/path.js'
 
 type Options = { manifest?: Manifest; prod?: boolean } & JSX.IntrinsicElements['link']
 
