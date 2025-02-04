@@ -1,3 +1,4 @@
+// @ts-expect-error don't use types
 import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
 import precinct from 'precinct'

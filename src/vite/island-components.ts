@@ -1,5 +1,7 @@
+// @ts-expect-error don't use types
 import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
+// @ts-expect-error don't use types
 import _traverse from '@babel/traverse'
 import {
   blockStatement,
@@ -77,6 +79,7 @@ export const transformJsxTags = (contents: string, componentName: string) => {
     let isTransformed = false
 
     traverse(ast, {
+      // @ts-expect-error path is not typed
       ExportNamedDeclaration(path) {
         if (path.node.declaration?.type === 'FunctionDeclaration') {
           // transform `export function NamedFunction() {}`
@@ -131,6 +134,7 @@ export const transformJsxTags = (contents: string, componentName: string) => {
           specifier.local.name = wrappedFunctionId.name
         }
       },
+      // @ts-expect-error path is not typed
       ExportDefaultDeclaration(path) {
         const declarationType = path.node.declaration.type
         if (
