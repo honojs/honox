@@ -650,37 +650,12 @@ Like the followings:
 
 ### Using Tailwind CSS
 
-Given that HonoX is Vite-centric, if you wish to utilize [Tailwind CSS](https://tailwindcss.com/), simply adhere to the official instructions.
+Given that HonoX is Vite-centric, if you wish to utilize [Tailwind CSS](https://tailwindcss.com/), basically adhere to [the official instructions](https://tailwindcss.com/docs/installation/using-vite).
 
-Prepare `tailwind.config.js` and `postcss.config.js`:
-
-```js
-// tailwind.config.js
-export default {
-  content: ['./app/**/*.tsx'],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-```
-
-```js
-// postcss.config.js
-export default {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
-```
-
-Write `app/style.css`:
+Write `app/style.css`, you must set the base path for source detection explicitly:
 
 ```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss" source("../app");
 ```
 
 Import it in a renderer file. Using the `Link` component will refer to the correct CSS file path after it is built.
@@ -710,6 +685,7 @@ Finally, add `vite.config.ts` configuration to output assets for the production.
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
 import build from '@hono/vite-build/cloudflare-pages'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
@@ -719,6 +695,7 @@ export default defineConfig({
       },
     }),
     build(),
+    tailwindcss(),
   ],
 })
 ```
