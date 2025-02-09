@@ -652,7 +652,7 @@ Like the followings:
 
 Given that HonoX is Vite-centric, if you wish to utilize [Tailwind CSS](https://tailwindcss.com/), basically adhere to [the official instructions](https://tailwindcss.com/docs/installation/using-vite).
 
-In `app/style.css`, you must set the base path for source detection explicitly:
+Write `app/style.css`, you must set the base path for source detection explicitly:
 
 ```css
 @import "tailwindcss" source("../app");
