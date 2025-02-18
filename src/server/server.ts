@@ -182,8 +182,14 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         // export default function Helle() {}
         if (typeof routeDefault === 'function') {
           subApp.get(path, setInnerMeta)
-          subApp.get(path, (c) => {
-            return c.render(routeDefault(c), route as any)
+          subApp.get(path, async (c) => {
+            const result = await routeDefault(c)
+
+            if (result instanceof Response) {
+              return result
+            }
+
+            return c.render(result, route as any)
           })
         }
       }
