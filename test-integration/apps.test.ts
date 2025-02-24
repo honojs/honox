@@ -877,3 +877,39 @@ describe('Nested Dynamic Routes', () => {
     expect(await res.text()).toBe('<b>Resource2 Id abcdef / 12345</b>')
   })
 })
+
+describe('Function Component Response', () => {
+  const ROUTES = import.meta.glob('../mocks/app-function/routes/**/[a-z[-][a-z[_-]*.(tsx|ts)', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: '../mocks/app-function/routes',
+    ROUTES: ROUTES as any,
+  })
+
+  it('Should handle direct Response return from function component', async () => {
+    const res = await app.request('/api-response')
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ message: 'API Response' })
+  })
+
+  it('Should handle JSX return from function component', async () => {
+    const res = await app.request('/jsx-response')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<div>JSX Response</div>')
+  })
+
+  it('Should handle async function component with Response', async () => {
+    const res = await app.request('/async-response')
+    expect(res.status).toBe(201)
+    expect(res.headers.get('x-custom')).toBe('async')
+    expect(await res.json()).toEqual({ message: 'Async Response' })
+  })
+
+  it('Should handle async function component with JSX', async () => {
+    const res = await app.request('/async-jsx')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('<div>Async JSX Response</div>')
+  })
+})
