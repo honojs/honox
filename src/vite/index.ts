@@ -37,6 +37,9 @@ function honox(options?: Options): PluginOption[] {
         /^\/favicon.ico/,
         /^\/static\/.+/,
       ],
+      handleHotUpdate: () => {
+        return undefined
+      },
       ...options?.devServer,
     })
   )
