@@ -325,11 +325,13 @@ Define the middleware:
 import { createRoute } from 'honox/factory'
 import { secureHeaders, NONCE } from 'hono/secure-headers'
 
-secureHeaders({
-  contentSecurityPolicy: {
-    scriptSrc: [NONCE]
-  }
-})
+export default createRoute(
+  secureHeaders({
+    contentSecurityPolicy: {
+      scriptSrc: [NONCE]
+    }
+  })
+);
 ```
 
 You can get the `nonce` value with `c.get('secureHeadersNonce')`:
