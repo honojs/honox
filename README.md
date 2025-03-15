@@ -328,10 +328,10 @@ import { secureHeaders, NONCE } from 'hono/secure-headers'
 export default createRoute(
   secureHeaders({
     contentSecurityPolicy: {
-      scriptSrc: [NONCE]
-    }
+      scriptSrc: [NONCE],
+    },
   })
-);
+)
 ```
 
 You can get the `nonce` value with `c.get('secureHeadersNonce')`:
@@ -657,7 +657,7 @@ Given that HonoX is Vite-centric, if you wish to utilize [Tailwind CSS](https://
 Write `app/style.css`, you must set the base path for source detection explicitly:
 
 ```css
-@import "tailwindcss" source("../app");
+@import 'tailwindcss' source('../app');
 ```
 
 Import it in a renderer file. Using the `Link` component will refer to the correct CSS file path after it is built.
