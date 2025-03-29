@@ -6,10 +6,14 @@ describe('Basic', () => {
   const ROUTES = import.meta.glob('../mocks/app/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)', {
     eager: true,
   })
+  const NOT_FOUND = import.meta.glob('../mocks/app/routes/**/_404.(ts|tsx)', {
+    eager: true,
+  })
 
   const app = createApp({
     root: '../mocks/app/routes',
     ROUTES: ROUTES as any,
+    NOT_FOUND: NOT_FOUND as any,
     init: (app) => {
       app.use('*', poweredBy())
     },
@@ -101,7 +105,7 @@ describe('Basic', () => {
         method: 'GET',
       },
     ]
-    expect(app.routes).toHaveLength(48)
+    expect(app.routes).toHaveLength(52)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
@@ -125,6 +129,12 @@ describe('Basic', () => {
   it('Should return 404 response - /foo', async () => {
     const res = await app.request('/foo')
     expect(res.status).toBe(404)
+  })
+
+  it('Should return custom 404 response - /not-found', async () => {
+    const res = await app.request('/not-found')
+    expect(res.status).toBe(404)
+    expect(await res.text()).toBe('<h1>Not Found</h1>')
   })
 
   it('Should return 200 response - /about/me', async () => {

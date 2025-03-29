@@ -120,6 +120,21 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
       }>()
       let hasIslandComponent = false
 
+      const notFoundHandler = getNotFoundHandler(dir, notFoundMap)
+      if (notFoundHandler) {
+        subApp.use(async (c, next) => {
+          await next()
+          if (c.res.status === 404) {
+            const notFoundResponse = await notFoundHandler(c)
+            const res = new Response(notFoundResponse.body, {
+              status: 404,
+              headers: notFoundResponse.headers,
+            })
+            c.res = res
+          }
+        })
+      }
+
       // Renderer
       const rendererPaths = getPaths(dir, rendererList)
       rendererPaths.map((path) => {
@@ -230,6 +245,17 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   }
 
   return app
+}
+
+function getNotFoundHandler(dir: string, map: Record<string, Record<string, NotFoundFile>>) {
+  for (const [mapDir, content] of Object.entries(map)) {
+    if (dir === mapDir) {
+      const notFound = content[NOTFOUND_FILENAME]
+      if (notFound) {
+        return notFound.default
+      }
+    }
+  }
 }
 
 function applyNotFound(
