@@ -127,11 +127,11 @@
     "hono": ">=4.*"
   },
   "devDependencies": {
-    "@hono/eslint-config": "^1.0.2",
+    "@hono/eslint-config": "^1.1.1",
     "@mdx-js/rollup": "^3.0.0",
     "@playwright/test": "^1.42.0",
     "@types/node": "^20.10.5",
-    "eslint": "^9.10.0",
+    "eslint": "^9.23.0",
     "glob": "^10.3.10",
     "happy-dom": "^15.11.6",
     "hono": "4.4.13",
