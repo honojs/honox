@@ -934,12 +934,16 @@ describe('Route Groups', () => {
   const NOT_FOUND = import.meta.glob('../mocks/app-route-groups/routes/**/_404.(ts|tsx)', {
     eager: true,
   })
+  const MIDDLEWARE = import.meta.glob('../mocks/app/routes/**/_middleware.(tsx|ts)', {
+    eager: true,
+  })
 
   const app = createApp({
     root: '../mocks/app-route-groups/routes',
     ROUTES: ROUTES as any,
     RENDERER: RENDERER as any,
     NOT_FOUND: NOT_FOUND as any,
+    MIDDLEWARE: MIDDLEWARE as any,
     init: (app) => {
       app.use('*', poweredBy())
     },
@@ -983,12 +987,16 @@ describe('Route Groups', () => {
   it('Should render /blog without (content) route group layout', async () => {
     const res = await app.request('/blog')
     expect(res.status).toBe(200)
+    expect(res.headers.get('x-message')).not.toBe('from middleware for (content-group)')
+    expect(await res.text()).toBe(
       '<!DOCTYPE html><html><head><title></title></head><body><div>Here lies the blog posts</div></body></html>')
   })
 
   it('Should render /blog/hello-world MDX with (content) route group layout', async () => {
     const res = await app.request('/blog/hello-world')
     expect(res.status).toBe(200)
+    expect(res.headers.get('x-message')).toBe('from middleware for (content-group)')
+    expect(await res.text()).toBe(
       '<!DOCTYPE html><html><head><title></title></head><body><div><h1>Blog</h1><p>Hello World</p></div></body></html>')
   })
 })
