@@ -934,7 +934,7 @@ describe('Route Groups', () => {
   const NOT_FOUND = import.meta.glob('../mocks/app-route-groups/routes/**/_404.(ts|tsx)', {
     eager: true,
   })
-  const MIDDLEWARE = import.meta.glob('../mocks/app/routes/**/_middleware.(tsx|ts)', {
+  const MIDDLEWARE = import.meta.glob('../mocks/app-route-groups/routes/**/_middleware.(tsx|ts)', {
     eager: true,
   })
 
@@ -968,7 +968,7 @@ describe('Route Groups', () => {
         method: 'GET',
       },
     ]
-    expect(app.routes).toHaveLength(12)
+    expect(app.routes).toHaveLength(13)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
