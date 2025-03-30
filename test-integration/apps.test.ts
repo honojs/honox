@@ -923,3 +923,72 @@ describe('Function Component Response', () => {
     expect(await res.text()).toBe('<div>Async JSX Response</div>')
   })
 })
+
+describe('Route Groups', () => {
+  const ROUTES = import.meta.glob('../mocks/app-route-groups/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)', {
+    eager: true,
+  })
+  const RENDERER = import.meta.glob('../mocks/app-route-groups/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+  const NOT_FOUND = import.meta.glob('../mocks/app-route-groups/routes/**/_404.(ts|tsx)', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: '../mocks/app-route-groups/routes',
+    ROUTES: ROUTES as any,
+    RENDERER: RENDERER as any,
+    NOT_FOUND: NOT_FOUND as any,
+    init: (app) => {
+      app.use('*', poweredBy())
+    },
+  })
+
+  it('Should have correct routes', () => {
+    const routes: { path: string; method: string }[] = [
+      {
+        path: '/*',
+        method: 'ALL',
+      },
+      {
+        path: '/',
+        method: 'GET',
+      },
+      {
+        path: '/blog',
+        method: 'GET',
+      },
+      {
+        path: '/blog/hello-world',
+        method: 'GET',
+      },
+    ]
+    expect(app.routes).toHaveLength(12)
+    expect(app.routes).toEqual(
+      expect.arrayContaining(
+        routes.map(({ path, method }) => {
+          return {
+            path,
+            method,
+            handler: expect.any(Function),
+          }
+        })
+      )
+    )
+  })
+
+
+
+  it('Should render /blog without (content) route group layout', async () => {
+    const res = await app.request('/blog')
+    expect(res.status).toBe(200)
+      '<!DOCTYPE html><html><head><title></title></head><body><div>Here lies the blog posts</div></body></html>')
+  })
+
+  it('Should render /blog/hello-world MDX with (content) route group layout', async () => {
+    const res = await app.request('/blog/hello-world')
+    expect(res.status).toBe(200)
+      '<!DOCTYPE html><html><head><title></title></head><body><div><h1>Blog</h1><p>Hello World</p></div></body></html>')
+  })
+})
