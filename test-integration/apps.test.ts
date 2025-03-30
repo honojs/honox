@@ -925,9 +925,12 @@ describe('Function Component Response', () => {
 })
 
 describe('Route Groups', () => {
-  const ROUTES = import.meta.glob('../mocks/app-route-groups/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)', {
-    eager: true,
-  })
+  const ROUTES = import.meta.glob(
+    '../mocks/app-route-groups/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)',
+    {
+      eager: true,
+    }
+  )
   const RENDERER = import.meta.glob('../mocks/app-route-groups/routes/**/_renderer.tsx', {
     eager: true,
   })
@@ -982,14 +985,13 @@ describe('Route Groups', () => {
     )
   })
 
-
-
   it('Should render /blog without (content) route group layout', async () => {
     const res = await app.request('/blog')
     expect(res.status).toBe(200)
     expect(res.headers.get('x-message')).not.toBe('from middleware for (content-group)')
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><div>Here lies the blog posts</div></body></html>')
+      '<!DOCTYPE html><html><head><title></title></head><body><div>Here lies the blog posts</div></body></html>'
+    )
   })
 
   it('Should render /blog/hello-world MDX with (content) route group layout', async () => {
@@ -997,6 +999,7 @@ describe('Route Groups', () => {
     expect(res.status).toBe(200)
     expect(res.headers.get('x-message')).toBe('from middleware for (content-group)')
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><div><h1>Blog</h1><p>Hello World</p></div></body></html>')
+      '<!DOCTYPE html><html><head><title></title></head><body><div><h1>Blog</h1><p>Hello World</p></div></body></html>'
+    )
   })
 })
