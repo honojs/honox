@@ -30,7 +30,9 @@ describe('filePathToPath', () => {
     expect(filePathToPath('/about/[arg1]/[arg2]')).toBe('/about/:arg1/:arg2')
 
     expect(filePathToPath('/articles/(grouped1)/[slug]')).toBe('/articles/:slug')
-    expect(filePathToPath('/articles/(grouped1)/[slug]/(grouped1)/edit')).toBe('/articles/:slug/edit')
+    expect(filePathToPath('/articles/(grouped1)/[slug]/(grouped1)/edit')).toBe(
+      '/articles/:slug/edit'
+    )
   })
 })
 
@@ -60,8 +62,8 @@ describe('groupByDirectory', () => {
         'comments.tsx': 'file6',
       },
       '/app/routes/articles/(content)': {
-        '[slug].tsx': 'file7'
-      }
+        '[slug].tsx': 'file7',
+      },
     })
   })
 })
