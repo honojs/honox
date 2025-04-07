@@ -28,6 +28,9 @@ describe('filePathToPath', () => {
     expect(filePathToPath('/about/[...foo].tsx')).toBe('/about/*')
     expect(filePathToPath('/about/[name]/address.tsx')).toBe('/about/:name/address')
     expect(filePathToPath('/about/[arg1]/[arg2]')).toBe('/about/:arg1/:arg2')
+
+    expect(filePathToPath('/articles/(grouped1)/[slug]')).toBe('/articles/:slug')
+    expect(filePathToPath('/articles/(grouped1)/[slug]/(grouped1)/edit')).toBe('/articles/:slug/edit')
   })
 })
 
@@ -39,6 +42,7 @@ describe('groupByDirectory', () => {
     '/app/routes/blog/about.tsx': 'file4',
     '/app/routes/blog/posts/index.tsx': 'file5',
     '/app/routes/blog/posts/comments.tsx': 'file6',
+    '/app/routes/articles/(content)/[slug].tsx': 'file7',
   }
 
   it('Should group by directories', () => {
@@ -55,6 +59,9 @@ describe('groupByDirectory', () => {
         'index.tsx': 'file5',
         'comments.tsx': 'file6',
       },
+      '/app/routes/articles/(content)': {
+        '[slug].tsx': 'file7'
+      }
     })
   })
 })
