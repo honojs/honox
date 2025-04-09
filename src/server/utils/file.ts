@@ -5,7 +5,9 @@ export const filePathToPath = (filePath: string) => {
     .replace(/^\/?index$/, '/') // `/index`
     .replace(/\/index$/, '') // `/about/index`
     .replace(/\[\.{3}.+\]/, '*')
+    .replace(/\((.+?)\)/g, '')
     .replace(/\[(.+?)\]/g, ':$1')
+    .replace(/\/\//g, '/')
   return /^\//.test(filePath) ? filePath : '/' + filePath
 }
 
