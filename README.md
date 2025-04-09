@@ -47,7 +47,7 @@ Below is a typical project structure for a HonoX application.
 │   │   ├── about
 │   │   │   └── [name].tsx // matches `/about/:name`
 │   │   ├── blog
-│   │   │   ├── index.tsx // matches /blog/index
+│   │   │   ├── index.tsx // matches /blog
 │   │   │   └── (content)
 │   │   │       ├── _renderer.tsx // renderer definition for routes inside this directory
 │   │   │       └── [name].tsx    // matches `/blog/:name`
