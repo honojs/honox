@@ -44,6 +44,8 @@ Below is a typical project structure for a HonoX application.
 │   │   ├── _404.tsx // not found page
 │   │   ├── _error.tsx // error page
 │   │   ├── _renderer.tsx // renderer definition
+│   │   ├── merch
+│   │   │   └── [...slug].tsx // matches `/merch/:category`, `/merch/:category/:item`, `/merch/:category/:item/:variant`
 │   │   ├── about
 │   │   │   └── [name].tsx // matches `/about/:name`
 │   │   ├── blog
