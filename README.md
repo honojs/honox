@@ -550,6 +550,7 @@ If you export a manifest file in `dist/.vite/manifest.json`, you can easily writ
 ```tsx
 // app/routes/_renderer.tsx
 import { reactRenderer } from '@hono/react-renderer'
+import { Script } from 'honox/server'
 
 export default reactRenderer(({ children, title }) => {
   return (
