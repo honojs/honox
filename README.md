@@ -543,6 +543,60 @@ Adjust `tsconfig.json` jsx factory function option.
 
 ```
 
+#### Use React with `<Script />`
+
+If you export a manifest file in `dist/.vite/manifest.json`, you can easily write some codes using `<Script />`.
+
+```tsx
+// app/routes/_renderer.tsx
+import { reactRenderer } from '@hono/react-renderer'
+import { Script } from 'honox/server'
+
+export default reactRenderer(({ children, title }) => {
+  return (
+    <html lang='en'>
+      <head>
+        <meta charSet='UTF-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+        <Script src="/app/client.ts" async />
+        {title ? <title>{title}</title> : ''}
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+})
+```
+
+Configure react in `vite.config.ts`.
+
+```ts
+// vite.config.ts
+import build from '@hono/vite-build/cloudflare-pages'
+import honox from 'honox/vite'
+import { defineConfig } from 'vite'
+
+export default defineConfig(({ mode }) => {
+  if (mode === 'client') {
+    return {
+      build: {
+        rollupOptions: {
+          input: ['./app/client.ts'],
+        },
+        manifest: true,
+        emptyOutDir: false,
+      },
+    }
+  } else {
+    return {
+      ssr: {
+        external: ['react', 'react-dom'],
+      },
+      plugins: [honox(), build()],
+    }
+  }
+})
+```
+
 ## Guides
 
 ### Nested Layouts
