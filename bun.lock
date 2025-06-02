@@ -8,7 +8,7 @@
         "@babel/parser": "7.25.6",
         "@babel/traverse": "7.25.6",
         "@babel/types": "7.25.6",
-        "@hono/vite-dev-server": "0.19.0",
+        "@hono/vite-dev-server": "^0.19.1",
         "jsonc-parser": "3.3.1",
         "precinct": "12.1.2",
       },
@@ -136,9 +136,9 @@
 
     "@hono/eslint-config": ["@hono/eslint-config@1.1.1", "", { "dependencies": { "@eslint/eslintrc": "^3.1.0", "@eslint/js": "^9.10.0", "eslint-config-prettier": "^10.1.1", "eslint-import-resolver-typescript": "^4.2.2", "eslint-plugin-import-x": "^4.1.1", "eslint-plugin-n": "^17.10.2", "typescript-eslint": "^8.27.0" }, "peerDependencies": { "eslint": "^9.0.0", "typescript": "^5.0.0" } }, "sha512-BMnaj+0zliH+OA4mxpY58zi1J5+zXMkpkZQlqwTSw5ZkBIPIgpOk+yRYm9poKL5PBrua3x7okTficFR1NwjLxg=="],
 
-    "@hono/node-server": ["@hono/node-server@1.13.8", "", { "peerDependencies": { "hono": "^4" } }, "sha512-fsn8ucecsAXUoVxrUil0m13kOEq4mkX4/4QozCqmY+HpGfKl74OYSn8JcMA8GnG0ClfdRI4/ZSeG7zhFaVg+wg=="],
+    "@hono/node-server": ["@hono/node-server@1.14.3", "", { "peerDependencies": { "hono": "^4" } }, "sha512-KuDMwwghtFYSmIpr4WrKs1VpelTrptvJ+6x6mbUcZnFcc213cumTF5BdqfHyW93B19TNI4Vaev14vOI2a0Ie3w=="],
 
-    "@hono/vite-dev-server": ["@hono/vite-dev-server@0.19.0", "", { "dependencies": { "@hono/node-server": "^1.12.0", "minimatch": "^9.0.3" }, "peerDependencies": { "hono": "*", "miniflare": "*", "wrangler": "*" }, "optionalPeers": ["miniflare", "wrangler"] }, "sha512-myMc4Nm0nFQSPaeE6I/a1ODyDR5KpQ4EHodX4Tu/7qlB31GfUemhUH/WsO91HJjDEpRRpsT4Zbg+PleMlpTljw=="],
+    "@hono/vite-dev-server": ["@hono/vite-dev-server@0.19.1", "", { "dependencies": { "@hono/node-server": "^1.14.2", "minimatch": "^9.0.3" }, "peerDependencies": { "hono": "*", "miniflare": "*", "wrangler": "*" }, "optionalPeers": ["miniflare", "wrangler"] }, "sha512-hh+0u3IxHErEyj4YwHk/U+2f+qAHEQZ9EIQtadG9jeHfxEXH6r/ZecjnpyEkQbDK7JtgEEoVAq/JGOkd3Dvqww=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 
