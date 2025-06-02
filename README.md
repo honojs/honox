@@ -558,7 +558,7 @@ export default reactRenderer(({ children, title }) => {
       <head>
         <meta charSet='UTF-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-        <Script src="/app/client.ts" async />
+        <Script src='/app/client.ts' async />
         {title ? <title>{title}</title> : ''}
       </head>
       <body>{children}</body>
@@ -710,6 +710,26 @@ Like the followings:
 
 - `trailingSlash` is `false` (default): `app/routes/path/index.mdx` => `/path`
 - `trailingSlash` is `true`: `app/routes/path/index.mdx` => `/path/`
+
+### Excluding Files and Directories from Routes
+
+By default, directories and files starting with `-` are excluded from routes.
+
+Example:
+
+```
+routes/
+├── posts.tsx
+├── -post-list.tsx     // 👈🏼 ignored
+├── -components/       // 👈🏼 ignored
+│   ├── header.tsx     // 👈🏼 ignored
+│   ├── footer.tsx     // 👈🏼 ignored
+│   └── ...
+```
+
+In this example, `routes/posts.tsx` is routed to `/posts`, but other items starting with `-` are not routed.
+
+This feature is useful for colocation.
 
 ### Using Tailwind CSS
 
