@@ -713,8 +713,6 @@ Like the followings:
 
 ### Excluding Files and Directories from Routes
 
-Okay, here's the English translation:
-
 By default, directories and files starting with `-` are excluded from routes.
 
 Example:
