@@ -466,6 +466,18 @@ describe('Nested Middleware', () => {
     expect(res.headers.get('foo')).toEqual('foo')
     expect(res.headers.get('bar')).toEqual('bar')
   })
+
+  it('Should apply admin middleware to child route - /admin/dashboard', async () => {
+    const res = await app.request('/admin/dashboard')
+    expect(res.status).toBe(200)
+    expect(res.headers.get('X-Admin-Middleware')).toEqual('true')
+  })
+
+  it('Should apply admin middleware to grandchild route - /admin/dashboard/settings', async () => {
+    const res = await app.request('/admin/dashboard/settings')
+    expect(res.status).toBe(200)
+    expect(res.headers.get('X-Admin-Middleware')).toEqual('true')
+  })
 })
 
 describe('<Script /> component', () => {
