@@ -63,6 +63,9 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   const app = options.app ?? new Hono()
   const trailingSlash = options.trailingSlash ?? false
 
+  // Track applied middleware to prevent duplication
+  const appliedMiddleware = new Set<string>()
+
   // Share context by AsyncLocalStorage
   app.use(async function ShareContext(c, next) {
     await contextStorage.run(c, () => next())
@@ -149,19 +152,47 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         }
       })
 
-      const middlewareFile = Object.keys(MIDDLEWARE_FILE).find((x) => {
-        const replacedDir = dir
+      // Helper functions
+      const escapeDir = (directory: string) =>
+        directory
           .replaceAll('[', '\\[')
           .replaceAll(']', '\\]')
           .replaceAll('(', '\\(')
           .replaceAll(')', '\\)')
 
-        return new RegExp(replacedDir + '/_middleware.tsx?').test(x)
-      })
+      const findMiddleware = (directory: string) =>
+        Object.keys(MIDDLEWARE_FILE).find((x) =>
+          new RegExp(escapeDir(directory) + '/_middleware.tsx?').test(x)
+        )
+
+      // Find middleware for current directory first
+      let middlewareFile = findMiddleware(dir)
+
+      // Issue 290 fix: Search parent directories if no middleware found
+      if (!middlewareFile) {
+        const dirParts = dir.split('/')
+        for (let i = dirParts.length - 1; i >= 0; i--) {
+          const parentDir = dirParts.slice(0, i).join('/')
+          middlewareFile = findMiddleware(parentDir)
+          if (middlewareFile) break
+        }
+      }
 
       if (middlewareFile) {
         const middleware = MIDDLEWARE_FILE[middlewareFile]
-        if (middleware.default) {
+        const middlewareDir = middlewareFile
+          .replace('/_middleware.tsx', '')
+          .replace('/_middleware.ts', '')
+
+        // Only apply if this directory should have this middleware
+        const shouldApply =
+          middlewareDir === dir ||
+          (!appliedMiddleware.has(middlewareFile) && dir.startsWith(middlewareDir + '/'))
+
+        if (middleware.default && shouldApply) {
+          if (!appliedMiddleware.has(middlewareFile)) {
+            appliedMiddleware.add(middlewareFile)
+          }
           subApp.use(...middleware.default)
         }
       }
