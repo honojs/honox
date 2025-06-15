@@ -33,9 +33,13 @@ function honox(options?: Options): PluginOption[] {
       entry,
       exclude: [
         ...devServerDefaultOptions.exclude,
+        ...(options?.devServer?.exclude || []),
         /^\/app\/.+\.tsx?/,
         /^\/favicon.ico/,
         /^\/static\/.+/,
+      ],
+      ignoreWatching: [
+        ...(options?.devServer?.ignoreWatching || []),
       ],
       handleHotUpdate: () => {
         return undefined
