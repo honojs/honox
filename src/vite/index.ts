@@ -31,6 +31,9 @@ const devServerDefaultOptions = {
     /^\/favicon.ico/,
     /^\/static\/.+/,
   ],
+  handleHotUpdate: () => {
+    return undefined
+  }
 }
 
 function honox(options?: Options): PluginOption[] {
@@ -42,9 +45,6 @@ function honox(options?: Options): PluginOption[] {
     devServer({
       ...devServerDefaultOptions,
       entry,
-      handleHotUpdate: () => {
-        return undefined
-      },
       ...options?.devServer,
     })
   )
