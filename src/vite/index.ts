@@ -33,7 +33,7 @@ const devServerDefaultOptions = {
   ],
   handleHotUpdate: () => {
     return undefined
-  }
+  },
 }
 
 function honox(options?: Options): PluginOption[] {
