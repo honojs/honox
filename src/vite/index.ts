@@ -1,4 +1,4 @@
-import devServer, { defaultOptions as devServerDefaultOptions } from '@hono/vite-dev-server'
+import devServer, { defaultOptions as viteDevServerDefaultOptions } from '@hono/vite-dev-server'
 import type { DevServerOptions } from '@hono/vite-dev-server'
 import type { PluginOption } from 'vite'
 import path from 'path'
@@ -23,6 +23,19 @@ export const defaultOptions: Options = {
   entry: path.join(process.cwd(), './app/server.ts'),
 }
 
+const devServerDefaultOptions = {
+  ...viteDevServerDefaultOptions,
+  exclude: [
+    ...viteDevServerDefaultOptions.exclude,
+    /^\/app\/.+\.tsx?/,
+    /^\/favicon.ico/,
+    /^\/static\/.+/,
+  ],
+  handleHotUpdate: () => {
+    return undefined
+  },
+}
+
 function honox(options?: Options): PluginOption[] {
   const plugins: PluginOption[] = []
 
@@ -30,16 +43,8 @@ function honox(options?: Options): PluginOption[] {
 
   plugins.push(
     devServer({
+      ...devServerDefaultOptions,
       entry,
-      exclude: [
-        ...devServerDefaultOptions.exclude,
-        /^\/app\/.+\.tsx?/,
-        /^\/favicon.ico/,
-        /^\/static\/.+/,
-      ],
-      handleHotUpdate: () => {
-        return undefined
-      },
       ...options?.devServer,
     })
   )
