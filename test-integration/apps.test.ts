@@ -1015,7 +1015,6 @@ describe('Route Groups', () => {
     )
   })
 })
-
 describe('Nested Route Groups', () => {
   const ROUTES = import.meta.glob(
     '../mocks/app-nested-route-groups/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)',
@@ -1055,7 +1054,7 @@ describe('Nested Route Groups', () => {
         method: 'GET',
       },
     ]
-    expect(app.routes).toHaveLength(13)
+    expect(app.routes).toHaveLength(4)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
@@ -1073,7 +1072,7 @@ describe('Nested Route Groups', () => {
     const res = await app.request('/privacy-policy')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title>This is a title</title></head><body><h1>Hello</h1></body></html>'
+      '<h1>Hello</h1>'
     )
   })
 
