@@ -1015,3 +1015,66 @@ describe('Route Groups', () => {
     )
   })
 })
+
+describe('Nested Route Groups', () => {
+  const ROUTES = import.meta.glob(
+    '../mocks/app-nested-route-groups/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)',
+    {
+      eager: true,
+    }
+  )
+  const RENDERER = import.meta.glob('../mocks/app-nested-route-groups/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+  const NOT_FOUND = import.meta.glob('../mocks/app-nested-route-groups/routes/**/_404.(ts|tsx)', {
+    eager: true,
+  })
+  const MIDDLEWARE = import.meta.glob('../mocks/app-nested-route-groups/routes/**/_middleware.(tsx|ts)', {
+    eager: true,
+  })
+
+  const app = createApp({
+    root: '../mocks/app-nested-route-groups/routes',
+    ROUTES: ROUTES as any,
+    RENDERER: RENDERER as any,
+    NOT_FOUND: NOT_FOUND as any,
+    MIDDLEWARE: MIDDLEWARE as any,
+    init: (app) => {
+      app.use('*', poweredBy())
+    },
+  })
+
+  it('Should have correct routes', () => {
+    const routes: { path: string; method: string }[] = [
+      {
+        path: '/*',
+        method: 'ALL',
+      },
+      {
+        path: '/privacy-policy',
+        method: 'GET',
+      },
+    ]
+    expect(app.routes).toHaveLength(13)
+    expect(app.routes).toEqual(
+      expect.arrayContaining(
+        routes.map(({ path, method }) => {
+          return {
+            path,
+            method,
+            handler: expect.any(Function),
+          }
+        })
+      )
+    )
+  })
+
+  it('Should render /privacy-policy', async () => {
+    const res = await app.request('/privacy-policy')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe(
+      '<!DOCTYPE html><html><head><title>This is a title</title></head><body><h1>Hello</h1></body></html>'
+    )
+  })
+
+})
