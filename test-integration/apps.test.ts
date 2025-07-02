@@ -982,8 +982,12 @@ describe('Route Groups', () => {
         path: '/blog/hello-world',
         method: 'GET',
       },
+      {
+        path: '/privacy-policy',
+        method: 'GET',
+      },
     ]
-    expect(app.routes).toHaveLength(13)
+    expect(app.routes).toHaveLength(16)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
@@ -1013,5 +1017,18 @@ describe('Route Groups', () => {
     expect(await res.text()).toBe(
       '<!DOCTYPE html><html><head><title></title></head><body><div><h1>Blog</h1><p>Hello World</p></div></body></html>'
     )
+  })
+
+  it('Should render /privacy-policy with (content) route group', async () => {
+    const res = await app.request('/privacy-policy')
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe(
+      '<!DOCTYPE html><html><head><title></title></head><body><h1>Privacy Policy</h1></body></html>'
+    )
+  })
+
+  it('Should render //privacy-policy as a not found', async () => {
+    const res = await app.request('//privacy-policy')
+    expect(res.status).toBe(404)
   })
 })

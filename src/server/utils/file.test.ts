@@ -33,6 +33,9 @@ describe('filePathToPath', () => {
     expect(filePathToPath('/articles/(grouped1)/[slug]/(grouped1)/edit')).toBe(
       '/articles/:slug/edit'
     )
+
+    expect(filePathToPath('/(static)/(legal)/privacy')).toBe('/privacy')
+    expect(filePathToPath('/(static)/(legal)/privacy')).not.toBe('//privacy')
   })
 })
 
