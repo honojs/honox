@@ -1,6 +1,6 @@
 # Contributing to HonoX
 
-This document outlines guidelines for contributing to [Your Project Name]. Please take a moment to review it before submitting your contributions.
+This document outlines guidelines for contributing to HonoX. Please take a moment to review it before submitting your contributions.
 
 ## How Can I Contribute?
 
@@ -30,7 +30,7 @@ When suggesting an enhancement, please include:
 
 1.  **Fork the repository** and create your branch from `main`.
 2.  **Make your changes**.
-3.  **Ensure your code adheres to our style guides** (see [Style guides](#styleguides)).
+3.  **Ensure your code adheres to our style guides** (see [Style guides](#style-guides)).
 4.  **Write clear, concise commit messages** (see [Git Commit Messages](#git-commit-messages)).
 5.  **Test your changes thoroughly.**
 6.  **Update documentation** if your changes require it.
@@ -77,6 +77,6 @@ We use [Eslint](https://eslint.org/) and [Prettier](https://prettier.io/) for co
 
 You can lint and format your code using:
 ```bash
-npm run lint:fix
-npm run format:fix
+bun run lint:fix
+bun run format:fix
 ```
