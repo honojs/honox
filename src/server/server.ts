@@ -172,9 +172,13 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         currentDir: string
       ): boolean => {
         const dirParts = currentDir.split('/')
-        return Array.from({ length: dirParts.length - 1 }, (_, i) =>
-          dirParts.slice(0, dirParts.length - 1 - i).join('/')
-        ).some((ancestorDir) => appliedMiddlewaresByDirectory.get(ancestorDir)?.has(middlewarePath))
+        const ancestorDirs: string[] = []
+        for (let i = dirParts.length - 1; i > 0; i--) {
+          ancestorDirs.push(dirParts.slice(0, i).join('/'))
+        }
+        return ancestorDirs.some((ancestorDir) =>
+          appliedMiddlewaresByDirectory.get(ancestorDir)?.has(middlewarePath)
+        )
       }
 
       // Find middleware for current directory first
