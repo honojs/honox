@@ -191,7 +191,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           const parentDir = dirParts.slice(0, i).join('/')
 
           // Don't go beyond the routes root directory
-          if (!parentDir.includes(root.replace('../', ''))) {
+          if (!parentDir.includes(root)) {
             break
           }
 
