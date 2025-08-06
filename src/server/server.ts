@@ -63,8 +63,9 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   const app = options.app ?? new Hono()
   const trailingSlash = options.trailingSlash ?? false
 
-  // Track applied middleware to prevent duplication
-  const appliedMiddleware = new Set<string>()
+  // Track applied middleware per directory to prevent duplication while allowing inheritance
+  // Key: directory path, Value: Set of middleware file paths applied to that directory
+  const appliedMiddlewaresByDirectory = new Map<string, Set<string>>()
 
   // Share context by AsyncLocalStorage
   app.use(async function ShareContext(c, next) {
@@ -165,16 +166,39 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           new RegExp(escapeDir(directory) + '/_middleware.tsx?').test(x)
         )
 
+      // Helper function to check if middleware has been applied to any ancestor
+      const isMiddlewareAppliedToAncestor = (
+        middlewarePath: string,
+        currentDir: string
+      ): boolean => {
+        const dirParts = currentDir.split('/')
+        return Array.from({ length: dirParts.length - 1 }, (_, i) =>
+          dirParts.slice(0, dirParts.length - 1 - i).join('/')
+        ).some((ancestorDir) => appliedMiddlewaresByDirectory.get(ancestorDir)?.has(middlewarePath))
+      }
+
       // Find middleware for current directory first
       let middlewareFile = findMiddleware(dir)
 
-      // Issue 290 fix: Search parent directories if no middleware found
+      // Issue 290/310 fix: Search parent directories if no middleware found
       if (!middlewareFile) {
         const dirParts = dir.split('/')
         for (let i = dirParts.length - 1; i >= 0; i--) {
           const parentDir = dirParts.slice(0, i).join('/')
-          middlewareFile = findMiddleware(parentDir)
-          if (middlewareFile) break
+
+          // Don't go beyond the routes root directory
+          if (!parentDir.includes(root.replace('../', ''))) {
+            break
+          }
+
+          const parentMiddleware = findMiddleware(parentDir)
+          if (!parentMiddleware) continue
+
+          // Skip if this middleware is already applied to any ancestor
+          if (isMiddlewareAppliedToAncestor(parentMiddleware, dir)) continue
+
+          middlewareFile = parentMiddleware
+          break
         }
       }
 
@@ -185,15 +209,16 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           .replace('/_middleware.ts', '')
 
         // Only apply if this directory should have this middleware
-        const shouldApply =
-          middlewareDir === dir ||
-          (!appliedMiddleware.has(middlewareFile) && dir.startsWith(middlewareDir + '/'))
+        const shouldApply = middlewareDir === dir || dir.startsWith(middlewareDir + '/')
 
         if (middleware.default && shouldApply) {
-          if (!appliedMiddleware.has(middlewareFile)) {
-            appliedMiddleware.add(middlewareFile)
-          }
           subApp.use(...middleware.default)
+
+          // Track that this middleware has been applied to this directory
+          if (!appliedMiddlewaresByDirectory.has(dir)) {
+            appliedMiddlewaresByDirectory.set(dir, new Set())
+          }
+          appliedMiddlewaresByDirectory.get(dir)?.add(middlewareFile)
         }
       }
 
