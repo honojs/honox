@@ -286,7 +286,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
 
       let rootPath = getRootPath(dir)
       if (trailingSlash) {
-        rootPath = /\/$/.test(rootPath) ? rootPath : rootPath + '/'
+        rootPath = rootPath.endsWith('/') ? rootPath : rootPath + '/'
       }
       app.route(rootPath, subApp)
     }
