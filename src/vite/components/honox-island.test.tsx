@@ -9,7 +9,7 @@ describe('HonoXIsland', () => {
       componentExport: 'Test',
       Component: () => <div>Test</div>,
       props: {
-          children: <TestComponent />,
+        children: <TestComponent />,
       },
     })
     // XXX: tested by internal implementation

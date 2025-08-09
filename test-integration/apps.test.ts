@@ -478,6 +478,20 @@ describe('Nested Middleware', () => {
     expect(res.status).toBe(200)
     expect(res.headers.get('X-Admin-Middleware')).toEqual('true')
   })
+
+  it('Should apply grandparent middleware to child index route - /without-route/with-index', async () => {
+    const res = await app.request('/without-route/with-index')
+    expect(res.status).toBe(200)
+    await expect(res.text()).resolves.toBe('<h1>IndexRoute</h1>')
+    expect(res.headers.get('grandparent-middleware-applied')).toEqual('true')
+  })
+
+  it('Should apply grandparent middleware to child named route - /without-route/with-named/named', async () => {
+    const res = await app.request('/without-route/with-named/named')
+    expect(res.status).toBe(200)
+    await expect(res.text()).resolves.toBe('<h1>Named Route</h1>')
+    expect(res.headers.get('grandparent-middleware-applied')).toEqual('true')
+  })
 })
 
 describe('<Script /> component', () => {

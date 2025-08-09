@@ -8,7 +8,7 @@ export const filePathToPath = (filePath: string) => {
     .replace(/\((.+?)\)/g, '')
     .replace(/\[(.+?)\]/g, ':$1')
     .replace(/\/\/+/g, '/')
-  return /^\//.test(filePath) ? filePath : '/' + filePath
+  return filePath.startsWith('/') ? filePath : '/' + filePath
 }
 
 /*

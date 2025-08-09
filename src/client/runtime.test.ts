@@ -8,7 +8,7 @@ describe('buildCreateChildrenFn', () => {
 
     const div = document.createElement('div')
     div.innerHTML = '<span>test</span><div>test2</div>'
-    const result = await createChildren(div.childNodes)
+    await createChildren(div.childNodes)
     expect(createElement).toHaveBeenNthCalledWith(1, 'SPAN', {
       children: ['test'],
       key: 1,
