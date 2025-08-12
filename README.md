@@ -839,20 +839,47 @@ export default function Top() {
 
 ### Cloudflare Bindings
 
-If you want to use Cloudflare's Bindings in your development environment, create `wrangler.toml` and configure it properly.
+If you want to use Cloudflare's Bindings in your development environment, create `wrangler.jsonc` and configure it properly.
 
-```toml
-name = "my-project-name"
-compatibility_date = "2024-04-01"
-compatibility_flags = [ "nodejs_compat" ]
-pages_build_output_dir = "./dist"
-
-# [vars]
-# MY_VARIABLE = "production_value"
-
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```jsonc
+// wrangler.jsonc
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-project-name",
+  "main": "./dist/index.js",
+  "compatibility_date": "2024-04-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist"
+  }
+  // "vars": {
+  //   "MY_VAR": "my-variable"
+  // },
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "MY_KV_NAMESPACE",
+  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  //   }
+  // ],
+  // "r2_buckets": [
+  //   {
+  //     "binding": "MY_BUCKET",
+  //     "bucket_name": "my-bucket"
+  //   }
+  // ],
+  // "d1_databases": [
+  //   {
+  //     "binding": "MY_DB",
+  //     "database_name": "my-database",
+  //     "database_id": ""
+  //   }
+  // ],
+  // "ai": {
+  //   "binding": "AI"
+  // }
+}
 ```
 
 In `vite.config.ts`, use the Cloudflare Adapter in `@hono/vite-dev-server`.
