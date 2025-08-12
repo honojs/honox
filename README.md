@@ -873,52 +873,12 @@ export default defineConfig({
 })
 ```
 
-## Deployment
-
-Since a HonoX instance is essentially a Hono instance, it can be deployed on any platform that Hono supports.
-
-### Cloudflare Pages
-
-Add the `wrangler.toml`:
-
-```toml
-# wrangler.toml
-name = "my-project-name"
-compatibility_date = "2024-04-01"
-compatibility_flags = [ "nodejs_compat" ]
-pages_build_output_dir = "./dist"
-```
-
-Setup the `vite.config.ts`:
-
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite'
-import honox from 'honox/vite'
-import build from '@hono/vite-build/cloudflare-pages'
-
-export default defineConfig({
-  plugins: [honox(), build()],
-})
-```
-
-Build command (including a client):
-
-```txt
-vite build --mode client && vite build
-```
-
-Deploy with the following commands after the build. Ensure you have [Wrangler](https://developers.cloudflare.com/workers/wrangler/) installed:
-
-```txt
-wrangler pages deploy
-```
-
 ### SSG - Static Site Generation
 
 Using Hono's SSG feature, you can generate static HTML for each route.
 
 ```ts
+// vite.config.ts
 import { defineConfig } from 'vite'
 import honox from 'honox/vite'
 import ssg from '@hono/vite-ssg'
@@ -961,30 +921,110 @@ export default defineConfig(({ mode }) => {
 
 Build command (including a client):
 
-```txt
+```sh
 vite build --mode client && vite build
 ```
 
-You can also deploy it to Cloudflare Pages.
+## Deployment
 
-```txt
-wrangler pages deploy ./dist
+[`@hono/vite-build`]: https://www.npmjs.com/package/@hono/vite-build
+
+HonoX consists of a Hono instance and Vite configuration, so it can be deployed on any platform that Hono supports.
+[`@hono/vite-build`] provides build configurations for Cloudflare Workers, Node.js, Bun, and many other platforms.
+
+### Cloudflare Workers
+
+If you create a project using the `create-hono` command and select `x-basic`, the configuration for deploying to Cloudflare Workers is already included by default.
+
+Add the `wrangler.jsonc`:
+
+```jsonc
+// wrangler.jsonc
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-project-name",
+  "main": "./dist/index.js",
+  "compatibility_date": "2024-04-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist"
+  }
+}
 ```
 
-### Others
-
-Using `@hono/vite-build`, you can build the HonoX app for various platforms. For example, you can make it for the Bun:
+Setup the `vite.config.ts`:
 
 ```ts
 // vite.config.ts
-import { defineConfig } from 'vite'
+import build from '@hono/vite-build/cloudflare-workers'
+import adapter from '@hono/vite-dev-server/cloudflare'
+import tailwindcss from '@tailwindcss/vite'
 import honox from 'honox/vite'
-import build from '@hono/vite-build/bun'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
-  plugins: [honox(), build()],
+  plugins: [
+    honox({
+      devServer: { adapter },
+      client: { input: ['./app/style.css'] }
+    }),
+    tailwindcss(),
+    build()
+  ]
 })
 ```
+
+Build command (including a client):
+
+```sh
+vite build --mode client && vite build
+```
+
+Deploy with the following commands after the build. Ensure you have [Wrangler](https://developers.cloudflare.com/workers/wrangler/) installed:
+
+```sh
+wrangler deploy
+```
+
+### On-Premises or Other Platforms
+
+You can build the HonoX app for on-premises environments or various other platforms. See the [`@hono/vite-build`] README for a full list of supported platforms. For example, you can make it for the Bun:
+
+```ts
+// vite.config.ts
+import build from '@hono/vite-build/bun' // Change to Bun
+import adapter from '@hono/vite-dev-server/bun' // Change to Bun
+import tailwindcss from '@tailwindcss/vite'
+import honox from 'honox/vite'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    honox({
+      devServer: { adapter },
+      client: { input: ['./app/style.css'] }
+    }),
+    tailwindcss(),
+    build()
+  ]
+})
+```
+
+Build command (including a client):
+
+```sh
+vite build --mode client && vite build
+```
+
+Run the server with Bun:
+
+```sh
+cd ./dist && bun index.js
+```
+
+**Note**: When running on-premises, make sure to change the working directory to the output directory (e.g., `cd ./dist`). Otherwise, JavaScript, CSS, and static assets may not be resolved correctly.
 
 ## Examples
 
