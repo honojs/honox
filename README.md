@@ -499,7 +499,7 @@ Configure react in `vite.config.ts`.
 
 ```ts
 // vite.config.ts
-import build from '@hono/vite-build/cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-workers'
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
 
@@ -571,7 +571,7 @@ Configure react in `vite.config.ts`.
 
 ```ts
 // vite.config.ts
-import build from '@hono/vite-build/cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-workers'
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
 
@@ -767,7 +767,7 @@ Finally, add `vite.config.ts` configuration to output assets for the production.
 ```ts
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
-import build from '@hono/vite-build/cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-workers'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
