@@ -499,7 +499,7 @@ Configure react in `vite.config.ts`.
 
 ```ts
 // vite.config.ts
-import build from '@hono/vite-build/cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-workers'
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
 
@@ -571,7 +571,7 @@ Configure react in `vite.config.ts`.
 
 ```ts
 // vite.config.ts
-import build from '@hono/vite-build/cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-workers'
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
 
@@ -767,7 +767,7 @@ Finally, add `vite.config.ts` configuration to output assets for the production.
 ```ts
 import honox from 'honox/vite'
 import { defineConfig } from 'vite'
-import build from '@hono/vite-build/cloudflare-pages'
+import build from '@hono/vite-build/cloudflare-workers'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
@@ -839,20 +839,22 @@ export default function Top() {
 
 ### Cloudflare Bindings
 
-If you want to use Cloudflare's Bindings in your development environment, create `wrangler.toml` and configure it properly.
+If you want to use Cloudflare's Bindings in your development environment, create `wrangler.jsonc` and configure it properly.
 
-```toml
-name = "my-project-name"
-compatibility_date = "2024-04-01"
-compatibility_flags = [ "nodejs_compat" ]
-pages_build_output_dir = "./dist"
-
-# [vars]
-# MY_VARIABLE = "production_value"
-
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```jsonc
+// wrangler.jsonc
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-project-name",
+  "main": "./dist/index.js",
+  "compatibility_date": "2025-08-03",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist"
+  }
+}
 ```
 
 In `vite.config.ts`, use the Cloudflare Adapter in `@hono/vite-dev-server`.
@@ -944,7 +946,7 @@ Add the `wrangler.jsonc`:
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-project-name",
   "main": "./dist/index.js",
-  "compatibility_date": "2024-04-01",
+  "compatibility_date": "2025-08-03",
   "compatibility_flags": [
     "nodejs_compat"
   ],
