@@ -847,7 +847,7 @@ If you want to use Cloudflare's Bindings in your development environment, create
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-project-name",
   "main": "./dist/index.js",
-  "compatibility_date": "2024-04-01",
+  "compatibility_date": "2025-08-03",
   "compatibility_flags": [
     "nodejs_compat"
   ],
@@ -971,7 +971,7 @@ Add the `wrangler.jsonc`:
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-project-name",
   "main": "./dist/index.js",
-  "compatibility_date": "2024-04-01",
+  "compatibility_date": "2025-08-03",
   "compatibility_flags": [
     "nodejs_compat"
   ],
