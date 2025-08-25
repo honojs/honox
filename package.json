@@ -144,6 +144,7 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.3"
   },
+  "packageManager": "bun@1.2.20",
   "engines": {
     "node": ">=18.14.1"
   },
