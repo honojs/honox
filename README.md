@@ -774,7 +774,10 @@ export default defineConfig({
   plugins: [
     honox({
       client: {
-        input: ['/app/style.css'],
+        input: [
+          '/app/client.ts', // the default value -> must be added if input is overridden
+          '/app/style.css', // add the style file entrypoint
+        ],
       },
     }),
     build(),
