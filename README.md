@@ -1026,6 +1026,28 @@ cd ./dist && bun index.js
 
 **Note**: When running on-premises, make sure to change the working directory to the output directory (e.g., `cd ./dist`). Otherwise, JavaScript, CSS, and static assets may not be resolved correctly.
 
+When using environment variables in a HonoX application, you may notice that variables like `process.env.MY_VAR` work in development but not in the built application. This is because Vite optimizes `process.env` to an empty object during the build process.
+
+To ensure environment variables are available at runtime, add the following to your `vite.config.ts`:
+
+```ts
+export default defineConfig({
+  define: {
+    'process.env': 'process.env' // <=== Add this line
+  },
+  plugins: [
+    honox({
+      devServer: { adapter },
+      client: { input: ['./app/style.css'] }
+    }),
+    tailwindcss(),
+    build()
+  ]
+})
+```
+
+This disables Vite's optimization of `process.env`, allowing your built application to access environment variables as expected. For more details, see [issue #307](https://github.com/honojs/honox/issues/307#issuecomment-3179529432).
+
 ## Examples
 
 - https://github.com/yusukebe/honox-examples
