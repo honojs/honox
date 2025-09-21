@@ -851,12 +851,10 @@ If you want to use Cloudflare's Bindings in your development environment, create
   "name": "my-project-name",
   "main": "./dist/index.js",
   "compatibility_date": "2025-08-03",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist"
-  }
+    "directory": "./dist",
+  },
 }
 ```
 
@@ -950,12 +948,10 @@ Add the `wrangler.jsonc`:
   "name": "my-project-name",
   "main": "./dist/index.js",
   "compatibility_date": "2025-08-03",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist"
-  }
+    "directory": "./dist",
+  },
 }
 ```
 
@@ -973,11 +969,11 @@ export default defineConfig({
   plugins: [
     honox({
       devServer: { adapter },
-      client: { input: ['./app/style.css'] }
+      client: { input: ['/app/client.ts', '/app/style.css'] },
     }),
     tailwindcss(),
-    build()
-  ]
+    build(),
+  ],
 })
 ```
 
@@ -1009,11 +1005,11 @@ export default defineConfig({
   plugins: [
     honox({
       devServer: { adapter },
-      client: { input: ['./app/style.css'] }
+      client: { input: ['/app/client.ts', '/app/style.css'] },
     }),
     tailwindcss(),
-    build()
-  ]
+    build(),
+  ],
 })
 ```
 
@@ -1038,16 +1034,16 @@ To ensure environment variables are available at runtime, add the following to y
 ```ts
 export default defineConfig({
   define: {
-    'process.env': 'process.env' // <=== Add this line
+    'process.env': 'process.env', // <=== Add this line
   },
   plugins: [
     honox({
       devServer: { adapter },
-      client: { input: ['./app/style.css'] }
+      client: { input: ['/app/client.ts', '/app/style.css'] },
     }),
     tailwindcss(),
-    build()
-  ]
+    build(),
+  ],
 })
 ```
 
