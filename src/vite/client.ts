@@ -6,10 +6,10 @@ export type ClientOptions = {
   input?: string[]
 }
 
-export const defaultOptions: ClientOptions = {
+const defaultOptions: Required<ClientOptions> = {
   jsxImportSource: 'hono/jsx/dom',
   assetsDir: 'static',
-  input: [],
+  input: ['/app/client.ts'],
 }
 
 function client(options?: ClientOptions): Plugin {
@@ -22,11 +22,10 @@ function client(options?: ClientOptions): Plugin {
       return false
     },
     config: () => {
-      const input = options?.input ?? defaultOptions.input ?? []
       return {
         build: {
           rollupOptions: {
-            input: ['/app/client.ts', ...input],
+            input: options?.input ?? defaultOptions.input,
           },
           assetsDir: options?.assetsDir ?? defaultOptions.assetsDir,
           manifest: true,
