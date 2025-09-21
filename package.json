@@ -1,6 +1,6 @@
 {
   "name": "honox",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
