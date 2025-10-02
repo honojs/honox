@@ -182,8 +182,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           // Apply extra middleware for parent routing patterns like /:lang{en} or /:lang?
           const rootPath = dir.replace(rootRegExp, '')
           const isRootLevel = !rootPath.includes('/') || rootPath === ''
-          const isSimpleStructure =
-            Object.keys(content).length <= 4 && !Object.keys(content).some((f) => f.includes('/'))
+          const isSimpleStructure = !Object.keys(content).some((f) => f.includes('/'))
 
           if (Object.keys(content).length > 0 && isRootLevel && isSimpleStructure) {
             subApp.use('/', rendererDefault)
