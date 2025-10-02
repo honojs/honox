@@ -139,20 +139,6 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         })
       }
 
-      // Renderer
-      const rendererPaths = getPaths(dir, rendererList)
-      rendererPaths.map((path) => {
-        const renderer = RENDERER_FILE[path]
-        const importingIslands = renderer[IMPORTING_ISLANDS_ID]
-        if (importingIslands) {
-          hasIslandComponent = true
-        }
-        const rendererDefault = renderer.default
-        if (rendererDefault) {
-          subApp.all('*', rendererDefault)
-        }
-      })
-
       // Helper functions
       const escapeDir = (directory: string) =>
         directory
@@ -180,6 +166,36 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           appliedMiddlewaresByDirectory.get(ancestorDir)?.has(middlewarePath)
         )
       }
+
+      // Apply renderer middleware more robustly to handle all routing scenarios
+      const rendererPaths = getPaths(dir, rendererList)
+      rendererPaths.map((path) => {
+        const renderer = RENDERER_FILE[path]
+        const importingIslands = renderer[IMPORTING_ISLANDS_ID]
+        if (importingIslands) {
+          hasIslandComponent = true
+        }
+        const rendererDefault = renderer.default
+        if (rendererDefault) {
+          subApp.use('*', rendererDefault)
+
+          // Apply extra middleware for parent routing patterns like /:lang{en} or /:lang?
+          const rootPath = dir.replace(rootRegExp, '')
+          const isRootLevel = !rootPath.includes('/') || rootPath === ''
+          const isSimpleStructure =
+            Object.keys(content).length <= 4 && !Object.keys(content).some((f) => f.includes('/'))
+
+          if (Object.keys(content).length > 0 && isRootLevel && isSimpleStructure) {
+            subApp.use('/', rendererDefault)
+            Object.keys(content).forEach((filename) => {
+              const path = filePathToPath(filename)
+              if (path !== '/' && !path.includes('[') && !path.includes('*')) {
+                subApp.use(path, rendererDefault)
+              }
+            })
+          }
+        }
+      })
 
       // Find middleware for current directory first
       let middlewareFile = findMiddleware(dir)

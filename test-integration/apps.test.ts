@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Hono } from 'hono'
 import { poweredBy } from 'hono/powered-by'
 import { createApp } from '../src/server'
 
@@ -1001,7 +1002,7 @@ describe('Route Groups', () => {
         method: 'GET',
       },
     ]
-    expect(app.routes).toHaveLength(16)
+    expect(app.routes).toHaveLength(17)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
@@ -1044,5 +1045,82 @@ describe('Route Groups', () => {
   it('Should render //privacy-policy as a not found', async () => {
     const res = await app.request('//privacy-policy')
     expect(res.status).toBe(404)
+  })
+})
+
+describe('Renderer loading when mounted with special route patterns', () => {
+  const ROUTES = import.meta.glob('../mocks/app-with-mount-patterns/routes/**/*.(tsx|ts|mdx)', {
+    eager: true,
+  })
+
+  const RENDERER = import.meta.glob('../mocks/app-with-mount-patterns/routes/**/_renderer.tsx', {
+    eager: true,
+  })
+
+  describe('RegExp pattern mounting (/:lang{en})', () => {
+    // Reproduce the scenario where parent app uses RegExp routing
+    const app = createApp({
+      root: '../mocks/app-with-mount-patterns/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    const apps = new Hono()
+
+    // This is the problematic setup with RegExp pattern
+    apps.route('/:lang{en}', app)
+    apps.route('/', app) // Additional route as mentioned in the original issue
+
+    it('Should return rendered index.tsx with _renderer.tsx', async () => {
+      // Test accessing /en (should show both index.tsx and _renderer.tsx)
+      const res = await apps.request('/en')
+      const html = await res.text()
+
+      expect(res.status).toBe(200)
+      expect(html).toContain('index.tsx')
+      expect(html).toContain('_renderer.tsx')
+    })
+
+    it('Should return rendered foo.tsx with _renderer.tsx', async () => {
+      // Test accessing /en/foo
+      const res = await apps.request('/en/foo')
+      const html = await res.text()
+
+      expect(res.status).toBe(200)
+      expect(html).toContain('foo.tsx')
+      expect(html).toContain('_renderer.tsx')
+    })
+  })
+
+  describe('Optional parameter mounting (/:lang?)', () => {
+    // Reproduce the scenario where parent app uses optional parameter routing
+    const app = createApp({
+      root: '../mocks/app-with-mount-patterns/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+    })
+
+    const apps = new Hono()
+
+    // This is the problematic setup with optional parameter
+    apps.route('/:lang?', app)
+
+    it('Should return rendered content with _renderer.tsx when using optional parameters', async () => {
+      // Test accessing /en (should show both index.tsx and _renderer.tsx)
+      const res = await apps.request('/en')
+      const html = await res.text()
+      expect(res.status).toBe(200)
+      expect(html).toContain('index.tsx')
+      expect(html).toContain('_renderer.tsx')
+    })
+
+    it('Should return rendered foo.tsx with _renderer.tsx when using optional parameters', async () => {
+      // Test accessing /en/foo
+      const res = await apps.request('/en/foo')
+      const html = await res.text()
+      expect(res.status).toBe(200)
+      expect(html).toContain('foo.tsx')
+      expect(html).toContain('_renderer.tsx')
+    })
   })
 })
