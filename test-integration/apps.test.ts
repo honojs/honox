@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Hono } from 'hono'
 import { poweredBy } from 'hono/powered-by'
 import { createApp } from '../src/server'
-import { Hono } from 'hono'
 
 describe('Basic', () => {
   const ROUTES = import.meta.glob('../mocks/app/routes/**/[a-z[-][a-z[_-]*.(tsx|ts|mdx)', {
