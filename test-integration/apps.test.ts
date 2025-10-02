@@ -1107,11 +1107,11 @@ describe('Renderer loading when mounted with special route patterns', () => {
 
     it('Should return rendered content with _renderer.tsx when using optional parameters', async () => {
       // Test accessing /en (should show both index.tsx and _renderer.tsx)
-      const resEn = await apps.request('/en')
-      const htmlEn = await resEn.text()
-      expect(resEn.status).toBe(200)
-      expect(htmlEn).toContain('index.tsx')
-      expect(htmlEn).toContain('_renderer.tsx')
+      const res = await apps.request('/en')
+      const html = await res.text()
+      expect(res.status).toBe(200)
+      expect(html).toContain('index.tsx')
+      expect(html).toContain('_renderer.tsx')
     })
 
     it('Should return rendered foo.tsx with _renderer.tsx when using optional parameters', async () => {
