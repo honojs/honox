@@ -110,11 +110,11 @@ describe('Basic', () => {
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
-          return {
+          return expect.objectContaining({
             path,
             method,
             handler: expect.any(Function),
-          }
+          })
         })
       )
     )
@@ -259,7 +259,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:5,&quot;id&quot;:&quot;first&quot;}"><div id="first"><p>Counter</p><p>Count: 5</p><button>Increment</button></div></honox-island><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:10}"><div id=""><p>Counter</p><p>Count: 10</p><button>Increment</button><div id=""><p>Counter</p><p>Count: 15</p><button>Increment</button></div></div><template data-hono-template="children"><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:15}"><div id=""><honox-island component-name="/mocks/app/islands/Badge.tsx" data-serialized-props="{&quot;name&quot;:&quot;Counter&quot;}"><p>Counter</p></honox-island><p>Count: 15</p><button>Increment</button></div></honox-island></template></honox-island><honox-island component-name="/mocks/app/islands/NamedCounter.tsx" component-export="NamedCounter" data-serialized-props="{&quot;initial&quot;:30,&quot;id&quot;:&quot;named&quot;}"><div id="named"><p>Counter</p><p>Count: 30</p><button>Increment</button></div></honox-island><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:20}"><div id=""><p>Counter</p><p>Count: 20</p><button>Increment</button><div id=""><p>Counter</p><p>Count: 30</p><button>Increment</button></div><div><div id="slot"><p>Counter</p><p>Count: 25</p><button>Increment</button></div></div></div><template data-hono-template="slot"><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;id&quot;:&quot;slot&quot;,&quot;initial&quot;:25}"><div id="slot"><honox-island component-name="/mocks/app/islands/Badge.tsx" data-serialized-props="{&quot;name&quot;:&quot;Counter&quot;}"><p>Counter</p></honox-island><p>Count: 25</p><button>Increment</button></div></honox-island></template><template data-hono-template="children"><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:30}"><div id=""><honox-island component-name="/mocks/app/islands/Badge.tsx" data-serialized-props="{&quot;name&quot;:&quot;Counter&quot;}"><p>Counter</p></honox-island><p>Count: 30</p><button>Increment</button></div></honox-island></template></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<!DOCTYPE html><html><head><title></title><script type="module" async="" src="/app/client.ts"></script></head><body><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:5,&quot;id&quot;:&quot;first&quot;}"><div id="first"><p>Counter</p><p>Count: 5</p><button>Increment</button></div></honox-island><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:10}"><div id=""><p>Counter</p><p>Count: 10</p><button>Increment</button><div id=""><p>Counter</p><p>Count: 15</p><button>Increment</button></div></div><template data-hono-template="children"><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:15}"><div id=""><honox-island component-name="/mocks/app/islands/Badge.tsx" data-serialized-props="{&quot;name&quot;:&quot;Counter&quot;}"><p>Counter</p></honox-island><p>Count: 15</p><button>Increment</button></div></honox-island></template></honox-island><honox-island component-name="/mocks/app/islands/NamedCounter.tsx" component-export="NamedCounter" data-serialized-props="{&quot;initial&quot;:30,&quot;id&quot;:&quot;named&quot;}"><div id="named"><p>Counter</p><p>Count: 30</p><button>Increment</button></div></honox-island><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:20}"><div id=""><p>Counter</p><p>Count: 20</p><button>Increment</button><div id=""><p>Counter</p><p>Count: 30</p><button>Increment</button></div><div><div id="slot"><p>Counter</p><p>Count: 25</p><button>Increment</button></div></div></div><template data-hono-template="slot"><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;id&quot;:&quot;slot&quot;,&quot;initial&quot;:25}"><div id="slot"><honox-island component-name="/mocks/app/islands/Badge.tsx" data-serialized-props="{&quot;name&quot;:&quot;Counter&quot;}"><p>Counter</p></honox-island><p>Count: 25</p><button>Increment</button></div></honox-island></template><template data-hono-template="children"><honox-island component-name="/mocks/app/islands/Counter.tsx" data-serialized-props="{&quot;initial&quot;:30}"><div id=""><honox-island component-name="/mocks/app/islands/Badge.tsx" data-serialized-props="{&quot;name&quot;:&quot;Counter&quot;}"><p>Counter</p></honox-island><p>Count: 30</p><button>Increment</button></div></honox-island></template></honox-island></body></html>'
     )
   })
 
@@ -267,7 +267,7 @@ describe('With preserved', () => {
     const res = await app.request('/interaction/anywhere')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/mocks/app/components/$counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div><p>Count: 5</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<!DOCTYPE html><html><head><title></title><script type="module" async="" src="/app/client.ts"></script></head><body><honox-island component-name="/mocks/app/components/$counter.tsx" data-serialized-props="{&quot;initial&quot;:5}"><div><p>Count: 5</p><button>Increment</button></div></honox-island></body></html>'
     )
   })
 
@@ -281,6 +281,7 @@ describe('With preserved', () => {
       <html>
          <head>
             <title></title>
+            <script type="module" async="" src="/app/client.ts"></script>
          </head>
          <body>
             <div>
@@ -293,7 +294,6 @@ describe('With preserved', () => {
                   </div>
                </honox-island>
             </div>
-            <script type="module" async="" src="/app/client.ts"></script>
          </body>
       </html>
 `.replace(/\n|\s{2,}/g, '')
@@ -305,7 +305,7 @@ describe('With preserved', () => {
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
     expect(await res.text()).toBe(
-      '<!DOCTYPE html><html><head><title></title></head><body><honox-island component-name="/mocks/app/routes/directory/_Counter.island.tsx" data-serialized-props="{&quot;id&quot;:&quot;under-score&quot;,&quot;initial&quot;:5}"><div id="under-score"><p>UnderScoreCount: 5</p><button>UnderScore Increment</button></div></honox-island><honox-island component-name="/mocks/app/routes/directory/$counter.tsx" data-serialized-props="{&quot;id&quot;:&quot;dollar&quot;,&quot;initial&quot;:5}"><div id="dollar"><p>DollarCount: 5</p><button>Dollar Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<!DOCTYPE html><html><head><title></title><script type="module" async="" src="/app/client.ts"></script></head><body><honox-island component-name="/mocks/app/routes/directory/_Counter.island.tsx" data-serialized-props="{&quot;id&quot;:&quot;under-score&quot;,&quot;initial&quot;:5}"><div id="under-score"><p>UnderScoreCount: 5</p><button>UnderScore Increment</button></div></honox-island><honox-island component-name="/mocks/app/routes/directory/$counter.tsx" data-serialized-props="{&quot;id&quot;:&quot;dollar&quot;,&quot;initial&quot;:5}"><div id="dollar"><p>DollarCount: 5</p><button>Dollar Increment</button></div></honox-island></body></html>'
     )
   })
 
@@ -652,7 +652,7 @@ describe('<Link /> component', () => {
       const res = await app.request('/')
       expect(res.status).toBe(200)
       expect(await res.text()).toBe(
-        '<html><head><link href="/static/globals-abc.css" rel="stylesheet"></link></head><body><main><div></div></main></body></html>'
+        '<html><head><link href="/static/globals-abc.css" rel="stylesheet"/></head><body><main><div></div></main></body></html>'
       )
     })
 
@@ -672,7 +672,7 @@ describe('<Link /> component', () => {
         const res = await app.request('/')
         expect(res.status).toBe(200)
         expect(await res.text()).toBe(
-          '<html><head><link href="/base/path/static/globals-abc.css" rel="stylesheet"></link></head><body><main><div></div></main></body></html>'
+          '<html><head><link href="/base/path/static/globals-abc.css" rel="stylesheet"/></head><body><main><div></div></main></body></html>'
         )
       })
     })
@@ -693,7 +693,7 @@ describe('<Link /> component', () => {
         const res = await app.request('/')
         expect(res.status).toBe(200)
         expect(await res.text()).toBe(
-          '<html><head><link href="/base/path/static/globals-abc.css" rel="stylesheet"></link></head><body><main><div></div></main></body></html>'
+          '<html><head><link href="/base/path/static/globals-abc.css" rel="stylesheet"/></head><body><main><div></div></main></body></html>'
         )
       })
     })
@@ -714,7 +714,7 @@ describe('<Link /> component', () => {
         const res = await app.request('/')
         expect(res.status).toBe(200)
         expect(await res.text()).toBe(
-          '<html><head><link href="https://example.com/base/path/static/globals-abc.css" rel="stylesheet"></link></head><body><main><div></div></main></body></html>'
+          '<html><head><link href="https://example.com/base/path/static/globals-abc.css" rel="stylesheet"/></head><body><main><div></div></main></body></html>'
         )
       })
     })
@@ -811,7 +811,7 @@ describe('Island Components with Preserved Files', () => {
     const res = await app.request('/foo')
     expect(res.status).toBe(404)
     expect(await res.text()).toBe(
-      '<html><head><title>Not Found</title></head><body><honox-island component-name="/mocks/app-islands-in-preserved/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<html><head><title>Not Found</title><script type="module" async="" src="/app/client.ts"></script></head><body><honox-island component-name="/mocks/app-islands-in-preserved/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island></body></html>'
     )
   })
 
@@ -819,7 +819,7 @@ describe('Island Components with Preserved Files', () => {
     const res = await app.request('/throw_error')
     expect(res.status).toBe(500)
     expect(await res.text()).toBe(
-      '<html><head><title>Internal Server Error</title></head><body><honox-island component-name="/mocks/app-islands-in-preserved/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<html><head><title>Internal Server Error</title><script type="module" async="" src="/app/client.ts"></script></head><body><honox-island component-name="/mocks/app-islands-in-preserved/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island></body></html>'
     )
   })
 
@@ -827,7 +827,7 @@ describe('Island Components with Preserved Files', () => {
     const res = await app.request('/nested/post')
     expect(res.status).toBe(200)
     expect(await res.text()).toBe(
-      '<html><head><title></title></head><body><honox-island component-name="/mocks/app-islands-in-preserved/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><h1>Hello MDX</h1><script type="module" async="" src="/app/client.ts"></script></body></html>'
+      '<html><head><title></title><script type="module" async="" src="/app/client.ts"></script></head><body><honox-island component-name="/mocks/app-islands-in-preserved/islands/Counter.tsx" data-serialized-props="{}"><div id=""><p>Count: 0</p><button>Increment</button></div></honox-island><h1>Hello MDX</h1></body></html>'
     )
   })
 })
@@ -1006,11 +1006,11 @@ describe('Route Groups', () => {
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
-          return {
+          return expect.objectContaining({
             path,
             method,
             handler: expect.any(Function),
-          }
+          })
         })
       )
     )

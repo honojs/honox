@@ -1,7 +1,7 @@
 import { createRoute } from '../../../../../../../src/factory'
 
 export default createRoute((c) => {
-  const { resourceId1, resourceId2 } = c.req.param()
+  const { resourceId1, resourceId2 } = c.req.param<'/resource/:resourceId1/:resourceId2'>()
   return c.render(
     <b>
       Resource2 Id {resourceId1} / {resourceId2}
