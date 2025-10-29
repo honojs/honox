@@ -6,7 +6,7 @@ export const POST = createRoute((c) => {
 })
 
 export default createRoute((c) => {
-  const { name } = c.req.param()
+  const { name } = c.req.param<'/about/:name'>()
   return c.render(
     <>
       <p>It's {name}</p>

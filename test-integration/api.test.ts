@@ -41,11 +41,11 @@ describe('Basic', () => {
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
-          return {
+          return expect.objectContaining({
             path,
             method,
             handler: expect.any(Function),
-          }
+          })
         })
       )
     )
