@@ -1057,70 +1057,105 @@ describe('Renderer loading when mounted with special route patterns', () => {
     eager: true,
   })
 
+  const MIDDLEWARE = import.meta.glob(
+    '../mocks/app-with-mount-patterns/routes/**/_middleware.(tsx|ts)',
+    {
+      eager: true,
+    }
+  )
+
   describe('RegExp pattern mounting (/:lang{en})', () => {
     // Reproduce the scenario where parent app uses RegExp routing
     const app = createApp({
       root: '../mocks/app-with-mount-patterns/routes',
       ROUTES: ROUTES as any,
       RENDERER: RENDERER as any,
+      MIDDLEWARE: MIDDLEWARE as any,
     })
 
-    const apps = new Hono()
+    const routeAndPaths = [
+      {
+        route: '/:lang{en}',
+        paths: ['/en', '/en/foo'],
+      },
+      {
+        route: '/bar/:lang{en}',
+        paths: ['/bar/en', '/bar/en/foo'],
+      },
+      {
+        route: '/bar/buzz/:lang{en}',
+        paths: ['/bar/buzz/en', '/bar/buzz/en/foo'],
+      },
+    ]
 
-    // This is the problematic setup with RegExp pattern
-    apps.route('/:lang{en}', app)
-    apps.route('/', app) // Additional route as mentioned in the original issue
+    routeAndPaths.forEach(({ route, paths }) => {
+      describe(route, () => {
+        const apps = new Hono()
+        // This is the problematic setup with RegExp pattern
+        apps.route(route, app)
+        apps.route('/', app) // Additional route as mentioned in the original issue
 
-    it('Should return rendered index.tsx with _renderer.tsx', async () => {
-      // Test accessing /en (should show both index.tsx and _renderer.tsx)
-      const res = await apps.request('/en')
-      const html = await res.text()
+        paths.forEach((path) => {
+          it(path, async () => {
+            const res = await apps.request(path)
+            const html = await res.text()
+            expect(res.status).toBe(200)
 
-      expect(res.status).toBe(200)
-      expect(html).toContain('index.tsx')
-      expect(html).toContain('_renderer.tsx')
-    })
-
-    it('Should return rendered foo.tsx with _renderer.tsx', async () => {
-      // Test accessing /en/foo
-      const res = await apps.request('/en/foo')
-      const html = await res.text()
-
-      expect(res.status).toBe(200)
-      expect(html).toContain('foo.tsx')
-      expect(html).toContain('_renderer.tsx')
+            // Check which component should be rendered based on the path
+            const expectedComponent = path.endsWith('/foo') ? 'foo.tsx' : 'index.tsx'
+            expect(html).toContain(expectedComponent)
+            expect(html).toContain('_renderer.tsx')
+            expect(res.headers.get('x-message')).toBe('from middleware')
+          })
+        })
+      })
     })
   })
 
-  describe('Optional parameter mounting (/:lang?)', () => {
+  describe('Optional parameter mounting', () => {
     // Reproduce the scenario where parent app uses optional parameter routing
     const app = createApp({
       root: '../mocks/app-with-mount-patterns/routes',
       ROUTES: ROUTES as any,
       RENDERER: RENDERER as any,
+      MIDDLEWARE: MIDDLEWARE as any,
     })
 
-    const apps = new Hono()
+    const routeAndPaths = [
+      {
+        route: '/:lang?',
+        paths: ['/en', '/en/foo'],
+      },
+      {
+        route: '/bar/:lang?',
+        paths: ['/bar/en', '/bar/en/foo'],
+      },
+      {
+        route: '/bar/buzz/:lang?',
+        paths: ['/bar/buzz/en', '/bar/buzz/en/foo'],
+      },
+    ]
 
-    // This is the problematic setup with optional parameter
-    apps.route('/:lang?', app)
+    routeAndPaths.forEach(({ route, paths }) => {
+      describe(route, () => {
+        const apps = new Hono()
+        // This is the problematic setup with optional parameter
+        apps.route(route, app)
 
-    it('Should return rendered content with _renderer.tsx when using optional parameters', async () => {
-      // Test accessing /en (should show both index.tsx and _renderer.tsx)
-      const res = await apps.request('/en')
-      const html = await res.text()
-      expect(res.status).toBe(200)
-      expect(html).toContain('index.tsx')
-      expect(html).toContain('_renderer.tsx')
-    })
+        paths.forEach((path) => {
+          it(path, async () => {
+            const res = await apps.request(path)
+            const html = await res.text()
+            expect(res.status).toBe(200)
 
-    it('Should return rendered foo.tsx with _renderer.tsx when using optional parameters', async () => {
-      // Test accessing /en/foo
-      const res = await apps.request('/en/foo')
-      const html = await res.text()
-      expect(res.status).toBe(200)
-      expect(html).toContain('foo.tsx')
-      expect(html).toContain('_renderer.tsx')
+            // Check which component should be rendered based on the path
+            const expectedComponent = path.endsWith('/foo') ? 'foo.tsx' : 'index.tsx'
+            expect(html).toContain(expectedComponent)
+            expect(html).toContain('_renderer.tsx')
+            expect(res.headers.get('x-message')).toBe('from middleware')
+          })
+        })
+      })
     })
   })
 })

@@ -181,7 +181,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
 
           // Apply extra middleware for parent routing patterns like /:lang{en} or /:lang?
           const rootPath = dir.replace(rootRegExp, '')
-          const isRootLevel = !rootPath.includes('/') || rootPath === ''
+          const isRootLevel = !rootPath.includes('/')
           const isSimpleStructure = !Object.keys(content).some((f) => f.includes('/'))
 
           if (Object.keys(content).length > 0 && isRootLevel && isSimpleStructure) {
@@ -231,7 +231,8 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         const shouldApply = middlewareDir === dir || dir.startsWith(middlewareDir + '/')
 
         if (middleware.default && shouldApply) {
-          subApp.use(...middleware.default)
+          // Use a dynamic route pattern that matches all paths including root
+          subApp.use('/:*{.+}?', ...middleware.default)
 
           // Track that this middleware has been applied to this directory
           if (!appliedMiddlewaresByDirectory.has(dir)) {
