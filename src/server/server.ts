@@ -67,6 +67,12 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   // Key: directory path, Value: Set of middleware file paths applied to that directory
   const appliedMiddlewaresByDirectory = new Map<string, Set<string>>()
 
+  // Track responses that have already been processed by 404 handler to prevent double execution
+  const processedNotFoundResponses = new WeakSet<Response>()
+
+  // Track requests that have been processed by each renderer to prevent double execution
+  const processedRendererRequests = new WeakMap<MiddlewareHandler, WeakSet<Request>>()
+
   // Share context by AsyncLocalStorage
   app.use(async function ShareContext(c, next) {
     await contextStorage.run(c, () => next())
@@ -128,13 +134,14 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
       if (notFoundHandler) {
         subApp.use(async (c, next) => {
           await next()
-          if (c.res.status === 404) {
+          if (c.res.status === 404 && !processedNotFoundResponses.has(c.res)) {
             const notFoundResponse = await notFoundHandler(c)
             const res = new Response(notFoundResponse.body, {
               status: 404,
               headers: notFoundResponse.headers,
             })
             c.res = res
+            processedNotFoundResponses.add(c.res)
           }
         })
       }
@@ -177,7 +184,22 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         }
         const rendererDefault = renderer.default
         if (rendererDefault) {
-          subApp.use('*', rendererDefault)
+          // Get or create WeakSet for this renderer
+          if (!processedRendererRequests.has(rendererDefault)) {
+            processedRendererRequests.set(rendererDefault, new WeakSet<Request>())
+          }
+          const processedRequests = processedRendererRequests.get(rendererDefault)!
+
+          // Wrap renderer to check if already processed
+          const wrappedRenderer = createMiddleware(async (c, next) => {
+            if (!processedRequests.has(c.req.raw)) {
+              processedRequests.add(c.req.raw)
+              return rendererDefault(c, next)
+            }
+            return next()
+          })
+
+          subApp.use('*', wrappedRenderer)
 
           // Apply extra middleware for parent routing patterns like /:lang{en} or /:lang?
           const rootPath = dir.replace(rootRegExp, '')
@@ -185,11 +207,11 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           const isSimpleStructure = !Object.keys(content).some((f) => f.includes('/'))
 
           if (Object.keys(content).length > 0 && isRootLevel && isSimpleStructure) {
-            subApp.use('/', rendererDefault)
+            subApp.use('/', wrappedRenderer)
             Object.keys(content).forEach((filename) => {
               const path = filePathToPath(filename)
               if (path !== '/' && !path.includes('[') && !path.includes('*')) {
-                subApp.use(path, rendererDefault)
+                subApp.use(path, wrappedRenderer)
               }
             })
           }
@@ -320,7 +342,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
     const subApp = new Hono<{
       Variables: Variables
     }>()
-    applyNotFound(subApp, dir, notFoundMap)
+    applyNotFound(subApp, dir, notFoundMap, processedNotFoundResponses)
     const rootPath = getRootPath(dir)
     app.route(rootPath, subApp)
   }
@@ -344,7 +366,8 @@ function applyNotFound(
     Variables: Variables
   }>,
   dir: string,
-  map: Record<string, Record<string, NotFoundFile>>
+  map: Record<string, Record<string, NotFoundFile>>,
+  processedNotFoundResponses: WeakSet<Response>
 ) {
   for (const [mapDir, content] of Object.entries(map)) {
     if (dir === mapDir) {
@@ -358,9 +381,13 @@ function applyNotFound(
             return next()
           })
         }
-        app.get('*', (c) => {
-          c.status(404)
-          return notFoundHandler(c)
+        app.get('*', async (c, next) => {
+          await next()
+          if (processedNotFoundResponses.has(c.res)) {
+            c.status(404)
+            processedNotFoundResponses.add(c.res)
+            c.res = await notFoundHandler(c)
+          }
         })
       }
     }

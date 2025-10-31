@@ -10,11 +10,15 @@ describe('Basic', () => {
   const NOT_FOUND = import.meta.glob('../mocks/app/routes/**/_404.(ts|tsx)', {
     eager: true,
   })
+  const RENDERER = import.meta.glob('../mocks/app/routes/**/_renderer.(ts|tsx)', {
+    eager: true,
+  })
 
   const app = createApp({
     root: '../mocks/app/routes',
     ROUTES: ROUTES as any,
     NOT_FOUND: NOT_FOUND as any,
+    RENDERER: RENDERER as any,
     init: (app) => {
       app.use('*', poweredBy())
     },
@@ -106,7 +110,7 @@ describe('Basic', () => {
         method: 'GET',
       },
     ]
-    expect(app.routes).toHaveLength(52)
+    expect(app.routes).toHaveLength(69)
     expect(app.routes).toEqual(
       expect.arrayContaining(
         routes.map(({ path, method }) => {
@@ -123,26 +127,30 @@ describe('Basic', () => {
   it('Should return 200 response - / with a Powered By header', async () => {
     const res = await app.request('/')
     expect(res.status).toBe(200)
-    expect(await res.text()).toBe('<h1>Hello</h1>')
+    expect(await res.text()).toContain('<h1>Hello</h1>')
     expect(res.headers.get('x-powered-by'), 'Hono')
   })
 
   it('Should return 404 response - /foo', async () => {
     const res = await app.request('/foo')
+    expect(res.headers.get('HeaderFrom404')).toBe('Hi')
+    expect(res.headers.get('HeaderFromRenderer')).toBe('Hi')
     expect(res.status).toBe(404)
   })
 
   it('Should return custom 404 response - /not-found', async () => {
     const res = await app.request('/not-found')
     expect(res.status).toBe(404)
-    expect(await res.text()).toBe('<h1>Not Found</h1>')
+    expect(res.headers.get('HeaderFrom404')).toBe('Hi')
+    expect(res.headers.get('HeaderFromRenderer')).toBe('Hi')
+    expect(await res.text()).toContain('<h1>Not Found</h1>')
   })
 
   it('Should return 200 response - /about/me', async () => {
     const res = await app.request('/about/me')
     expect(res.status).toBe(200)
     // hono/jsx escape a single quote to &#39;
-    expect(await res.text()).toBe('<p>It&#39;s me</p><b>My name is me</b>')
+    expect(await res.text()).toContain('<p>It&#39;s me</p><b>My name is me</b>')
   })
 
   it('Should return 200 response - POST /about/me', async () => {
@@ -155,19 +163,19 @@ describe('Basic', () => {
   it('Should return 200 response - GET /fc', async () => {
     const res = await app.request('/fc')
     expect(res.status).toBe(200)
-    expect(await res.text()).toBe('<h1>Function from /fc</h1>')
+    expect(await res.text()).toContain('<h1>Function from /fc</h1>')
   })
 
   it('Should not determined as an island component - GET /non-interactive', async () => {
     const res = await app.request('/non-interactive')
     expect(res.status).toBe(200)
-    expect(await res.text()).toBe('<p>Not Island</p>')
+    expect(await res.text()).toContain('<p>Not Island</p>')
   })
 
   it('Should render MDX content - /post', async () => {
     const res = await app.request('/post')
     expect(res.status).toBe(200)
-    expect(await res.text()).toBe('<h1>Hello MDX</h1>')
+    expect(await res.text()).toContain('<h1>Hello MDX</h1>')
   })
 
   it('Should return 500 response - /throw_error', async () => {
