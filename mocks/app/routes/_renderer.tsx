@@ -1,6 +1,6 @@
+import { createMiddleware } from 'hono/factory'
 import { jsxRenderer } from 'hono/jsx-renderer'
 import { HasIslands } from '../../../src/server'
-import { createMiddleware } from 'hono/factory'
 
 const middleware = createMiddleware(async (c, next) => {
   c.res.headers.append('HeaderFromRenderer', 'Hi')
