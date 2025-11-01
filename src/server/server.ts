@@ -73,6 +73,9 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   // Track requests that have been processed by each renderer to prevent double execution
   const processedRendererRequests = new WeakMap<MiddlewareHandler, WeakSet<Request>>()
 
+  // Track requests that have been processed by each middleware to prevent double execution
+  const processedMiddlewareRequests = new WeakMap<MiddlewareHandler, WeakSet<Request>>()
+
   // Share context by AsyncLocalStorage
   app.use(async function ShareContext(c, next) {
     await contextStorage.run(c, () => next())
@@ -174,6 +177,23 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         )
       }
 
+      // Helper function to apply extra handlers for parent routing patterns like /:lang{en} or /:lang?
+      const applyExtraHandlersForRouting = (handlers: MiddlewareHandler[]) => {
+        const rootPath = dir.replace(rootRegExp, '')
+        const isRootLevel = !rootPath.includes('/')
+        const isSimpleStructure = !Object.keys(content).some((f) => f.includes('/'))
+
+        if (Object.keys(content).length > 0 && isRootLevel && isSimpleStructure) {
+          subApp.use('/', ...handlers)
+          Object.keys(content).forEach((filename) => {
+            const path = filePathToPath(filename)
+            if (path !== '/' && !path.includes('[') && !path.includes('*')) {
+              subApp.use(path, ...handlers)
+            }
+          })
+        }
+      }
+
       // Apply renderer middleware more robustly to handle all routing scenarios
       const rendererPaths = getPaths(dir, rendererList)
       rendererPaths.map((path) => {
@@ -202,19 +222,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
           subApp.use('*', wrappedRenderer)
 
           // Apply extra middleware for parent routing patterns like /:lang{en} or /:lang?
-          const rootPath = dir.replace(rootRegExp, '')
-          const isRootLevel = !rootPath.includes('/')
-          const isSimpleStructure = !Object.keys(content).some((f) => f.includes('/'))
-
-          if (Object.keys(content).length > 0 && isRootLevel && isSimpleStructure) {
-            subApp.use('/', wrappedRenderer)
-            Object.keys(content).forEach((filename) => {
-              const path = filePathToPath(filename)
-              if (path !== '/' && !path.includes('[') && !path.includes('*')) {
-                subApp.use(path, wrappedRenderer)
-              }
-            })
-          }
+          applyExtraHandlersForRouting([wrappedRenderer])
         }
       })
 
@@ -253,8 +261,28 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
         const shouldApply = middlewareDir === dir || dir.startsWith(middlewareDir + '/')
 
         if (middleware.default && shouldApply) {
-          // Use a dynamic route pattern that matches all paths including root
-          subApp.use('/:*{.+}?', ...middleware.default)
+          // Wrap each middleware to check if already processed
+          const wrappedMiddleware = middleware.default.map((mw) => {
+            // Get or create WeakSet for this specific middleware
+            if (!processedMiddlewareRequests.has(mw)) {
+              processedMiddlewareRequests.set(mw, new WeakSet<Request>())
+            }
+            const processedRequests = processedMiddlewareRequests.get(mw)!
+
+            return createMiddleware(async (c, next) => {
+              if (!processedRequests.has(c.req.raw)) {
+                processedRequests.add(c.req.raw)
+                return mw(c, next)
+              }
+              return next()
+            })
+          })
+
+          // Use a wildcard pattern that matches all paths including root
+          subApp.use('*', ...wrappedMiddleware)
+
+          // Apply extra middleware for parent routing patterns like /:lang{en} or /:lang?
+          applyExtraHandlersForRouting(wrappedMiddleware)
 
           // Track that this middleware has been applied to this directory
           if (!appliedMiddlewaresByDirectory.has(dir)) {

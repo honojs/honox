@@ -1166,4 +1166,28 @@ describe('Renderer loading when mounted with special route patterns', () => {
       })
     })
   })
+
+  describe('Path parameter pattern mounting (/:lang', () => {
+    const app = createApp({
+      root: '../mocks/app-with-mount-patterns/routes',
+      ROUTES: ROUTES as any,
+      RENDERER: RENDERER as any,
+      MIDDLEWARE: MIDDLEWARE as any,
+    })
+
+    describe('_middleware.ts execution when 404', () => {
+      const apps = new Hono()
+      apps.route('/:lang', app)
+
+      const paths = ['/bar/', '/bar/buzz']
+
+      paths.forEach((path) => {
+        test(path, async () => {
+          const res = await apps.request(path)
+          expect(res.status).toBe(404)
+          expect(res.headers.get('x-message')).toBe('from middleware')
+        })
+      })
+    })
+  })
 })
