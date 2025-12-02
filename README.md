@@ -1049,6 +1049,61 @@ export default defineConfig({
 
 This disables Vite's optimization of `process.env`, allowing your built application to access environment variables as expected. For more details, see [issue #307](https://github.com/honojs/honox/issues/307#issuecomment-3179529432).
 
+## Testing
+
+### Integration tests
+
+Integration tests in HonoX are intended to exercise the application using `app.request()` against a Hono instance created by `createApp()` and assert the responses. These tests are useful for validating the behavior of routing, middleware, renderers, 404 pages, and other features.
+
+HonoX depends on several Vite-specific extensions internally. For this reason, we recommend running integration tests with Vitest, a test runner that integrates closely with Vite. Other test runners should only be used if they provide compatibility with Vite.
+
+If your project doesn't already include Vitest, install it as a development dependency:
+
+```sh
+npm install -D vitest
+```
+
+Here is a minimal example showing how you can write integration tests with Vitest:
+
+```ts
+// tests/integration/index.test.ts
+import { describe, expect, it } from 'vitest'
+import { createApp } from 'honox/server'
+
+const app = createApp()
+
+describe('Top page', () => {
+  it("should return 'Hello, Hono!' when name query param is 'Hono'", async () => {
+    const res = await app.request('/?name=Hono')
+    const text = await res.text()
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toMatch(/text\/html/)
+    expect(text).toMatch(/<h1[^>]*>\s*Hello, Hono!\s*<\/h1>/)
+  })
+})
+```
+
+You can run the tests with the following command:
+
+```sh
+npx vitest run
+```
+
+When a `vitest.config` file is present, Vitest will take precedence and override settings from `vite.config`. If you add Vitest-specific configuration, make sure to merge it with your Vite configuration. See [Configuring Vitest | Vitest](https://vitest.dev/config/) for more details.
+
+```ts
+// vitest.config.ts
+import { defineConfig, mergeConfig } from 'vitest/config'
+import viteConfig from './vite.config'
+
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    // Your Vitest-specific configuration here
+  })
+)
+```
+
 ## Examples
 
 - https://github.com/yusukebe/honox-examples
