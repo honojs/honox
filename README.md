@@ -373,7 +373,7 @@ createClient()
 
 ### Interactions
 
-If you want to add interactions to your page, create Island components. Islands components should be:
+If you want to add interactions to your page, create Island components. Island components should be:
 
 - Placed under `app/islands` directory or named with `$` prefix like `$componentName.tsx`.
 - It should be exported as a `default` or a proper component name that uses camel case but does not contain `_` and is not all uppercase.
@@ -545,7 +545,7 @@ Adjust `tsconfig.json` jsx factory function option.
 
 #### Use React with `<Script />`
 
-If you export a manifest file in `dist/.vite/manifest.json`, you can easily write some codes using `<Script />`.
+If you export a manifest file in `dist/.vite/manifest.json`, you can easily write some code using `<Script />`.
 
 ```tsx
 // app/routes/_renderer.tsx
