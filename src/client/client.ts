@@ -12,6 +12,7 @@ import type {
   HydrateComponent,
   TriggerHydration,
 } from '../types.js'
+import { filterByPattern } from './utils/filter.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FileCallback = () => Promise<Record<string, Promise<any>>>
@@ -35,11 +36,20 @@ export type ClientOptions = {
 }
 
 export const createClient = async (options?: ClientOptions) => {
-  const FILES = options?.ISLAND_FILES ?? {
-    ...import.meta.glob('/app/islands/**/[a-zA-Z0-9-]+.tsx'),
-    ...import.meta.glob('/app/**/_[a-zA-Z0-9-]+.island.tsx'),
-    ...import.meta.glob('/app/**/$[a-zA-Z0-9-]+.tsx'),
-  }
+  const FILES =
+    options?.ISLAND_FILES ??
+    filterByPattern(
+      {
+        ...import.meta.glob('/app/islands/**/*.tsx'),
+        ...import.meta.glob('/app/**/*.island.tsx'),
+        ...import.meta.glob('/app/**/$*.tsx'),
+      },
+      [
+        /\/[a-zA-Z0-9-]+\.tsx$/, // /app/islands/**/*.tsx
+        /\/_[a-zA-Z0-9-]+\.island\.tsx$/, // /app/**/_*.island.tsx
+        /\/\$[a-zA-Z0-9-]+\.tsx$/, // /app/**/$*.tsx
+      ]
+    )
 
   const hydrateComponent: HydrateComponent = async (document) => {
     const filePromises = Object.keys(FILES).map(async (filePath) => {
