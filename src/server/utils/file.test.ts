@@ -25,7 +25,7 @@ describe('filePathToPath', () => {
     expect(filePathToPath('/about/me/address.tsx')).toBe('/about/me/address')
 
     expect(filePathToPath('/about/[name].tsx')).toBe('/about/:name')
-    expect(filePathToPath('/about/[...foo].tsx')).toBe('/about/*')
+    expect(filePathToPath('/about/[...foo].tsx')).toBe('/about/:foo{.+}')
     expect(filePathToPath('/about/[name]/address.tsx')).toBe('/about/:name/address')
     expect(filePathToPath('/about/[arg1]/[arg2]')).toBe('/about/:arg1/:arg2')
 
