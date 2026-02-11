@@ -55,7 +55,7 @@ export async function injectImportingIslands(
 
       const childDeps = await Promise.all(
         currentFileDeps.map(async (file) => {
-          const resolvedId = await resolve(file, baseFile)
+          const resolvedId = await resolve(file, depPath)
           return await walkDependencyTree(depPath, resolve, resolvedId ?? file)
         })
       )
