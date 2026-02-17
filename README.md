@@ -2,7 +2,7 @@
 
 **HonoX** is a simple and fast meta-framework for creating full-stack websites or Web APIs - (formerly _[Sonik](https://github.com/sonikjs/sonik)_). It stands on the shoulders of giants; built on [Hono](https://hono.dev/), [Vite](https://vitejs.dev/), and UI libraries.
 
-**Note**: _HonoX is currently in the "alpha stage". Breaking changes are introduced without following semantic versioning._
+**Note**: _HonoX is currently in the "alpha stage". Breaking changes are introduced within the same major version, following [semantic versioning for zerover](https://semver.org/#spec-item-4)._
 
 ## Features
 
