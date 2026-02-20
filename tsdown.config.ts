@@ -16,7 +16,7 @@ export default defineConfig({
   clean: true,
   target: false,
   external: ['fsevents', 'vite'],
-  fixedExtension:false,
+  fixedExtension: false,
   globImport: false,
-  exports: true
+  exports: true,
 })
