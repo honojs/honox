@@ -71,9 +71,6 @@
       "client": [
         "./dist/client"
       ],
-      "utils/*": [
-        "./dist/utils/*"
-      ],
       "vite": [
         "./dist/vite"
       ],
