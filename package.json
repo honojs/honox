@@ -1,7 +1,6 @@
 {
   "name": "honox",
   "version": "0.1.54",
-  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "prepare": "tsdown",
@@ -25,46 +24,35 @@
     "dist"
   ],
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./types": {
-      "types": "./dist/types.d.ts",
-      "import": "./dist/types.js"
-    },
-    "./factory": {
-      "types": "./dist/factory/index.d.ts",
-      "import": "./dist/factory/index.js"
-    },
-    "./server": {
-      "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.js"
-    },
-    "./server/base": {
-      "types": "./dist/server/base.d.ts",
-      "import": "./dist/server/base.js"
-    },
-    "./client": {
-      "types": "./dist/client/index.d.ts",
-      "import": "./dist/client/index.js"
-    },
-    "./utils/*": {
-      "types": "./dist/utils/*.d.ts",
-      "import": "./dist/utils/*.js"
-    },
-    "./vite": {
-      "types": "./dist/vite/index.d.ts",
-      "import": "./dist/vite/index.js"
-    },
-    "./vite/client": {
-      "types": "./dist/vite/client.d.ts",
-      "import": "./dist/vite/client.js"
-    },
-    "./vite/components": {
-      "types": "./dist/vite/components/index.d.ts",
-      "import": "./dist/vite/components/index.js"
-    }
+    ".": "./dist/index.js",
+    "./client": "./dist/client/index.js",
+    "./client/client": "./dist/client/client.js",
+    "./client/runtime": "./dist/client/runtime.js",
+    "./client/utils/filter": "./dist/client/utils/filter.js",
+    "./constants": "./dist/constants.js",
+    "./factory": "./dist/factory/index.js",
+    "./factory/factory": "./dist/factory/factory.js",
+    "./server": "./dist/server/index.js",
+    "./server/base": "./dist/server/base.js",
+    "./server/components": "./dist/server/components/index.js",
+    "./server/components/has-islands": "./dist/server/components/has-islands.js",
+    "./server/components/link": "./dist/server/components/link.js",
+    "./server/components/script": "./dist/server/components/script.js",
+    "./server/context-storage": "./dist/server/context-storage.js",
+    "./server/server": "./dist/server/server.js",
+    "./server/utils/file": "./dist/server/utils/file.js",
+    "./server/utils/path": "./dist/server/utils/path.js",
+    "./server/with-defaults": "./dist/server/with-defaults.js",
+    "./types": "./dist/types.js",
+    "./vite": "./dist/vite/index.js",
+    "./vite/client": "./dist/vite/client.js",
+    "./vite/components": "./dist/vite/components/index.js",
+    "./vite/components/honox-island": "./dist/vite/components/honox-island.js",
+    "./vite/inject-importing-islands": "./dist/vite/inject-importing-islands.js",
+    "./vite/island-components": "./dist/vite/island-components.js",
+    "./vite/restart-on-add-unlink": "./dist/vite/restart-on-add-unlink.js",
+    "./vite/utils/path": "./dist/vite/utils/path.js",
+    "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
