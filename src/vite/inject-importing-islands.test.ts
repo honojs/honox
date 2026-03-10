@@ -1,8 +1,8 @@
 import fs from 'fs/promises'
 import os from 'os'
 import path from 'path'
-import { injectImportingIslands } from './inject-importing-islands'
 import { IMPORTING_ISLANDS_ID } from '../constants'
+import { injectImportingIslands } from './inject-importing-islands'
 
 describe('injectImportingIslands', () => {
   let tmpDir: string
