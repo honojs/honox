@@ -4,7 +4,7 @@ export const filePathToPath = (filePath: string) => {
     .replace(/\.mdx?$/g, '')
     .replace(/^\/?index$/, '/') // `/index`
     .replace(/\/index$/, '') // `/about/index`
-    .replace(/\[\.{3}.+\]/, '*')
+    .replace(/\[\.{3}(.+?)\]/, ':$1{.+}')
     .replace(/\((.+?)\)/g, '')
     .replace(/\[(.+?)\]/g, ':$1')
     .replace(/\/\/+/g, '/')

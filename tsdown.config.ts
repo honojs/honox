@@ -1,5 +1,5 @@
 import { glob } from 'glob'
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsdown'
 
 const entryPoints = glob.sync('./src/**/*.+(ts|tsx|json)', {
   posix: true,
@@ -9,9 +9,14 @@ const entryPoints = glob.sync('./src/**/*.+(ts|tsx|json)', {
 export default defineConfig({
   entry: entryPoints,
   dts: true,
-  splitting: false,
   minify: false,
   format: ['esm'],
-  bundle: false,
+  unbundle: true,
   platform: 'node',
+  clean: true,
+  target: false,
+  external: ['fsevents', 'vite'],
+  fixedExtension: false,
+  globImport: false,
+  exports: true,
 })
