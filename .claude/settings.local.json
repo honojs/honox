@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue:*)",
+      "Bash(git stash:*)",
+      "Bash(npx vitest:*)"
+    ]
+  }
+}
