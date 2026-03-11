@@ -1104,6 +1104,34 @@ export default mergeConfig(
 )
 ```
 
+## Development
+
+### Wrangler Bindings and Variables
+
+If you use a `wrangler.toml` file to declare Bindings (Such as a D1 Database) and Variables , these can be used in your HonoX application during local development (with the `vite` command) with a small change to your vite.config.ts file.
+
+Import the `getPlatformProxy` function from the `wrangler` package and use it to get the environment variables and dispose function. Then, pass the environment variables to your HonoX application devServer configuration.
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import { getPlatformProxy } from 'wrangler'
+
+export default defineConfig(async () => {
+  const { env, dispose } = await getPlatformProxy()
+  return {
+    plugins: [
+      honox({
+        devServer: {
+          env,
+          plugins: [{ onServerClose: dispose }],
+        },
+      }),
+    ],
+  }
+})
+```
+
 ## Examples
 
 - https://github.com/yusukebe/honox-examples
@@ -1120,3 +1148,4 @@ export default mergeConfig(
 ## License
 
 MIT
+
