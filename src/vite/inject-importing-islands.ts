@@ -3,7 +3,7 @@ import _generate from '@babel/generator'
 import { parse } from '@babel/parser'
 import precinct from 'precinct'
 import { normalizePath } from 'vite'
-import type { Plugin, ResolvedConfig } from 'vite'
+import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite'
 import { readFile } from 'fs/promises'
 import path from 'path'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
@@ -30,14 +30,15 @@ export async function injectImportingIslands(
   let root = ''
   let config: ResolvedConfig
   const resolvedCache = new Map<string, true>()
-  const cache: Record<string, string> = {}
+  const cache = new Map<string, string>()
   const depTreeCache = new Map<string, string[]>()
 
   const walkDependencyTree: (
     baseFile: string,
     resolve: (path: string, importer?: string) => Promise<ResolvedId | null>,
-    dependencyFile?: ResolvedId | string
-  ) => Promise<string[]> = async (baseFile: string, resolve, dependencyFile?) => {
+    dependencyFile?: ResolvedId | string,
+    seen?: Set<string>
+  ) => Promise<string[]> = async (baseFile: string, resolve, dependencyFile?, seen = new Set()) => {
     const depPath = dependencyFile
       ? typeof dependencyFile === 'string'
         ? path.join(path.dirname(baseFile), dependencyFile) + '.tsx'
@@ -48,21 +49,25 @@ export async function injectImportingIslands(
       return depTreeCache.get(depPath)!
     }
 
+    if (seen.has(depPath)) {
+      return [depPath]
+    }
     const deps = [depPath]
+    const nextSeen = new Set(seen).add(depPath)
 
     try {
-      if (!cache[depPath]) {
-        cache[depPath] = (await readFile(depPath, { flag: '' })).toString()
+      if (!cache.has(depPath)) {
+        cache.set(depPath, (await readFile(depPath, { flag: '' })).toString())
       }
 
-      const currentFileDeps = precinct(cache[depPath], {
+      const currentFileDeps = precinct(cache.get(depPath)!, {
         type: 'tsx',
       }) as string[]
 
       const childDeps = await Promise.all(
         currentFileDeps.map(async (file) => {
           const resolvedId = await resolve(file, depPath)
-          return await walkDependencyTree(depPath, resolve, resolvedId ?? file)
+          return await walkDependencyTree(depPath, resolve, resolvedId ?? file, nextSeen)
         })
       )
       deps.push(...childDeps.flat())
@@ -73,8 +78,23 @@ export async function injectImportingIslands(
     return deps
   }
 
+  const clearCaches = () => {
+    resolvedCache.clear()
+    cache.clear()
+    depTreeCache.clear()
+  }
+
   return {
     name: 'inject-importing-islands',
+    buildStart() {
+      clearCaches()
+    },
+    configureServer(server: ViteDevServer) {
+      server.watcher.on('change', clearCaches)
+    },
+    watchChange() {
+      clearCaches()
+    },
     configResolved: async (resolveConfig) => {
       config = resolveConfig
       appPath = path.join(config.root, options?.appDir ?? '/app')

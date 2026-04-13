@@ -207,4 +207,56 @@ describe('injectImportingIslands', () => {
     expect(result).not.toBeUndefined()
     expect(result.code).toContain(IMPORTING_ISLANDS_ID)
   })
+  it('should clear dependency caches between builds', async () => {
+    const componentPath = await createFile(
+      'app/components/toggle.tsx',
+      `
+      export default function Toggle() {
+        return <div>plain</div>
+      }
+    `
+    )
+
+    await createFile(
+      'app/components/$counter.tsx',
+      `
+      export default function Counter() {
+        return <div>counter</div>
+      }
+    `
+    )
+
+    const routePath = await createFile(
+      'app/routes/cache.tsx',
+      `
+      import Toggle from "../components/toggle.tsx"
+      export default function Page() {
+        return <Toggle />
+      }
+    `
+    )
+
+    const routeSource = await fs.readFile(routePath, 'utf-8')
+    const plugin = await setupPlugin()
+
+    const firstResult = await callTransform(plugin, routePath, routeSource)
+    expect(firstResult).toBeUndefined()
+
+    await fs.writeFile(
+      componentPath,
+      `
+      import Counter from "./$counter.tsx"
+      export default function Toggle() {
+        return <Counter />
+      }
+    `
+    )
+
+    const buildStart = plugin.buildStart as Function
+    await buildStart()
+
+    const secondResult = await callTransform(plugin, routePath, routeSource)
+    expect(secondResult).not.toBeUndefined()
+    expect(secondResult.code).toContain(IMPORTING_ISLANDS_ID)
+  })
 })
