@@ -731,6 +731,30 @@ In this example, `routes/posts.tsx` is routed to `/posts`, but other items start
 
 This feature is useful for colocation.
 
+### Excluding Directories from Island Detection
+
+HonoX walks the dependency tree of each route file to detect island component imports. By default this includes `node_modules`, which allows island components shipped in npm packages to be detected automatically.
+
+If you don't use island components from npm packages and want to speed up the dependency walk, you can exclude specific directories with the `injectImportingIslands.exclude` option:
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import honox from 'honox/vite'
+
+export default defineConfig({
+  plugins: [
+    honox({
+      injectImportingIslands: {
+        exclude: ['node_modules'],
+      },
+    }),
+  ],
+})
+```
+
+Any dependency path containing one of the strings in `exclude` will be skipped during the tree walk.
+
 ### Using Tailwind CSS
 
 Given that HonoX is Vite-centric, if you wish to utilize [Tailwind CSS](https://tailwindcss.com/), basically adhere to [the official instructions](https://tailwindcss.com/docs/installation/using-vite).
