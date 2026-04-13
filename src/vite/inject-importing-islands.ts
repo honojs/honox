@@ -29,8 +29,9 @@ export async function injectImportingIslands(
   const islandDir = options?.islandDir ?? '/app/islands'
   let root = ''
   let config: ResolvedConfig
-  const resolvedCache = new Map()
+  const resolvedCache = new Map<string, true>()
   const cache: Record<string, string> = {}
+  const depTreeCache = new Map<string, string[]>()
 
   const walkDependencyTree: (
     baseFile: string,
@@ -42,6 +43,11 @@ export async function injectImportingIslands(
         ? path.join(path.dirname(baseFile), dependencyFile) + '.tsx'
         : dependencyFile['id']
       : baseFile
+
+    if (depTreeCache.has(depPath)) {
+      return depTreeCache.get(depPath)!
+    }
+
     const deps = [depPath]
 
     try {
@@ -60,11 +66,11 @@ export async function injectImportingIslands(
         })
       )
       deps.push(...childDeps.flat())
-      return deps
     } catch {
       // file does not exist or is a directory
-      return deps
     }
+    depTreeCache.set(depPath, deps)
+    return deps
   }
 
   return {
@@ -91,7 +97,7 @@ export async function injectImportingIslands(
 
       const hasIslandsImport = (
         await Promise.all(
-          (await walkDependencyTree(id, resolve)).flat().map(async (x) => {
+          (await walkDependencyTree(id, resolve)).map(async (x) => {
             const rootPath = '/' + path.relative(root, normalizePath(x)).replace(/\\/g, '/')
             return matchIslandComponentId(rootPath, islandDir)
           })
