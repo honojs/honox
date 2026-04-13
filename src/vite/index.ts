@@ -5,6 +5,7 @@ import path from 'path'
 import type { ClientOptions } from './client.js'
 import client from './client.js'
 import { injectImportingIslands } from './inject-importing-islands.js'
+import type { InjectImportingIslandsOptions } from './inject-importing-islands.js'
 import { islandComponents } from './island-components.js'
 import type { IslandComponentsOptions } from './island-components.js'
 import { restartOnAddUnlink } from './restart-on-add-unlink.js'
@@ -14,6 +15,7 @@ type Options = {
   entry?: string
   devServer?: DevServerOptions
   islandComponents?: IslandComponentsOptions
+  injectImportingIslands?: InjectImportingIslandsOptions
   client?: ClientOptions
   external?: string[]
 }
@@ -53,7 +55,7 @@ function honox(options?: Options): PluginOption[] {
     plugins.push(islandComponents(options?.islandComponents))
   }
 
-  plugins.push(injectImportingIslands())
+  plugins.push(injectImportingIslands(options?.injectImportingIslands))
   plugins.push(restartOnAddUnlink())
   plugins.push(client(options?.client))
 

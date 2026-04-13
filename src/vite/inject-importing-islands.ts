@@ -13,9 +13,10 @@ import { matchIslandComponentId } from './utils/path.js'
 // @ts-ignore
 const generate = (_generate.default as typeof _generate) ?? _generate
 
-type InjectImportingIslandsOptions = {
+export type InjectImportingIslandsOptions = {
   appDir?: string
   islandDir?: string
+  exclude?: string[]
 }
 
 type ResolvedId = {
@@ -27,11 +28,19 @@ export async function injectImportingIslands(
 ): Promise<Plugin> {
   let appPath = ''
   const islandDir = options?.islandDir ?? '/app/islands'
+  const excludePatterns = (options?.exclude ?? []).map((dir) => {
+    const segments = normalizePath(dir).split('/').filter(Boolean)
+    return '/' + segments.join('/') + '/'
+  })
   let root = ''
   let config: ResolvedConfig
   const resolvedCache = new Map<string, Promise<ResolvedId | null>>()
   const cache = new Map<string, string>()
   const depTreeCache = new Map<string, string[]>()
+
+  const shouldExclude = (depPath: string) => {
+    return excludePatterns.some((pattern) => depPath.includes(pattern))
+  }
 
   const walkDependencyTree: (
     baseFile: string,
@@ -41,12 +50,16 @@ export async function injectImportingIslands(
   ) => Promise<string[]> = async (baseFile: string, resolve, dependencyFile?, seen = new Set()) => {
     const depPath = dependencyFile
       ? typeof dependencyFile === 'string'
-        ? path.join(path.dirname(baseFile), dependencyFile) + '.tsx'
-        : dependencyFile['id']
-      : baseFile
+        ? normalizePath(path.join(path.dirname(baseFile), dependencyFile) + '.tsx')
+        : normalizePath(dependencyFile['id'])
+      : normalizePath(baseFile)
 
     if (depTreeCache.has(depPath)) {
       return depTreeCache.get(depPath)!
+    }
+
+    if (shouldExclude(depPath)) {
+      return []
     }
 
     if (seen.has(depPath)) {
@@ -101,7 +114,9 @@ export async function injectImportingIslands(
       root = config.root
     },
     async transform(sourceCode, id) {
-      if (!path.resolve(id).startsWith(appPath)) {
+      const normalizedId = normalizePath(path.resolve(id))
+
+      if (!normalizedId.startsWith(normalizePath(appPath))) {
         return
       }
 
@@ -120,7 +135,7 @@ export async function injectImportingIslands(
 
       const hasIslandsImport = (
         await Promise.all(
-          (await walkDependencyTree(id, resolve)).map(async (x) => {
+          (await walkDependencyTree(normalizedId, resolve)).map(async (x) => {
             const rootPath = '/' + path.relative(root, normalizePath(x)).replace(/\\/g, '/')
             return matchIslandComponentId(rootPath, islandDir)
           })

@@ -3,6 +3,7 @@ import os from 'os'
 import path from 'path'
 import { IMPORTING_ISLANDS_ID } from '../constants'
 import { injectImportingIslands } from './inject-importing-islands'
+import honox from './index'
 
 describe('injectImportingIslands', () => {
   let tmpDir: string
@@ -14,15 +15,59 @@ describe('injectImportingIslands', () => {
     return fullPath
   }
 
-  const setupPlugin = async () => {
-    const plugin = await injectImportingIslands({
-      appDir: '/app',
-    })
+  const resolveContext = {
+    resolve: async (importee: string, importer?: string) => {
+      // Simulate Vite's resolve: resolve relative paths based on importer
+      if (importee.startsWith('.')) {
+        const base = importer ? path.dirname(importer) : tmpDir
+        const resolved = path.resolve(base, importee)
+        // Try with .tsx extension if not already present
+        const candidates = [resolved, resolved + '.tsx', resolved + '.ts']
+        for (const candidate of candidates) {
+          try {
+            await fs.access(candidate)
+            return { id: candidate }
+          } catch {
+            // continue
+          }
+        }
+      }
+      return null
+    },
+  }
 
+  const configurePlugin = async (plugin: Awaited<ReturnType<typeof injectImportingIslands>>) => {
     // Simulate configResolved
     const configResolved = plugin.configResolved as Function
     await configResolved({ root: tmpDir })
+  }
 
+  const setupPlugin = async (options?: Parameters<typeof injectImportingIslands>[0]) => {
+    const plugin = await injectImportingIslands({
+      appDir: '/app',
+      ...options,
+    })
+
+    await configurePlugin(plugin)
+
+    return plugin
+  }
+
+  const setupPluginFromHonox = async (options?: Parameters<typeof honox>[0]) => {
+    const plugins = await Promise.all(honox(options).map((plugin) => plugin))
+    const plugin = plugins.find(
+      (candidate): candidate is Awaited<ReturnType<typeof injectImportingIslands>> =>
+        typeof candidate === 'object' &&
+        candidate !== null &&
+        'name' in candidate &&
+        candidate.name === 'inject-importing-islands'
+    )
+
+    if (!plugin) {
+      throw new Error('inject-importing-islands plugin not found')
+    }
+
+    await configurePlugin(plugin)
     return plugin
   }
 
@@ -32,27 +77,7 @@ describe('injectImportingIslands', () => {
     sourceCode: string
   ) => {
     const transform = plugin.transform as Function
-    const context = {
-      resolve: async (importee: string, importer?: string) => {
-        // Simulate Vite's resolve: resolve relative paths based on importer
-        if (importee.startsWith('.')) {
-          const base = importer ? path.dirname(importer) : tmpDir
-          const resolved = path.resolve(base, importee)
-          // Try with .tsx extension if not already present
-          const candidates = [resolved, resolved + '.tsx', resolved + '.ts']
-          for (const candidate of candidates) {
-            try {
-              await fs.access(candidate)
-              return { id: candidate }
-            } catch {
-              // continue
-            }
-          }
-        }
-        return null
-      },
-    }
-    return await transform.call(context, sourceCode, filePath)
+    return await transform.call(resolveContext, sourceCode, filePath)
   }
 
   beforeEach(async () => {
@@ -330,5 +355,116 @@ describe('injectImportingIslands', () => {
 
     expect(result).not.toBeUndefined()
     expect(result.code).toContain(IMPORTING_ISLANDS_ID)
+  })
+
+  it('should skip excluded directories during island detection', async () => {
+    await createFile(
+      'node_modules/pkg/$counter.tsx',
+      `
+      export default function Counter() {
+        return <div>counter</div>
+      }
+    `
+    )
+
+    await createFile(
+      'app/components/from-package.tsx',
+      `
+      import Counter from "../../node_modules/pkg/$counter.tsx"
+      export default function FromPackage() {
+        return <Counter />
+      }
+    `
+    )
+
+    const routePath = await createFile(
+      'app/routes/exclude.tsx',
+      `
+      import FromPackage from "../components/from-package.tsx"
+      export default function Page() {
+        return <FromPackage />
+      }
+    `
+    )
+
+    const routeSource = await fs.readFile(routePath, 'utf-8')
+    const plugin = await setupPlugin({
+      exclude: ['node_modules'],
+    })
+    const result = await callTransform(plugin, routePath, routeSource)
+
+    expect(result).toBeUndefined()
+  })
+
+  it('should not exclude partial directory name matches', async () => {
+    await createFile(
+      'app/components-old/$counter.tsx',
+      `
+      export default function Counter() {
+        return <div>counter</div>
+      }
+    `
+    )
+
+    const routePath = await createFile(
+      'app/routes/partial-match.tsx',
+      `
+      import Counter from "../components-old/$counter.tsx"
+      export default function Page() {
+        return <Counter />
+      }
+    `
+    )
+
+    const routeSource = await fs.readFile(routePath, 'utf-8')
+    const plugin = await setupPlugin({
+      exclude: ['components'],
+    })
+    const result = await callTransform(plugin, routePath, routeSource)
+
+    expect(result).not.toBeUndefined()
+    expect(result.code).toContain(IMPORTING_ISLANDS_ID)
+  })
+
+  it('should pass injectImportingIslands options through honox', async () => {
+    await createFile(
+      'node_modules/pkg/$counter.tsx',
+      `
+      export default function Counter() {
+        return <div>counter</div>
+      }
+    `
+    )
+
+    await createFile(
+      'app/components/from-package.tsx',
+      `
+      import Counter from "../../node_modules/pkg/$counter.tsx"
+      export default function FromPackage() {
+        return <Counter />
+      }
+    `
+    )
+
+    const routePath = await createFile(
+      'app/routes/honox.tsx',
+      `
+      import FromPackage from "../components/from-package.tsx"
+      export default function Page() {
+        return <FromPackage />
+      }
+    `
+    )
+
+    const routeSource = await fs.readFile(routePath, 'utf-8')
+    const plugin = await setupPluginFromHonox({
+      injectImportingIslands: {
+        appDir: '/app',
+        exclude: ['node_modules'],
+      },
+    })
+    const result = await callTransform(plugin, routePath, routeSource)
+
+    expect(result).toBeUndefined()
   })
 })
