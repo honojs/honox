@@ -259,4 +259,76 @@ describe('injectImportingIslands', () => {
     expect(secondResult).not.toBeUndefined()
     expect(secondResult.code).toContain(IMPORTING_ISLANDS_ID)
   })
+  it('should cache resolutions per importer', async () => {
+    await createFile(
+      'app/components/a/shared.tsx',
+      `
+      export default function Shared() {
+        return <div>plain</div>
+      }
+    `
+    )
+
+    await createFile(
+      'app/components/a/wrapper.tsx',
+      `
+      import Shared from "./shared"
+      export default function WrapperA() {
+        return <Shared />
+      }
+    `
+    )
+
+    await createFile(
+      'app/components/b/$counter.tsx',
+      `
+      export default function Counter() {
+        return <div>counter</div>
+      }
+    `
+    )
+
+    await createFile(
+      'app/components/b/shared.tsx',
+      `
+      import Counter from "./$counter"
+      export default function Shared() {
+        return <Counter />
+      }
+    `
+    )
+
+    await createFile(
+      'app/components/b/wrapper.tsx',
+      `
+      import Shared from "./shared"
+      export default function WrapperB() {
+        return <Shared />
+      }
+    `
+    )
+
+    const routePath = await createFile(
+      'app/routes/importer-cache.tsx',
+      `
+      import WrapperA from "../components/a/wrapper.tsx"
+      import WrapperB from "../components/b/wrapper.tsx"
+      export default function Page() {
+        return (
+          <>
+            <WrapperA />
+            <WrapperB />
+          </>
+        )
+      }
+    `
+    )
+
+    const routeSource = await fs.readFile(routePath, 'utf-8')
+    const plugin = await setupPlugin()
+    const result = await callTransform(plugin, routePath, routeSource)
+
+    expect(result).not.toBeUndefined()
+    expect(result.code).toContain(IMPORTING_ISLANDS_ID)
+  })
 })

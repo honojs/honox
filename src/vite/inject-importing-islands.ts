@@ -29,7 +29,7 @@ export async function injectImportingIslands(
   const islandDir = options?.islandDir ?? '/app/islands'
   let root = ''
   let config: ResolvedConfig
-  const resolvedCache = new Map<string, true>()
+  const resolvedCache = new Map<string, Promise<ResolvedId | null>>()
   const cache = new Map<string, string>()
   const depTreeCache = new Map<string, string[]>()
 
@@ -106,12 +106,15 @@ export async function injectImportingIslands(
       }
 
       const resolve = async (importee: string, importer?: string) => {
-        if (resolvedCache.has(importee)) {
-          return this.resolve(importee)
+        const cacheKey = `${importee}\0${importer ?? ''}`
+        const cached = resolvedCache.get(cacheKey)
+
+        if (cached) {
+          return cached
         }
-        const resolvedId = await this.resolve(importee, importer)
-        // Cache to prevent infinite loops in recursive calls.
-        resolvedCache.set(importee, true)
+
+        const resolvedId = this.resolve(importee, importer) as Promise<ResolvedId | null>
+        resolvedCache.set(cacheKey, resolvedId)
         return resolvedId
       }
 
