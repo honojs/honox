@@ -1,17 +1,23 @@
-// @ts-expect-error don't use types
-import _generate from '@babel/generator'
+import type * as BabelGenerator from '@babel/generator'
 import { parse } from '@babel/parser'
+import {
+  booleanLiteral,
+  exportNamedDeclaration,
+  identifier,
+  variableDeclaration,
+  variableDeclarator,
+} from '@babel/types'
 import precinct from 'precinct'
 import { normalizePath } from 'vite'
 import type { Plugin, ResolvedConfig } from 'vite'
 import { readFile } from 'fs/promises'
+import { createRequire } from 'node:module'
 import path from 'path'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
 import { matchIslandComponentId } from './utils/path.js'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const generate = (_generate.default as typeof _generate) ?? _generate
+const require = createRequire(import.meta.url)
+const generate: typeof BabelGenerator.default = require('@babel/generator').default
 
 type InjectImportingIslandsOptions = {
   appDir?: string
@@ -51,7 +57,7 @@ export async function injectImportingIslands(
 
       const currentFileDeps = precinct(cache[depPath], {
         type: 'tsx',
-      }) as string[]
+      })
 
       const childDeps = await Promise.all(
         currentFileDeps.map(async (file) => {
@@ -107,22 +113,12 @@ export async function injectImportingIslands(
         plugins: ['jsx', 'typescript'],
       })
 
-      const hasIslandsNode = {
-        type: 'ExportNamedDeclaration',
-        declaration: {
-          type: 'VariableDeclaration',
-          declarations: [
-            {
-              type: 'VariableDeclarator',
-              id: { type: 'Identifier', name: IMPORTING_ISLANDS_ID },
-              init: { type: 'BooleanLiteral', value: true },
-            },
-          ],
-          kind: 'const',
-        },
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ast.program.body.push(hasIslandsNode as any)
+      const hasIslandsNode = exportNamedDeclaration(
+        variableDeclaration('const', [
+          variableDeclarator(identifier(IMPORTING_ISLANDS_ID), booleanLiteral(true)),
+        ])
+      )
+      ast.program.body.push(hasIslandsNode)
 
       const output = generate(ast, {}, sourceCode)
       return {

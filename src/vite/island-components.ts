@@ -1,8 +1,6 @@
-// @ts-expect-error don't use types
-import _generate from '@babel/generator'
+import type * as BabelGenerator from '@babel/generator'
 import { parse } from '@babel/parser'
-// @ts-expect-error don't use types
-import _traverse from '@babel/traverse'
+import type * as BabelTraverse from '@babel/traverse'
 import {
   blockStatement,
   conditionalExpression,
@@ -21,6 +19,7 @@ import {
   jsxOpeningElement,
   jsxSpreadAttribute,
   memberExpression,
+  metaProperty,
   returnStatement,
   stringLiteral,
   variableDeclaration,
@@ -29,19 +28,18 @@ import {
 import { parse as parseJsonc } from 'jsonc-parser'
 import type { Plugin } from 'vite'
 import fs from 'fs/promises'
+import { createRequire } from 'node:module'
 import path from 'path'
 import { isComponentName, matchIslandComponentId } from './utils/path.js'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const generate = (_generate.default as typeof _generate) ?? _generate
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const traverse = (_traverse.default as typeof _traverse) ?? _traverse
+
+const require = createRequire(import.meta.url)
+const generate: typeof BabelGenerator.default = require('@babel/generator').default
+const traverse: typeof BabelTraverse.default = require('@babel/traverse').default
 
 function addSSRCheck(funcName: string, componentName: string, componentExport?: string) {
   const isSSR = memberExpression(
-    memberExpression(identifier('import'), identifier('meta')),
-    identifier('env.SSR')
+    memberExpression(metaProperty(identifier('import'), identifier('meta')), identifier('env')),
+    identifier('SSR')
   )
 
   const props = [
@@ -79,7 +77,6 @@ export const transformJsxTags = (contents: string, componentName: string) => {
     let isTransformed = false
 
     traverse(ast, {
-      // @ts-expect-error path is not typed
       ExportNamedDeclaration(path) {
         if (path.node.declaration?.type === 'FunctionDeclaration') {
           // transform `export function NamedFunction() {}`
@@ -134,7 +131,6 @@ export const transformJsxTags = (contents: string, componentName: string) => {
           specifier.local.name = wrappedFunctionId.name
         }
       },
-      // @ts-expect-error path is not typed
       ExportDefaultDeclaration(path) {
         const declarationType = path.node.declaration.type
         if (

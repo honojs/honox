@@ -94,10 +94,10 @@
   },
   "homepage": "https://hono.dev",
   "dependencies": {
-    "@babel/generator": "7.25.6",
-    "@babel/parser": "7.25.6",
-    "@babel/traverse": "7.25.6",
-    "@babel/types": "7.25.6",
+    "@babel/generator": "7.29.1",
+    "@babel/parser": "7.29.3",
+    "@babel/traverse": "7.29.0",
+    "@babel/types": "7.29.0",
     "@hono/vite-dev-server": "^0.25.1",
     "jsonc-parser": "3.3.1",
     "precinct": "12.2.0"
@@ -115,6 +115,8 @@
     "@hono/eslint-config": "^1.1.1",
     "@mdx-js/rollup": "^3.0.0",
     "@playwright/test": "^1.42.0",
+    "@types/babel__generator": "7.27.0",
+    "@types/babel__traverse": "7.28.0",
     "@types/node": "^20.10.5",
     "eslint": "^9.23.0",
     "glob": "^10.3.10",
