@@ -17,13 +17,13 @@ import { filterByPattern } from './utils/filter.js'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FileCallback = () => Promise<Record<string, Promise<any>>>
 
-export type ClientOptions = {
-  hydrate?: Hydrate
-  createElement?: CreateElement
+export type ClientOptions<E = Node> = {
+  hydrate?: Hydrate<E>
+  createElement?: CreateElement<E>
   /**
    * Create "children" attribute of a component from a list of child nodes
    */
-  createChildren?: CreateChildren
+  createChildren?: CreateChildren<E>
   /**
    * Trigger hydration on your own
    */
@@ -35,7 +35,7 @@ export type ClientOptions = {
   island_root?: string
 }
 
-export const createClient = async (options?: ClientOptions) => {
+export const createClient = async <E = Node>(options?: ClientOptions<E>) => {
   const FILES =
     options?.ISLAND_FILES ??
     filterByPattern(
@@ -82,8 +82,8 @@ export const createClient = async (options?: ClientOptions) => {
             let createChildren = options?.createChildren
             if (!createChildren) {
               const { buildCreateChildrenFn } = await import('./runtime')
-              createChildren = buildCreateChildrenFn(
-                createElement as CreateElement,
+              createChildren = buildCreateChildrenFn<E>(
+                createElement as CreateElement<E>,
                 async (name: string) => (await (FILES[`${name}`] as FileCallback)()).default
               )
             }

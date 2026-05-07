@@ -3,12 +3,12 @@ import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../co
 import type { CreateChildren, CreateElement, HydrateComponent } from '../types.js'
 
 type ImportComponent = (name: string) => Promise<Function | undefined>
-export const buildCreateChildrenFn = (
-  createElement: CreateElement,
+export const buildCreateChildrenFn = <E = Node>(
+  createElement: CreateElement<E>,
   importComponent: ImportComponent
-): CreateChildren => {
+): CreateChildren<E> => {
   let keyIndex = 0
-  const setChildrenFromTemplate = async (props: { children?: Node[] }, element: HTMLElement) => {
+  const setChildrenFromTemplate = async (props: { children?: E[] }, element: HTMLElement) => {
     const maybeTemplate = element.childNodes[element.childNodes.length - 1]
     if (
       maybeTemplate?.nodeName === 'TEMPLATE' &&
@@ -19,10 +19,10 @@ export const buildCreateChildrenFn = (
       )
     }
   }
-  const createElementFromHTMLElement = async (element: HTMLElement) => {
+  const createElementFromHTMLElement = async (element: HTMLElement): Promise<E> => {
     const props = {
       children: await createChildren(element.childNodes),
-    } as Record<string, string> & { children: Node[] }
+    } as Record<string, string> & { children: E[] }
     const attributes = element.attributes
     for (let i = 0; i < attributes.length; i++) {
       props[attributes[i].name] = attributes[i].value
@@ -32,22 +32,22 @@ export const buildCreateChildrenFn = (
       ...props,
     })
   }
-  const createChildren = async (childNodes: NodeListOf<ChildNode>): Promise<Node[]> => {
-    const children = []
+  const createChildren = async (childNodes: NodeListOf<ChildNode>): Promise<E[]> => {
+    const children: E[] = []
     for (let i = 0; i < childNodes.length; i++) {
       const child = childNodes[i] as HTMLElement
       if (child.nodeType === 8) {
         // skip comments
         continue
       } else if (child.nodeType === 3) {
-        // text node
-        children.push(child.textContent)
+        // text node — string is a valid child for hono/jsx and React; cast to E
+        children.push(child.textContent as E)
       } else if (child.nodeName === 'TEMPLATE' && child.id.match(/(?:H|E):\d+/)) {
         const placeholderElement = document.createElement('hono-placeholder')
         placeholderElement.style.display = 'none'
 
-        let resolve: (nodes: Node[]) => void
-        const promise = new Promise<Node[]>((r) => (resolve = r))
+        let resolve: (nodes: E[]) => void
+        const promise = new Promise<E[]>((r) => (resolve = r))
 
         // Suspense: replace content by `replaceWith` when resolved
         // ErrorBoundary: replace content by `replaceWith` when error
@@ -90,8 +90,8 @@ export const buildCreateChildrenFn = (
 
         // if no content available, wait for ErrorBoundary fallback content
         if (fallback.length === 0 && child.id.startsWith('E:')) {
-          let resolve: (nodes: Node[]) => void
-          const promise = new Promise<Node[]>((r) => (resolve = r))
+          let resolve: (nodes: E[]) => void
+          const promise = new Promise<E[]>((r) => (resolve = r))
           fallback = await createElement(Suspense, {
             fallback: [],
             children: [await createElement(() => use(promise), {})],
@@ -132,8 +132,7 @@ export const buildCreateChildrenFn = (
         }
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return children as any
+    return children
   }
 
   return createChildren
