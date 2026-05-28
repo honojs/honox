@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** JSX */
-export type CreateElement = (type: any, props: any) => Node | Promise<Node>
-export type Hydrate = (children: Node, parent: Element) => void | Promise<void>
-export type CreateChildren = (childNodes: NodeListOf<ChildNode>) => Node[] | Promise<Node[]>
+export type CreateElement<E = Node> = (type: any, props: any) => E | Promise<E>
+export type Hydrate<E = Node> = (children: E, parent: Element) => void | Promise<void>
+export type CreateChildren<E = Node> = (childNodes: NodeListOf<ChildNode>) => E[] | Promise<E[]>
 export type HydrateComponent = (doc: {
   querySelectorAll: typeof document.querySelectorAll
 }) => Promise<void>
