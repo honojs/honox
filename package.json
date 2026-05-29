@@ -103,10 +103,10 @@
     "precinct": "12.2.0"
   },
   "overrides": {
-    "@typescript-eslint/typescript-estree": "^8.19.0"
+    "@typescript-eslint/typescript-estree": "^8.60.0"
   },
   "resolutions": {
-    "@typescript-eslint/typescript-estree": "^8.19.0"
+    "@typescript-eslint/typescript-estree": "^8.60.0"
   },
   "peerDependencies": {
     "hono": ">=4.*"
