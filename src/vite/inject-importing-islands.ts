@@ -37,6 +37,7 @@ export async function injectImportingIslands(
   let config: ResolvedConfig
   const resolvedCache = new Map()
   const cache: Record<string, string> = {}
+  const depTreeCache = new Map<string, string[]>()
 
   const walkDependencyTree: (
     baseFile: string,
@@ -48,6 +49,14 @@ export async function injectImportingIslands(
         ? path.join(path.dirname(baseFile), dependencyFile) + '.tsx'
         : dependencyFile['id']
       : baseFile
+
+    // island components are never in node_modules; 
+    // skip to avoid pulling in hundreds of third-party files on every transform call.
+    if (depPath.includes('node_modules')) return []
+
+    // return the already-walked subtree instead of re-walking it.
+    if (depTreeCache.has(depPath)) return depTreeCache.get(depPath)!
+
     const deps = [depPath]
 
     try {
@@ -66,6 +75,7 @@ export async function injectImportingIslands(
         })
       )
       deps.push(...childDeps.flat())
+      depTreeCache.set(depPath, deps)
       return deps
     } catch {
       // file does not exist or is a directory
