@@ -18,7 +18,7 @@
     "format": "prettier --check \"src/**/*.{js,ts}\" \"mocks/**/*.{js,ts}\" \"test-*/**/*.{js,ts}\"",
     "format:fix": "prettier --write \"src/**/*.{js,ts}\" \"mocks/**/*.{js,ts}\" \"test-*/**/*.{js,ts}\"",
     "prerelease": "bun run test && bun run build",
-    "release": "np"
+    "release": "np --no-publish"
   },
   "files": [
     "dist"
