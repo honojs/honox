@@ -50,7 +50,7 @@ export async function injectImportingIslands(
         : dependencyFile['id']
       : baseFile
 
-    // island components are never in node_modules; 
+    // island components are never in node_modules;
     // skip to avoid pulling in hundreds of third-party files on every transform call.
     if (depPath.includes('node_modules')) return []
 
