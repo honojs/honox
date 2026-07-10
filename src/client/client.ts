@@ -12,6 +12,7 @@ import type {
   HydrateComponent,
   TriggerHydration,
 } from '../types.js'
+import { isTemplateElement } from './utils/dom.js'
 import { filterByPattern } from './utils/filter.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,11 +71,16 @@ export const createClient = async <E = Node>(options?: ClientOptions<E>) => {
           const props = JSON.parse(serializedProps ?? '{}') as Record<string, unknown>
 
           const hydrate = options?.hydrate ?? render
-          const createElement = options?.createElement ?? createElementHono
+          // The fallback cast is unsound when `E` is specialized without
+          // `options.createElement`: hono's `createElement` returns `JSXNode`,
+          // not `E`. Callers that customize `E` must supply their own
+          // `createElement` (and a matching `hydrate`).
+          const createElement = options?.createElement ?? (createElementHono as CreateElement<E>)
 
-          let maybeTemplate = element.childNodes[element.childNodes.length - 1]
-          while (maybeTemplate?.nodeName === 'TEMPLATE') {
-            const propKey = (maybeTemplate as HTMLElement).getAttribute(DATA_HONO_TEMPLATE)
+          let maybeTemplate: ChildNode | null | undefined =
+            element.childNodes[element.childNodes.length - 1]
+          while (isTemplateElement(maybeTemplate)) {
+            const propKey = maybeTemplate.getAttribute(DATA_HONO_TEMPLATE)
             if (propKey == null) {
               break
             }
@@ -82,16 +88,13 @@ export const createClient = async <E = Node>(options?: ClientOptions<E>) => {
             let createChildren = options?.createChildren
             if (!createChildren) {
               const { buildCreateChildrenFn } = await import('./runtime')
-              createChildren = buildCreateChildrenFn<E>(
-                createElement as CreateElement<E>,
-                async (name: string) => (await (FILES[`${name}`] as FileCallback)()).default
-              )
+              const importComponent = async (name: string) =>
+                (await (FILES[`${name}`] as FileCallback)()).default
+              createChildren = buildCreateChildrenFn<E>(createElement, importComponent)
             }
-            props[propKey] = await createChildren(
-              (maybeTemplate as HTMLTemplateElement).content.childNodes
-            )
+            props[propKey] = await createChildren(maybeTemplate.content.childNodes)
 
-            maybeTemplate = maybeTemplate.previousSibling as ChildNode
+            maybeTemplate = maybeTemplate.previousSibling
           }
 
           const newElem = await createElement(Component, props)

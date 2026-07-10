@@ -28,6 +28,7 @@
     "./client": "./dist/client/index.js",
     "./client/client": "./dist/client/client.js",
     "./client/runtime": "./dist/client/runtime.js",
+    "./client/utils/dom": "./dist/client/utils/dom.js",
     "./client/utils/filter": "./dist/client/utils/filter.js",
     "./constants": "./dist/constants.js",
     "./factory": "./dist/factory/index.js",
