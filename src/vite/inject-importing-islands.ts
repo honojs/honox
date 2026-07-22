@@ -35,8 +35,28 @@ export async function injectImportingIslands(
   const islandDir = options?.islandDir ?? '/app/islands'
   let root = ''
   let config: ResolvedConfig
-  const cache: Record<string, string> = {}
   const depTreeCache = new Map<string, string[]>()
+  // file path -> resolved direct dependencies. Memoized as a promise so that
+  // concurrent transforms resolve each file's imports at most once per build.
+  // Keyed by the importer file path (not the specifier), so relative specifiers
+  // shared across files are always resolved with the correct importer.
+  const fileDepsCache = new Map<string, Promise<(ResolvedId | string)[]>>()
+
+  const getFileDeps = (
+    depPath: string,
+    resolve: (path: string, importer?: string) => Promise<ResolvedId | null>
+  ): Promise<(ResolvedId | string)[]> => {
+    let deps = fileDepsCache.get(depPath)
+    if (!deps) {
+      deps = (async () => {
+        const source = (await readFile(depPath, { flag: '' })).toString()
+        const specifiers = precinct(source, { type: 'tsx' })
+        return Promise.all(specifiers.map(async (file) => (await resolve(file, depPath)) ?? file))
+      })()
+      fileDepsCache.set(depPath, deps)
+    }
+    return deps
+  }
 
   const walkDependencyTree = async (
     baseFile: string,
@@ -67,20 +87,9 @@ export async function injectImportingIslands(
       const deps = [depPath]
 
       try {
-        if (!cache[depPath]) {
-          cache[depPath] = (await readFile(depPath, { flag: '' })).toString()
-        }
+        const resolvedDeps = await getFileDeps(depPath, resolve)
 
-        const currentFileDeps = precinct(cache[depPath], {
-          type: 'tsx',
-        })
-
-        const childDeps = await Promise.all(
-          currentFileDeps.map(async (file) => {
-            const resolvedId = await resolve(file, depPath)
-            return await walk(depPath, resolvedId ?? file)
-          })
-        )
+        const childDeps = await Promise.all(resolvedDeps.map((dep) => walk(depPath, dep)))
         deps.push(...childDeps.flat())
         depTreeCache.set(depPath, deps)
         return deps
