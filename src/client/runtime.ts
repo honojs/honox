@@ -14,10 +14,7 @@ export const buildCreateChildrenFn = <E = Node>(
   importComponent: ImportComponent
 ): CreateChildren<E> => {
   let keyIndex = 0
-  const setChildrenFromTemplate = async (
-    props: Record<string, unknown>,
-    element: Element
-  ) => {
+  const setChildrenFromTemplate = async (props: Record<string, unknown>, element: Element) => {
     const maybeTemplate = element.childNodes[element.childNodes.length - 1]
     if (isTemplateElement(maybeTemplate)) {
       const propKey = maybeTemplate.getAttribute(DATA_HONO_TEMPLATE)
