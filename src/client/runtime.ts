@@ -15,11 +15,12 @@ export const buildCreateChildrenFn = <E = Node>(
 ): CreateChildren<E> => {
   let keyIndex = 0
   const setChildrenFromTemplate = async (props: Record<string, unknown>, element: Element) => {
-    const maybeTemplate = element.childNodes[element.childNodes.length - 1]
-    if (isTemplateElement(maybeTemplate)) {
-      const propKey = maybeTemplate.getAttribute(DATA_HONO_TEMPLATE)
-      if (propKey !== null) {
-        props[propKey] = await createChildren(maybeTemplate.content.childNodes)
+    for (const child of element.childNodes) {
+      if (isTemplateElement(child)) {
+        const propKey = child.getAttribute(DATA_HONO_TEMPLATE)
+        if (propKey !== null) {
+          props[propKey] = await createChildren(child.content.childNodes)
+        }
       }
     }
   }
