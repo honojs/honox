@@ -94,4 +94,19 @@ describe('buildCreateChildrenFn', () => {
       },
     })
   })
+
+  it('should not treat user templates as suspense placeholders', async () => {
+    const createElement = vi.fn((type, props) => ({ type, props }))
+    const importComponent = vi.fn()
+    const createChildren = buildCreateChildrenFn(createElement, importComponent)
+
+    const div = document.createElement('div')
+    div.innerHTML = '<template id="SEARCH:1"></template>'
+    const [child] = await createChildren(div.childNodes)
+
+    expect(child).toEqual({
+      type: 'TEMPLATE',
+      props: { children: [], id: 'SEARCH:1', key: 1 },
+    })
+  })
 })

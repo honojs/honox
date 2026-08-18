@@ -88,8 +88,10 @@ export const createClient = async <E = Node>(options?: ClientOptions<E>) => {
             let createChildren = options?.createChildren
             if (!createChildren) {
               const { buildCreateChildrenFn } = await import('./runtime')
-              const importComponent = async (name: string, exportName = 'default') =>
-                (await (FILES[`${name}`] as FileCallback)())[exportName]
+              const importComponent = async (name: string, exportName = 'default') => {
+                const fileCallback = FILES[name] as FileCallback | undefined
+                return fileCallback ? (await fileCallback())[exportName] : undefined
+              }
               createChildren = buildCreateChildrenFn<E>(createElement, importComponent)
             }
             props[propKey] = await createChildren(maybeTemplate.content.childNodes)
