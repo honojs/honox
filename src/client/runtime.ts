@@ -1,24 +1,27 @@
 import { Suspense, use } from 'hono/jsx/dom'
-import { COMPONENT_NAME, DATA_HONO_TEMPLATE, DATA_SERIALIZED_PROPS } from '../constants.js'
+import {
+  COMPONENT_EXPORT,
+  COMPONENT_NAME,
+  DATA_HONO_TEMPLATE,
+  DATA_SERIALIZED_PROPS,
+} from '../constants.js'
 import type { CreateChildren, CreateElement, HydrateComponent } from '../types.js'
 import { isComment, isElement, isProperText, isTemplateElement } from './utils/dom.js'
 
-type ImportComponent = (name: string) => Promise<Function | undefined>
+type ImportComponent = (name: string, exportName?: string) => Promise<Function | undefined>
 export const buildCreateChildrenFn = <E = Node>(
   createElement: CreateElement<E>,
   importComponent: ImportComponent
 ): CreateChildren<E> => {
   let keyIndex = 0
-  const setChildrenFromTemplate = async (
-    props: { children?: (string | E)[] },
-    element: Element
-  ) => {
-    const maybeTemplate = element.childNodes[element.childNodes.length - 1]
-    if (
-      isTemplateElement(maybeTemplate) &&
-      maybeTemplate.getAttribute(DATA_HONO_TEMPLATE) !== null
-    ) {
-      props.children = await createChildren(maybeTemplate.content.childNodes)
+  const setChildrenFromTemplate = async (props: Record<string, unknown>, element: Element) => {
+    for (const child of element.childNodes) {
+      if (isTemplateElement(child)) {
+        const propKey = child.getAttribute(DATA_HONO_TEMPLATE)
+        if (propKey !== null) {
+          props[propKey] = await createChildren(child.content.childNodes)
+        }
+      }
     }
   }
   const createElementFromDom = async (element: Element): Promise<E> => {
@@ -117,7 +120,8 @@ export const buildCreateChildrenFn = <E = Node>(
         let component: Function | undefined = undefined
         const componentName = child.getAttribute(COMPONENT_NAME)
         if (componentName) {
-          component = await importComponent(componentName)
+          const exportName = child.getAttribute(COMPONENT_EXPORT) || 'default'
+          component = await importComponent(componentName, exportName)
         }
         if (component) {
           const props = JSON.parse(child.getAttribute(DATA_SERIALIZED_PROPS) || '{}')
