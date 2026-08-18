@@ -45,7 +45,7 @@ export const buildCreateChildrenFn = <E = Node>(
         continue
       } else if (isProperText(child)) {
         children.push(child.textContent)
-      } else if (isTemplateElement(child) && child.id.match(/(?:H|E):\d+/)) {
+      } else if (isTemplateElement(child) && child.id.match(/^(?:H|E):\d+$/)) {
         const placeholderElement = document.createElement('hono-placeholder')
         placeholderElement.style.display = 'none'
 
