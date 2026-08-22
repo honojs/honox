@@ -104,10 +104,10 @@
     "precinct": "12.2.0"
   },
   "overrides": {
-    "@typescript-eslint/typescript-estree": "^8.19.0"
+    "@typescript-eslint/typescript-estree": "^8.60.0"
   },
   "resolutions": {
-    "@typescript-eslint/typescript-estree": "^8.19.0"
+    "@typescript-eslint/typescript-estree": "^8.60.0"
   },
   "peerDependencies": {
     "hono": ">=4.*"
@@ -127,7 +127,7 @@
     "prettier": "^3.1.1",
     "publint": "^0.2.7",
     "tsdown": "^0.20.3",
-    "typescript": "^5.3.3",
+    "typescript": "^6.0.3",
     "vite": "^5.4.12",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.3"
