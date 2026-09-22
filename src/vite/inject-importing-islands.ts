@@ -103,6 +103,7 @@ export async function injectImportingIslands(
   }
   return {
     name: 'inject-importing-islands',
+    apply: (_config, { command, mode }) => command !== 'build' || mode !== 'client',
     configResolved: async (resolveConfig) => {
       config = resolveConfig
       appPath = path.join(config.root, options?.appDir ?? '/app')

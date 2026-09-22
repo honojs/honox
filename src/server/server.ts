@@ -4,7 +4,10 @@ import type { Env, ErrorHandler, MiddlewareHandler, NotFoundHandler } from 'hono
 import { createMiddleware } from 'hono/factory'
 import type { H } from 'hono/types'
 import { IMPORTING_ISLANDS_ID } from '../constants.js'
+import honoRenderer from '../renderer/server.js'
+import type { ServerRenderer } from '../types.js'
 import { contextStorage } from './context-storage.js'
+import { withServerRenderer } from './renderer-context.js'
 import {
   filePathToPath,
   groupByDirectory,
@@ -42,6 +45,8 @@ type BaseServerOptions<E extends Env = Env> = {
   ERROR: Record<string, ErrorFile>
   MIDDLEWARE: Record<string, MiddlewareFile>
   root: string
+  /** Renderer used for server components and island roots. Defaults to Hono JSX. */
+  renderer?: ServerRenderer<any>
   app?: Hono<E>
   init?: InitFunction<E>
   /**
@@ -61,6 +66,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
   const getRootPath = (dir: string) => filePathToPath(dir.replace(rootRegExp, ''))
 
   const app = options.app ?? new Hono()
+  const renderer = options.renderer ?? honoRenderer
   const trailingSlash = options.trailingSlash ?? false
 
   // Track applied middleware per directory to prevent duplication while allowing inheritance
@@ -78,7 +84,7 @@ export const createApp = <E extends Env>(options: BaseServerOptions<E>): Hono<E>
 
   // Share context by AsyncLocalStorage
   app.use(async function ShareContext(c, next) {
-    await contextStorage.run(c, () => next())
+    await withServerRenderer(renderer, () => contextStorage.run(c, () => next()))
   })
 
   if (options.init) {

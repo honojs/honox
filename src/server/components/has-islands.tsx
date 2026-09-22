@@ -7,5 +7,5 @@ export const HasIslands = ({ children }: { children: any }): any => {
   if (!c) {
     throw new Error('No context found')
   }
-  return <>{c.get(IMPORTING_ISLANDS_ID) && children}</>
+  return c.get(IMPORTING_ISLANDS_ID) ? children : null
 }

@@ -3,6 +3,7 @@ import type { Plugin } from 'vite'
 export function restartOnAddUnlink(): Plugin {
   return {
     name: 'restart-on-add-unlink',
+    apply: 'serve',
     configureServer(server) {
       server.watcher.add('./app/**')
       server.watcher.on('add', async () => {

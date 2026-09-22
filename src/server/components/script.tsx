@@ -1,4 +1,5 @@
 import type { Manifest } from 'vite'
+import { getServerRenderer } from '../renderer-context.js'
 import { ensureTrailngSlash } from '../utils/path.js'
 import { HasIslands } from './has-islands.js'
 
@@ -12,6 +13,7 @@ type Options = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Script = (options: Options): any => {
+  const renderer = getServerRenderer()
   const src = options.src
   if (options.prod ?? import.meta.env.PROD) {
     let manifest: Manifest | undefined = options.manifest
@@ -29,20 +31,23 @@ export const Script = (options: Options): any => {
     if (manifest) {
       const scriptInManifest = manifest[src.replace(/^\//, '')]
       if (scriptInManifest) {
-        return (
-          <HasIslands>
-            <script
-              type='module'
-              async={!!options.async}
-              src={`${ensureTrailngSlash(import.meta.env.BASE_URL)}${scriptInManifest.file}`}
-              nonce={options.nonce}
-            ></script>
-          </HasIslands>
-        )
+        return renderer.createElement(HasIslands, {
+          children: renderer.createElement('script', {
+            type: 'module',
+            async: !!options.async,
+            src: `${ensureTrailngSlash(import.meta.env.BASE_URL)}${scriptInManifest.file}`,
+            nonce: options.nonce,
+          }),
+        })
       }
     }
-    return <></>
+    return null
   } else {
-    return <script type='module' async={!!options.async} src={src} nonce={options.nonce}></script>
+    return renderer.createElement('script', {
+      type: 'module',
+      async: !!options.async,
+      src,
+      nonce: options.nonce,
+    })
   }
 }

@@ -137,3 +137,28 @@ test('/app/nested', async ({ page }) => {
   const contentH1 = await page.textContent('h1')
   expect(contentH1).toBe('Nested')
 })
+
+for (const [name, port] of [
+  ['React', 6174],
+  ['Preact', 6175],
+  ['Solid', 6176],
+  ['Vue', 6177],
+] as const) {
+  test(`${name} renderer keeps generated IDs stable across hydration`, async ({ page }) => {
+    await page.goto(`http://localhost:${port}/`)
+    await expect(page.locator('body')).toHaveAttribute('data-client-loaded', 'true')
+
+    const probes = page.locator('[data-probe]')
+    await expect(probes).toHaveCount(2)
+    const serverIds = await probes.evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute('data-render-id'))
+    )
+    expect(serverIds).not.toContain(null)
+    expect(new Set(serverIds).size).toBe(2)
+
+    for (const [index, probe] of (await probes.all()).entries()) {
+      await probe.click()
+      await expect(probe).toHaveAttribute('data-client-id', serverIds[index]!)
+    }
+  })
+}
