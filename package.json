@@ -110,7 +110,7 @@
     "@typescript-eslint/typescript-estree": "^8.19.0"
   },
   "peerDependencies": {
-    "hono": ">=4.*"
+    "hono": ">=4.* || ^5.0.0-0"
   },
   "devDependencies": {
     "@hono/eslint-config": "^1.1.1",
