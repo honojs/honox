@@ -1,0 +1,19 @@
+package.json
+  s_dd0ce7018ad684::t_ca29e3e2c98d85 113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "a200671461d29694cf51fed5fb5b2d071c823752",
+  "prompts": {},
+  "sessions": {
+    "s_dd0ce7018ad684": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "745c5cb5-c5a4-4e1d-985e-ded42606d5bf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Yusuke Wada <yusuke@kamawada.com>"
+    }
+  }
+}
