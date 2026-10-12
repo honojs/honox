@@ -5,6 +5,7 @@ import type { ServerOptions } from './server.js'
 export const createApp = <E extends Env>(options?: ServerOptions<E>) => {
   const newOptions = {
     root: options?.root ?? '/app/routes',
+    renderer: options?.renderer,
     app: options?.app,
     init: options?.init,
     trailingSlash: options?.trailingSlash,

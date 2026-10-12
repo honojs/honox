@@ -1,11 +1,17 @@
-import type { FC } from 'hono/jsx'
-import type { JSX } from 'hono/jsx/jsx-runtime'
 import type { Manifest } from 'vite'
+import { getServerRenderer } from '../renderer-context.js'
 import { ensureTrailngSlash } from '../utils/path.js'
 
-type Options = { manifest?: Manifest; prod?: boolean } & JSX.IntrinsicElements['link']
+type Options = {
+  href?: string
+  manifest?: Manifest
+  prod?: boolean
+  [attribute: string]: unknown
+}
 
-export const Link: FC<Options> = (options) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const Link = (options: Options): any => {
+  const renderer = getServerRenderer()
   let { href, prod, manifest, ...rest } = options
   if (href) {
     if (prod ?? import.meta.env.PROD) {
@@ -24,22 +30,20 @@ export const Link: FC<Options> = (options) => {
         const assetInManifest = manifest[href.replace(/^\//, '')]
         if (assetInManifest) {
           if (href.startsWith('/')) {
-            return (
-              <link
-                href={`${ensureTrailngSlash(import.meta.env.BASE_URL)}${assetInManifest.file}`}
-                {...rest}
-              ></link>
-            )
+            return renderer.createElement('link', {
+              href: `${ensureTrailngSlash(import.meta.env.BASE_URL)}${assetInManifest.file}`,
+              ...rest,
+            })
           }
 
-          return <link href={assetInManifest.file} {...rest}></link>
+          return renderer.createElement('link', { href: assetInManifest.file, ...rest })
         }
       }
-      return <></>
+      return null
     } else {
-      return <link href={href} {...rest}></link>
+      return renderer.createElement('link', { href, ...rest })
     }
   }
 
-  return <link {...rest} />
+  return renderer.createElement('link', rest)
 }

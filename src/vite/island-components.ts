@@ -25,9 +25,8 @@ import {
   variableDeclaration,
   variableDeclarator,
 } from '@babel/types'
-import { parse as parseJsonc } from 'jsonc-parser'
+import { normalizePath } from 'vite'
 import type { Plugin } from 'vite'
-import fs from 'fs/promises'
 import { createRequire } from 'node:module'
 import path from 'path'
 import { isComponentName, matchIslandComponentId } from './utils/path.js'
@@ -204,58 +203,27 @@ export type IslandComponentsOptions = {
    */
   isIsland?: IsIsland
   islandDir?: string
-  reactApiImportSource?: string
 }
 
 export function islandComponents(options?: IslandComponentsOptions): Plugin {
   let root = ''
-  let reactApiImportSource = options?.reactApiImportSource
   const islandDir = options?.islandDir ?? '/app/islands'
   return {
     name: 'transform-island-components',
-    configResolved: async (config) => {
+    apply: (_config, { command, mode }) => command !== 'build' || mode !== 'client',
+    enforce: 'pre',
+    configResolved: (config) => {
       root = config.root
-
-      if (!reactApiImportSource) {
-        const tsConfigFiles = ['deno.json', 'deno.jsonc', 'tsconfig.json']
-        let tsConfigRaw: string | undefined
-        for (const tsConfigFile of tsConfigFiles) {
-          try {
-            const tsConfigPath = path.resolve(process.cwd(), tsConfigFile)
-            tsConfigRaw = await fs.readFile(tsConfigPath, 'utf8')
-            break
-          } catch {}
-        }
-        if (!tsConfigRaw) {
-          console.warn('Cannot find tsconfig.json or deno.json(c)')
-          return
-        }
-        const tsConfig = parseJsonc(tsConfigRaw)
-
-        reactApiImportSource = tsConfig?.compilerOptions?.jsxImportSource
-        if (reactApiImportSource === 'hono/jsx/dom') {
-          reactApiImportSource = 'hono/jsx' // we should use hono/jsx instead of hono/jsx/dom
-        }
-      }
     },
 
-    async load(id) {
-      if (/\/honox\/.*?\/(?:server|vite)\/components\//.test(id)) {
-        if (!reactApiImportSource) {
-          return
-        }
-        const contents = await fs.readFile(id, 'utf-8')
-        return {
-          code: contents.replaceAll('hono/jsx', reactApiImportSource),
-          map: null,
-        }
-      }
-
-      const rootPath = '/' + path.relative(root, id).replace(/\\/g, '/')
+    /** Transform island source before renderer-specific JSX plugins run. */
+    transform(contents, id, { ssr } = {}) {
+      if (!ssr) return
+      const fileId = id.split('?')[0]
+      const rootPath = `/${normalizePath(path.relative(root, fileId))}`
       const match = matchIslandComponentId(rootPath, islandDir)
       if (match) {
         const componentName = match[0]
-        const contents = await fs.readFile(id, 'utf-8')
         const code = transformJsxTags(contents, componentName)
         if (code) {
           return {

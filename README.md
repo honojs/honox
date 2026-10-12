@@ -477,21 +477,53 @@ export default reactRenderer(({ children, title }) => {
 })
 ```
 
-The `app/client.ts` will be like this.
+Pass matching server and client renderers from their entry points.
+
+```tsx
+// app/server.ts
+import { Fragment, createContext, createElement, isValidElement, useContext } from 'react'
+import type { ReactNode } from 'react'
+import { renderToString } from 'react-dom/server'
+import { createApp } from 'honox/server'
+import type { IslandState, ServerRenderer } from 'honox/types'
+
+const IslandContext = createContext<IslandState>({ inIsland: false, inChildren: false })
+
+export default createApp({
+  renderer: {
+    createElement,
+    isElement: isValidElement,
+    island: {
+      useState: () => useContext(IslandContext),
+      wrap: (create, state) => createElement(IslandContext.Provider, { value: state }, create()),
+    },
+    renderRoot: (createRoot, createTemplates, root) => ({
+      dangerouslySetInnerHTML: {
+        __html:
+          renderToString(createRoot(), { identifierPrefix: root.id }) +
+          renderToString(createElement(Fragment, null, ...createTemplates())),
+      },
+    }),
+  } satisfies ServerRenderer<ReactNode>,
+})
+```
 
 ```ts
 // app/client.ts
+import { Suspense, createElement, use } from 'react'
+import type { ReactNode } from 'react'
+import { hydrateRoot } from 'react-dom/client'
 import { createClient } from 'honox/client'
+import type { ClientRenderer } from 'honox/types'
 
 createClient({
-  hydrate: async (elem, root) => {
-    const { hydrateRoot } = await import('react-dom/client')
-    hydrateRoot(root, elem)
-  },
-  createElement: async (type: any, props: any) => {
-    const { createElement } = await import('react')
-    return createElement(type, props)
-  },
+  renderer: {
+    createElement,
+    hydrateRoot: (element, parent, root) => {
+      hydrateRoot(parent, element, { identifierPrefix: root.id })
+    },
+    suspense: { component: Suspense, suspend: use },
+  } satisfies ClientRenderer<ReactNode>,
 })
 ```
 
@@ -506,6 +538,7 @@ import { defineConfig } from 'vite'
 export default defineConfig(({ mode }) => {
   if (mode === 'client') {
     return {
+      plugins: [honox({ jsxImportSource: 'react' })],
       build: {
         rollupOptions: {
           input: ['./app/client.ts'],
@@ -523,7 +556,7 @@ export default defineConfig(({ mode }) => {
       ssr: {
         external: ['react', 'react-dom'],
       },
-      plugins: [honox(), build()],
+      plugins: [honox({ jsxImportSource: 'react' }), build()],
     }
   }
 })
@@ -578,6 +611,7 @@ import { defineConfig } from 'vite'
 export default defineConfig(({ mode }) => {
   if (mode === 'client') {
     return {
+      plugins: [honox({ jsxImportSource: 'react' })],
       build: {
         rollupOptions: {
           input: ['./app/client.ts'],
@@ -591,7 +625,7 @@ export default defineConfig(({ mode }) => {
       ssr: {
         external: ['react', 'react-dom'],
       },
-      plugins: [honox(), build()],
+      plugins: [honox({ jsxImportSource: 'react' }), build()],
     }
   }
 })
@@ -901,7 +935,6 @@ If you want to include client-side scripts and assets:
 // vite.config.ts
 import ssg from '@hono/vite-ssg'
 import honox from 'honox/vite'
-import client from 'honox/vite/client'
 import { defineConfig } from 'vite'
 
 const entry = './app/server.ts'
@@ -909,7 +942,7 @@ const entry = './app/server.ts'
 export default defineConfig(({ mode }) => {
   if (mode === 'client') {
     return {
-      plugins: [client()],
+      plugins: [honox()],
     }
   } else {
     return {
