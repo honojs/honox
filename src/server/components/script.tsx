@@ -19,7 +19,7 @@ export const Script = (options: Options): any => {
       const MANIFEST = import.meta.glob<{ default: Manifest }>('/dist/.vite/manifest.json', {
         eager: true,
       })
-      for (const [, manifestFile] of Object.entries(MANIFEST)) {
+      for (const manifestFile of Object.values(MANIFEST)) {
         if (manifestFile['default']) {
           manifest = manifestFile['default']
           break
