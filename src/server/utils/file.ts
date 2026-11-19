@@ -96,7 +96,7 @@ export const listByDirectory = <T = unknown>(files: Record<string, T>) => {
   const directories = Object.keys(organizedFiles).sort((a, b) => b.length - a.length)
   for (const dir of directories) {
     for (const subDir of directories) {
-      if (subDir.startsWith(dir) && subDir !== dir) {
+      if (subDir.startsWith(dir + '/')) {
         const uniqueFiles = new Set([...organizedFiles[subDir], ...organizedFiles[dir]])
         organizedFiles[subDir] = [...uniqueFiles]
       }

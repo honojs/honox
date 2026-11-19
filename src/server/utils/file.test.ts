@@ -133,6 +133,25 @@ describe('listByDirectory', () => {
       ],
     })
   })
+
+  it('Should not list files of a sibling directory with the same name prefix', () => {
+    const files = {
+      '/app/routes/_renderer.tsx': 'foo',
+      '/app/routes/blog/_renderer.tsx': 'foo2',
+      '/app/routes/blog-archive/_renderer.tsx': 'foo3',
+    }
+
+    const result = listByDirectory(files)
+
+    expect(result).toEqual({
+      '/app/routes': ['/app/routes/_renderer.tsx'],
+      '/app/routes/blog': ['/app/routes/blog/_renderer.tsx', '/app/routes/_renderer.tsx'],
+      '/app/routes/blog-archive': [
+        '/app/routes/blog-archive/_renderer.tsx',
+        '/app/routes/_renderer.tsx',
+      ],
+    })
+  })
 })
 
 describe('pathToDirectoryPath', () => {
