@@ -317,4 +317,84 @@ describe('injectImportingIslands', () => {
     expect(result).not.toBeUndefined()
     expect(result.code).toContain(IMPORTING_ISLANDS_ID)
   })
+
+  it('should inject flag for a route that reaches an island only through a circular import', async () => {
+    await createFile(
+      'app/islands/$counter.tsx',
+      'export default function Counter() { return <div>counter</div> }'
+    )
+    await createFile(
+      'app/components/a.ts',
+      'import "./b.js"; import Counter from "../islands/$counter.js"; export { Counter }'
+    )
+    await createFile('app/components/b.ts', 'import "./a.js"; export const b = 1')
+    const routeA = await createFile(
+      'app/routes/a.tsx',
+      'import "../components/a.js"; export default function Page() { return <div /> }'
+    )
+    const routeB = await createFile(
+      'app/routes/b.tsx',
+      'import "../components/b.js"; export default function Page() { return <div /> }'
+    )
+
+    const plugin = await setupPlugin()
+    const resultA = await callTransform(plugin, routeA, await fs.readFile(routeA, 'utf-8'))
+    const resultB = await callTransform(plugin, routeB, await fs.readFile(routeB, 'utf-8'))
+
+    expect(resultA?.code).toContain(IMPORTING_ISLANDS_ID)
+    expect(resultB?.code).toContain(IMPORTING_ISLANDS_ID)
+  })
+
+  it('should inject flag for a route whose dependency was walked concurrently with a sibling', async () => {
+    await createFile(
+      'app/islands/$counter.tsx',
+      'export default function Counter() { return <div>counter</div> }'
+    )
+    await createFile(
+      'app/components/shared.ts',
+      'import Counter from "../islands/$counter.js"; export { Counter }'
+    )
+    await createFile('app/components/x.ts', 'import "./shared.js"; export const x = 1')
+    await createFile('app/components/y.ts', 'import "./shared.js"; export const y = 1')
+    const routeXY = await createFile(
+      'app/routes/xy.tsx',
+      'import "../components/x.js"; import "../components/y.js"; export default function Page() { return <div /> }'
+    )
+    const routeY = await createFile(
+      'app/routes/y.tsx',
+      'import "../components/y.js"; export default function Page() { return <div /> }'
+    )
+
+    // Fix the order: x.ts reaches shared.ts first, and y.ts reaches it while it is still being walked
+    let sharedInProgress!: () => void
+    const sharedStarted = new Promise<void>((resolve) => {
+      sharedInProgress = resolve
+    })
+    let release!: () => void
+    const yReachedShared = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const beforeResolve = async (importee: string, importer?: string) => {
+      if (importee === './shared.js' && importer?.endsWith('y.ts')) {
+        await sharedStarted
+        setTimeout(release, 0)
+      }
+      if (importee === '../islands/$counter.js') {
+        sharedInProgress()
+        await yReachedShared
+      }
+    }
+
+    const plugin = await setupPlugin()
+    const resultXY = await callTransform(
+      plugin,
+      routeXY,
+      await fs.readFile(routeXY, 'utf-8'),
+      beforeResolve
+    )
+    const resultY = await callTransform(plugin, routeY, await fs.readFile(routeY, 'utf-8'))
+
+    expect(resultXY?.code).toContain(IMPORTING_ISLANDS_ID)
+    expect(resultY?.code).toContain(IMPORTING_ISLANDS_ID)
+  })
 })
