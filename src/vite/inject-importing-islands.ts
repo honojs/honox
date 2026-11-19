@@ -35,7 +35,6 @@ export async function injectImportingIslands(
   const islandDir = options?.islandDir ?? '/app/islands'
   let root = ''
   let config: ResolvedConfig
-  const depTreeCache = new Map<string, string[]>()
   // file path -> resolved direct dependencies. Memoized as a promise so that
   // concurrent transforms resolve each file's imports at most once per build.
   // Keyed by the importer file path (not the specifier), so relative specifiers
@@ -58,16 +57,15 @@ export async function injectImportingIslands(
     return deps
   }
 
+  // Collects every file reachable from `baseFile`. Subtrees are not cached:
+  // a subtree cut short by `visited` is only complete for the walk that made it.
   const walkDependencyTree = async (
     baseFile: string,
     resolve: (path: string, importer?: string) => Promise<ResolvedId | null>
   ): Promise<string[]> => {
     const visited = new Set<string>()
 
-    const walk = async (
-      currentFile: string,
-      dependencyFile?: ResolvedId | string
-    ): Promise<string[]> => {
+    const walk = async (currentFile: string, dependencyFile?: ResolvedId | string) => {
       const depPath = dependencyFile
         ? typeof dependencyFile === 'string'
           ? path.join(path.dirname(currentFile), dependencyFile) + '.tsx'
@@ -76,30 +74,21 @@ export async function injectImportingIslands(
 
       // island components are never in node_modules;
       // skip to avoid pulling in hundreds of third-party files on every transform call.
-      if (depPath.includes('node_modules')) return []
+      if (depPath.includes('node_modules')) return
 
-      // return the already-walked subtree instead of re-walking it.
-      if (depTreeCache.has(depPath)) return depTreeCache.get(depPath)!
-
-      if (visited.has(depPath)) return []
+      if (visited.has(depPath)) return
       visited.add(depPath)
-
-      const deps = [depPath]
 
       try {
         const resolvedDeps = await getFileDeps(depPath, resolve)
-
-        const childDeps = await Promise.all(resolvedDeps.map((dep) => walk(depPath, dep)))
-        deps.push(...childDeps.flat())
-        depTreeCache.set(depPath, deps)
-        return deps
+        await Promise.all(resolvedDeps.map((dep) => walk(depPath, dep)))
       } catch {
         // file does not exist or is a directory
-        return deps
       }
     }
 
-    return walk(baseFile)
+    await walk(baseFile)
+    return [...visited]
   }
   return {
     name: 'inject-importing-islands',
@@ -117,7 +106,7 @@ export async function injectImportingIslands(
 
       const hasIslandsImport = (
         await Promise.all(
-          (await walkDependencyTree(id, resolve)).flat().map(async (x) => {
+          (await walkDependencyTree(id, resolve)).map(async (x) => {
             const rootPath = '/' + path.relative(root, normalizePath(x)).replace(/\\/g, '/')
             return matchIslandComponentId(rootPath, islandDir)
           })
